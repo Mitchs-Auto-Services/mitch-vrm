@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Mitch’s Auto – Check my reg</title>
+<style>
+  body{font-family:system-ui,Arial,sans-serif;max-width:720px;margin:24px auto;padding:0 16px}
+  .card{border:1px solid #ddd;border-radius:8px;padding:16px;margin:12px 0}
+  .row{display:flex;gap:8px}
+  input,select,button{padding:10px;border:1px solid #ccc;border-radius:6px}
+  button{cursor:pointer}
+  .hint{color:#666;font-size:0.9rem}
+  .price{font-weight:700}
+</style>
+<h1>Find services for your exact car</h1>
+
+<div class="card">
+  <form id="vrmForm">
+    <label>Registration (VRM)</label>
+    <div class="row">
+      <input id="vrm" placeholder="e.g. AB12 CDE" required />
+      <button type="submit">Look up</button>
+    </div>
+    <div class="hint">We use official DVLA data. No spam.</div>
+  </form>
+</div>
+
+<div id="vehicle" class="card" style="display:none"></div>
+
+<div id="services" class="card" style="display:none">
+  <label>Select a service</label>
+  <select id="service">
+    <option value="">— choose —</option>
+    <option value="diagnostics">Diagnostics (flat)</option>
+    <option value="oil">Oil & Filter Change (from)</option>
+    <option value="brakes_front">Front Brake Pads (from)</option>
+    <option value="battery">Battery Replacement (from)</option>
+    <option value="inspection">General Inspection (per hour)</option>
+  </select>
+  <div id="pricing" style="margin-top:8px"></div>
+  <button id="quoteBtn" style="margin-top:12px;display:none">Get exact quote</button>
+  <div class="hint">Parts priced to your reg; fixed quote before work starts.</div>
+</div>
+
+<script>
+  // CHANGE THESE IF YOU LIKE
+  const PRICES = { labourHourly: 55, diagnosticsFlat: 50, oilFrom: 40, brakesFrontFrom: 60, batteryFrom: 35 };
+
+  // We'll replace API_URL after deployment
+  let API_URL = '/api/vrm';
+
+  document.getElementById("vrmForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const vrm = document.getElementById("vrm").value.trim();
+    const out = document.getElementById("vehicle");
+    out.style.display = "block";
+    out.textContent = "Looking up vehicle…";
+    try {
+      const res = await fetch(API_URL, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ vrm }) });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data && (data.message || data.error) || "Lookup failed");
+
+      out.innerHTML = `
+        <strong>${data.make || ""} ${data.model || ""}</strong>
+        <div>${data.fuelType || ""} • ${data.engineCapacity ? (data.engineCapacity/1000 + "L") : ""} • ${data.colour || ""}</div>
+        <div class="hint">Reg: ${vrm.toUpperCase()}</div>
+      `;
+      document.getElementById("services").style.display = "block";
+    } catch(err){
+      out.textContent = err.message || "Couldn’t find vehicle.";
+    }
+  });
+
+  document.getElementById("service").addEventListener("change", (e) => {
+    const v = e.target.value, p = document.getElementById("pricing"), btn = document.getElementById("quoteBtn");
+    btn.style.display = v ? "inline-block" : "none";
+    if (v === "diagnostics") p.innerHTML = `<span class="price">£${PRICES.diagnosticsFlat}</span> (labour flat)`;
+    else if (v === "oil") p.innerHTML = `Labour <span class="price">from £${PRICES.oilFrom}</span> + parts at cost`;
+    else if (v === "brakes_front") p.innerHTML = `Labour <span class="price">from £${PRICES.brakesFrontFrom}</span> + pads/discs priced to your reg`;
+    else if (v === "battery") p.innerHTML = `Labour <span class="price">from £${PRICES.batteryFrom}</span> + battery priced to your reg`;
+    else if (v === "inspection") p.innerHTML = `Labour <span class="price">£${PRICES.labourHourly}/hr</span> + parts if needed`;
+    else p.textContent = "";
+  });
+
+  document.getElementById("quoteBtn").addEventListener("click", () => {
+    const vrm = document.getElementById("vrm").value.trim().toUpperCase();
+    const svc = document.getElementById("service").value;
+    const url = `mailto:bookings@mitchautoservices.co.uk?subject=Quote%20request%20${vrm}&body=VRM:%20${vrm}%0AService:%20${svc}`;
+    window.location.href = url;
+  });
+</script>
+</html>

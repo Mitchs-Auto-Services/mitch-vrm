@@ -1,92 +1,303 @@
 <!doctype html>
 <html lang="en">
+<head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Mitch’s Auto – Check my reg</title>
+<title>Mitch’s Auto Services – Check My Reg</title>
+<meta name="description" content="Mobile mechanic for Stockton-on-Tees. Instantly check your car by number plate using official DVLA data, then choose a service with clear labour-from pricing. Parts matched to your reg." />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔧</text></svg>">
+
 <style>
-  body{font-family:system-ui,Arial,sans-serif;max-width:720px;margin:24px auto;padding:0 16px}
-  .card{border:1px solid #ddd;border-radius:8px;padding:16px;margin:12px 0}
-  .row{display:flex;gap:8px}
-  input,select,button{padding:10px;border:1px solid #ccc;border-radius:6px}
-  button{cursor:pointer}
-  .hint{color:#666;font-size:0.9rem}
-  .price{font-weight:700}
+  :root{
+    --brand:#F06407;      /* your orange */
+    --ink:#EDEDED;        /* light text on dark */
+    --bg:#0b0e13;
+    --card:#121720;
+    --muted:#9aa1ac;
+    --accent:#4A4443;     /* your charcoal accent */
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:linear-gradient(180deg,#0b0e13,#101622);color:var(--ink);font-family:system-ui, Inter, Arial, sans-serif}
+  .wrap{max-width:1000px;margin:0 auto;padding:22px 16px 40px}
+  header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;gap:10px}
+  .id{display:flex;align-items:center;gap:12px}
+  .id img{width:44px;height:44px;border-radius:10px;object-fit:cover;border:2px solid var(--brand)}
+  .id .name{font-weight:900;letter-spacing:.2px}
+  .badge{background:rgba(240,100,7,.15);color:#ffd9c5;border:1px dashed var(--brand);padding:6px 10px;border-radius:999px;font-size:12px}
+  .card{background:var(--card);border:1px solid #202a37;border-radius:16px;padding:18px;margin-top:12px}
+  h1{font-size:clamp(22px,3.6vw,34px);margin:0 0 8px}
+  p.lead{margin:0 0 12px;color:var(--muted)}
+  label{display:block;font-weight:700;margin:6px 0}
+  input,select,button{padding:12px;border-radius:10px;border:1px solid #2a3544;background:#0d121a;color:var(--ink);font-size:16px}
+  input:focus,select:focus{outline:2px solid var(--brand)}
+  button{cursor:pointer;background:var(--brand);color:#111;font-weight:800;border:none}
+  button[disabled]{opacity:.6;cursor:not-allowed}
+  small.hint{color:var(--muted)}
+  .grid{display:grid;gap:14px}
+  @media(min-width:920px){.grid{grid-template-columns:1.2fr .8fr}}
+  .plate{display:flex;gap:10px;align-items:center;background:#161b25;border:1px solid #2a3544;padding:10px;border-radius:12px}
+  .plate::before{content:"GB";font-weight:800;background:#1b3ea5;color:#fff;border-radius:6px;padding:6px 8px}
+  .plate input{flex:1;text-transform:uppercase;letter-spacing:2px}
+  .skeleton{height:16px;background:#18202b;border-radius:6px;animation:pulse 1.2s infinite}
+  @keyframes pulse{0%{opacity:.6}50%{opacity:1}100%{opacity:.6}}
+  .muted{color:var(--muted)}
+  .tag{font-size:12px;border:1px solid #2a3544;color:var(--muted);padding:6px 8px;border-radius:999px}
+  .price{font-weight:900}
+  .flow{display:grid;gap:10px;margin-top:8px}
+  .row{display:flex;gap:8px;flex-wrap:wrap}
+  .radiochip{display:inline-flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid #344155;border-radius:10px;background:#0e141d;cursor:pointer}
+  .radiochip input{accent-color:var(--brand)}
+  .cta{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+  footer{margin-top:18px;color:var(--muted);font-size:14px}
+  a{color:#ffd6bf}
+  .accent{color:#d9d5d4}
+  .accent b{color:#fff}
+  .warranty{margin-top:8px}
+  .disclaimer{font-size:12px;color:#8690a0}
 </style>
-<h1>Find services for your exact car</h1>
-
-<div class="card">
-  <form id="vrmForm">
-    <label>Registration (VRM)</label>
-    <div class="row">
-      <input id="vrm" placeholder="e.g. AB12 CDE" required />
-      <button type="submit">Look up</button>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="id">
+      <img src="/brand.png" alt="Mitch’s Auto Services logo">
+      <div class="name">Mitch’s Auto Services</div>
     </div>
-    <div class="hint">We use official DVLA data. No spam.</div>
-  </form>
-</div>
+    <div class="badge">Mobile mechanic • 15‑mile radius from Stockton‑on‑Tees</div>
+  </header>
 
-<div id="vehicle" class="card" style="display:none"></div>
+  <div class="grid">
+    <!-- LEFT: Lookup + Mini-flow -->
+    <section class="card">
+      <h1>Check your number plate & get the right service</h1>
+      <p class="lead">We use <strong>official DVLA data</strong> to identify your exact vehicle. You’ll see labour‑from pricing; parts are matched to your reg at cost with a fixed quote before work starts.</p>
 
-<div id="services" class="card" style="display:none">
-  <label>Select a service</label>
-  <select id="service">
-    <option value="">— choose —</option>
-    <option value="diagnostics">Diagnostics (flat)</option>
-    <option value="oil">Oil & Filter Change (from)</option>
-    <option value="brakes_front">Front Brake Pads (from)</option>
-    <option value="battery">Battery Replacement (from)</option>
-    <option value="inspection">General Inspection (per hour)</option>
-  </select>
-  <div id="pricing" style="margin-top:8px"></div>
-  <button id="quoteBtn" style="margin-top:12px;display:none">Get exact quote</button>
-  <div class="hint">Parts priced to your reg; fixed quote before work starts.</div>
+      <!-- STEP 1: VRM -->
+      <form id="vrmForm" novalidate>
+        <label for="vrm">Step 1 — Enter your registration</label>
+        <div class="plate">
+          <input id="vrm" placeholder="e.g. AB12 CDE" inputmode="latin-prose" maxlength="8" autocomplete="off" required />
+          <button id="lookupBtn" type="submit">Look up</button>
+        </div>
+        <small class="hint">Tip: remove spaces if it doesn’t find it first time.</small>
+      </form>
+
+      <div id="vehicleCard" style="margin-top:12px;display:none">
+        <div id="vehTitle"><div class="skeleton" style="width:240px;height:18px"></div></div>
+        <div id="vehMeta" class="muted" style="margin-top:4px"><div class="skeleton" style="width:300px;height:16px"></div></div>
+        <div id="vehReg" class="muted" style="margin-top:2px"></div>
+      </div>
+      <div id="error" style="margin-top:8px;color:#ff9c9c;display:none"></div>
+
+      <!-- STEP 2: Choose category (changes by fuel type) -->
+      <div id="step2" class="flow" style="display:none">
+        <label>Step 2 — What do you need help with?</label>
+        <div id="cats" class="row">
+          <!-- chips inserted by JS -->
+        </div>
+      </div>
+
+      <!-- STEP 3: Clarifier question + pricing + quote -->
+      <div id="step3" class="flow" style="display:none">
+        <label>Step 3 — A quick detail</label>
+        <div id="clarifiers" class="row"></div>
+
+        <div id="pricing" class="accent" style="margin-top:6px">Select an option above to see labour‑from pricing.</div>
+
+        <div class="warranty">
+          <label for="warr">Warranty options</label>
+          <select id="warr">
+            <option value="0">Standard 6 months (included)</option>
+            <option value="20">12 months (+£20)</option>
+            <option value="40">18 months (+£40)</option>
+          </select>
+          <div class="disclaimer">Warranty covers labour. Full details in our <a href="https://mitchsautoservices.com/page/terms-and-conditions" target="_blank" rel="noopener">Terms & Conditions</a>.</div>
+        </div>
+
+        <div class="cta">
+          <button id="quoteBtn" style="display:none">Get exact quote</button>
+          <a class="tag" href="https://mitchsautoservices.com/page/services" target="_blank" rel="noopener">Browse full service & price list</a>
+          <span class="tag">No hidden mark‑ups</span>
+          <span class="tag">Parts matched to your reg</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- RIGHT: Contact & trust -->
+    <aside class="card">
+      <label>Book or ask a question</label>
+      <div class="row" style="margin-top:6px">
+        <a href="tel:+447926725369"><button>Call 07926 725369</button></a>
+        <a href="mailto:support@mitchsautoservices.co.uk?subject=Service%20enquiry"><button>Email us</button></a>
+      </div>
+      <p class="muted" style="margin-top:10px">Mon–Sat • Mobile call‑outs across Stockton‑on‑Tees + 15 miles.</p>
+      <ul class="muted" style="margin:8px 0 0 18px">
+        <li>Honest labour pricing; parts at cost to your reg</li>
+        <li>Standard <strong>6‑month labour warranty</strong> (upgrade at checkout)</li>
+        <li>Upfront quotes — no surprises</li>
+      </ul>
+      <p class="muted" style="margin-top:10px">Read our <a href="https://mitchsautoservices.com/page/terms-and-conditions" target="_blank" rel="noopener">Terms & Conditions</a>.</p>
+    </aside>
+  </div>
+
+  <footer>
+    © Mitch’s Auto Services — Powered by DVLA Vehicle Enquiry. We don’t store your data on this page.
+  </footer>
 </div>
 
 <script>
-  // CHANGE THESE IF YOU LIKE
-  const PRICES = { labourHourly: 55, diagnosticsFlat: 50, oilFrom: 40, brakesFrontFrom: 60, batteryFrom: 35 };
+  // ===== CONFIG YOU CAN TWEAK =====
+  const API_URL = '/api/vrm';
 
-  // We'll replace API_URL after deployment
-  let API_URL = '/api/vrm';
+  // Base labour "from" prices — keep these simple; full list on your live Services page
+  const PRICES = {
+    diagnostics: 50,
+    oil: 40,
+    brakes_front: 60,
+    battery: 35,
+    dpf_clean: 80,
+    hybrid_check: 45,
+    inspection_hour: 55
+  };
 
-  document.getElementById("vrmForm").addEventListener("submit", async (e) => {
+  // Categories to show depending on fuel type
+  const CATS_DEFAULT = [
+    {id:'diagnostics', label:'Diagnostics'},
+    {id:'oil', label:'Oil & Filter'},
+    {id:'brakes', label:'Brakes'},
+    {id:'battery', label:'Battery/Starting'},
+    {id:'inspection', label:'General Inspection'}
+  ];
+  const CATS_DIESEL = [...CATS_DEFAULT, {id:'dpf', label:'DPF / Emissions'}];
+  const CATS_ELECTRIC = [
+    {id:'diagnostics', label:'Diagnostics'},
+    {id:'brakes', label:'Brakes'},
+    {id:'battery12', label:'12V Battery'},
+    {id:'inspection', label:'General Inspection'}
+  ];
+  const CATS_HYBRID = [...CATS_ELECTRIC, {id:'hybrid', label:'Hybrid Health Check'}];
+
+  // Clarifier questions per category (mini step)
+  const CLARIFIERS = {
+    diagnostics: ['Warning light on','Won’t start','Strange noise','Other'],
+    oil: ['Service due','Oil light on','Oil leak'],
+    brakes: ['Front issues','Rear issues','Noise','Low pedal','Not sure'],
+    battery: ['Slow crank','Clicking only','Completely dead','Not sure'],
+    battery12: ['12V low','Accessory power issues','Not sure'],
+    dpf: ['DPF light on','Power loss','Frequent regens','Not sure'],
+    hybrid: ['Check hybrid system','No start','Reduced power','Not sure'],
+    inspection: ['Pre‑purchase','Annual check','Specific fault','Not sure']
+  };
+
+  // ===== PAGE WIRING =====
+  const $ = (id) => document.getElementById(id);
+  const vrmInput=$('vrm'), lookupBtn=$('lookupBtn'), vehicleCard=$('vehicleCard'),
+        vehTitle=$('vehTitle'), vehMeta=$('vehMeta'), vehReg=$('vehReg'),
+        errorBox=$('error'), step2=$('step2'), step3=$('step3'),
+        catsDiv=$('cats'), clarifiersDiv=$('clarifiers'), pricing=$('pricing'),
+        quoteBtn=$('quoteBtn'), warrSel=$('warr');
+
+  let lastVRM = '', chosenCat=null, chosenClarifier=null, fuel='';
+
+  function normaliseVRM(v){ return (v||'').toUpperCase().replace(/\s+/g,'').replace(/[^A-Z0-9]/g,''); }
+
+  function renderCats(list){
+    catsDiv.innerHTML='';
+    list.forEach(c=>{
+      const id = 'cat_'+c.id;
+      const label = document.createElement('label');
+      label.className='radiochip';
+      label.innerHTML = `<input type="radio" name="cat" value="${c.id}"><span>${c.label}</span>`;
+      catsDiv.appendChild(label);
+    });
+  }
+  function renderClarifiers(catId){
+    clarifiersDiv.innerHTML='';
+    (CLARIFIERS[catId]||[]).forEach((txt,i)=>{
+      const label = document.createElement('label');
+      label.className='radiochip';
+      label.innerHTML = `<input type="radio" name="clar" value="${txt}"><span>${txt}</span>`;
+      clarifiersDiv.appendChild(label);
+    });
+  }
+  function setPricing(catId){
+    let text = 'Select an option above to see labour‑from pricing.';
+    if (catId==='diagnostics') text = `Diagnostics labour <span class="price">£${PRICES.diagnostics || 50}</span> (flat). Parts only if needed.`;
+    else if (catId==='oil') text = `Oil & Filter labour <span class="price">from £${PRICES.oil || 40}</span> + parts priced to your reg.`;
+    else if (catId==='brakes') text = `Brake job labour <span class="price">from £${PRICES.brakes_front || 60}</span> + pads/discs priced to your reg.`;
+    else if (catId==='battery' || catId==='battery12') text = `Battery labour <span class="price">from £${PRICES.battery || 35}</span> + battery priced to your reg.`;
+    else if (catId==='dpf') text = `DPF/Emissions labour <span class="price">from £${PRICES.dpf_clean || 80}</span> + parts/fluids if needed.`;
+    else if (catId==='hybrid') text = `Hybrid health check labour <span class="price">£${PRICES.hybrid_check || 45}</span>.`;
+    else if (catId==='inspection') text = `Inspection labour <span class="price">£${PRICES.inspection_hour || 55}/hr</span>.`;
+    pricing.innerHTML = text + ` <span class="muted">(Warranty upgrade: +£${Number(warrSel.value) || 0})</span>`;
+    quoteBtn.style.display='inline-block';
+  }
+
+  $('vrmForm').addEventListener('submit', async (e) => {
     e.preventDefault();
-    const vrm = document.getElementById("vrm").value.trim();
-    const out = document.getElementById("vehicle");
-    out.style.display = "block";
-    out.textContent = "Looking up vehicle…";
-    try {
-      const res = await fetch(API_URL, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ vrm }) });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data && (data.message || data.error) || "Lookup failed");
+    errorBox.style.display='none';
+    const raw = vrmInput.value.trim();
+    const vrm = normaliseVRM(raw);
+    if (vrm.length < 5){ errorBox.textContent='Please enter a valid UK registration.'; errorBox.style.display='block'; return; }
 
-      out.innerHTML = `
-        <strong>${data.make || ""} ${data.model || ""}</strong>
-        <div>${data.fuelType || ""} • ${data.engineCapacity ? (data.engineCapacity/1000 + "L") : ""} • ${data.colour || ""}</div>
-        <div class="hint">Reg: ${vrm.toUpperCase()}</div>
-      `;
-      document.getElementById("services").style.display = "block";
-    } catch(err){
-      out.textContent = err.message || "Couldn’t find vehicle.";
+    lookupBtn.disabled=true; lookupBtn.textContent='Looking…';
+    vehicleCard.style.display='block';
+    vehTitle.innerHTML = '<div class="skeleton" style="width:240px;height:18px"></div>';
+    vehMeta.innerHTML  = '<div class="skeleton" style="width:300px;height:16px"></div>';
+    vehReg.textContent = '';
+
+    try{
+      const res = await fetch(API_URL, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ vrm })});
+      const data = await res.json();
+      if(!res.ok) throw new Error(data?.message || data?.error || 'Lookup failed');
+
+      lastVRM = vrm;
+      const engine = data.engineCapacity ? (data.engineCapacity/1000).toFixed(1) + 'L' : '';
+      vehTitle.innerHTML = `<strong>${data.make || ''} ${data.model || ''}</strong>`;
+      vehMeta.innerHTML  = [data.fuelType, engine, data.colour].filter(Boolean).join(' • ') || '<span class="muted">Details unavailable</span>';
+      vehReg.textContent = 'Reg: ' + vrm;
+
+      fuel = String(data.fuelType||'').toLowerCase();
+      if (fuel.includes('diesel')) renderCats(CATS_DIESEL);
+      else if (fuel.includes('electric') && !fuel.includes('hybrid')) renderCats(CATS_ELECTRIC);
+      else if (fuel.includes('hybrid')) renderCats(CATS_HYBRID);
+      else renderCats(CATS_DEFAULT);
+
+      step2.style.display='block';
+      step3.style.display='none';
+      quoteBtn.style.display='none';
+      pricing.textContent='Select an option to see labour‑from pricing.';
+
+    }catch(err){
+      errorBox.textContent = err.message.includes('Forbidden') ? 'DVLA says “Forbidden”: your server isn’t sending a valid API key yet.' : err.message;
+      errorBox.style.display='block';
+      vehicleCard.style.display='none';
+    }finally{
+      lookupBtn.disabled=false; lookupBtn.textContent='Look up';
     }
   });
 
-  document.getElementById("service").addEventListener("change", (e) => {
-    const v = e.target.value, p = document.getElementById("pricing"), btn = document.getElementById("quoteBtn");
-    btn.style.display = v ? "inline-block" : "none";
-    if (v === "diagnostics") p.innerHTML = `<span class="price">£${PRICES.diagnosticsFlat}</span> (labour flat)`;
-    else if (v === "oil") p.innerHTML = `Labour <span class="price">from £${PRICES.oilFrom}</span> + parts at cost`;
-    else if (v === "brakes_front") p.innerHTML = `Labour <span class="price">from £${PRICES.brakesFrontFrom}</span> + pads/discs priced to your reg`;
-    else if (v === "battery") p.innerHTML = `Labour <span class="price">from £${PRICES.batteryFrom}</span> + battery priced to your reg`;
-    else if (v === "inspection") p.innerHTML = `Labour <span class="price">£${PRICES.labourHourly}/hr</span> + parts if needed`;
-    else p.textContent = "";
+  catsDiv.addEventListener('change', (e) => {
+    if (e.target.name!=='cat') return;
+    chosenCat = e.target.value;
+    renderClarifiers(chosenCat);
+    step3.style.display='block';
+    setPricing(chosenCat);
   });
 
-  document.getElementById("quoteBtn").addEventListener("click", () => {
-    const vrm = document.getElementById("vrm").value.trim().toUpperCase();
-    const svc = document.getElementById("service").value;
-    const url = `mailto:bookings@mitchautoservices.co.uk?subject=Quote%20request%20${vrm}&body=VRM:%20${vrm}%0AService:%20${svc}`;
+  clarifiersDiv.addEventListener('change', (e) => {
+    if (e.target.name!=='clar') return;
+    chosenClarifier = e.target.value;
+  });
+
+  warrSel.addEventListener('change', () => {
+    if (chosenCat) setPricing(chosenCat);
+  });
+
+  document.getElementById('quoteBtn').addEventListener('click', () => {
+    const url = `mailto:support@mitchsautoservices.co.uk?subject=Quote%20request%20${encodeURIComponent(lastVRM)}&body=VRM:%20${encodeURIComponent(lastVRM)}%0AService:%20${encodeURIComponent(chosenCat||'')}%0ADetail:%20${encodeURIComponent(chosenClarifier||'')}%0AWarranty%20upgrade:%20£${encodeURIComponent(warrSel.value)}`;
     window.location.href = url;
   });
 </script>
+</body>
 </html>

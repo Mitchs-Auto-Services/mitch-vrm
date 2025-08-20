@@ -24,11 +24,17 @@ export default async function handler(req, res) {
       }
     );
 
-    const data = await dvlaRes.json().catch(() => ({}));
+    const data = await dvlaRes.json().catch(() => null);
 
     if (!dvlaRes.ok) {
+      const message =
+        typeof data === 'string'
+          ? data
+          : typeof data?.message === 'string'
+          ? data.message
+          : null;
       return res.status(dvlaRes.status).json({
-        error: data?.message || data || 'DVLA lookup failed',
+        error: message || 'DVLA lookup failed',
       });
     }
 

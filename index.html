@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Mitch’s Auto Services – Mobile Mechanic • Stockton-on-Tees</title>
-<meta name="description" content="Mobile mechanic in Stockton-on-Tees (+15 mile radius). DVLA number-plate lookup, choose a service with clear 'from' pricing, review details, and request a quote via Email or WhatsApp.">
+<meta name="description" content="Mobile mechanic in Stockton-on-Tees within a 15 mile radius. DVLA number-plate lookup, choose a service with clear 'from' pricing, review details, and request a quote via Email or WhatsApp.">
 <style>
   :root{
     --brand:#F06407;    /* primary */
@@ -111,7 +111,7 @@
           <form id="vrmForm" novalidate>
             <label for="vrm">Registration (VRM)</label>
             <div class="plate">
-              <input id="vrm" placeholder="e.g. AB12 ABC" maxlength="8" autocomplete="off" required />
+              <input id="vrm" placeholder="e.g. AB12 CDE" maxlength="8" autocomplete="off" required />
               <button id="lookupBtn" type="submit">Look up</button>
             </div>
             <small class="fine">Tip: remove spaces if it doesn’t find it first time.</small>
@@ -242,7 +242,7 @@ const SERVICES = [
   { id:'pollen_filter',      label:'Dust/Pollen Filter Change',            priceFrom: 30.22 },
   { id:'oil_filter',         label:'Engine Oil and Filter Change',         priceFrom: 65.51 },
   { id:'fuel_filter',        label:'Fuel Filter Change',                   priceFrom: 40.36 },
-  { id:'lights',             label:'Headlights/Rear Lights Replacement',   priceFrom: 30.99 },  // ← id fixed to 'lights'
+  { id:'lights',             label:'Headlights/Rear Lights Replacement',   priceFrom: 30.99 },
   { id:'major_service',      label:'Major Service Package',                priceFrom: 350.33 },
   { id:'minor_service',      label:'Minor Service Package',                priceFrom: 115.69 },
   { id:'premium_service',    label:'Premium Service Package',              priceFrom: 340.33 },

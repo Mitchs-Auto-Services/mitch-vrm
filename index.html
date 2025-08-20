@@ -4,96 +4,495 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Mitch’s Auto Services – Mobile Mechanic • Stockton-on-Tees</title>
-<meta name="description" content="Mobile mechanic in Stockton-on-Tees (+15 mile radius). DVLA number-plate lookup, choose a service with clear 'from' pricing, review details, and request a quote via Email or WhatsApp.">
+<meta name="description" content="Mobile mechanic in Stockton-on-Tees (+15 miles). Check your car by number plate using official DVLA data. Choose a service, review details, and send a quote request via Email or WhatsApp. Transparent labour, parts matched to your registration.">
 <style>
-  :root {
-    --brand:#F06407;
-    --accent:#4A4443;
-    --ink:#EDEDED;
-    --bg:#0b0e13;
-    --card:#121720;
-    --muted:#9aa1ac;
-    --line:#223046;
-    --ok:#9cffb0;
-    --err:#ff9c9c;
+  :root{
+    --brand:#F06407;    /* primary */
+    --accent:#4A4443;   /* secondary */
+    --ink:#EDEDED;      /* text */
+    --bg:#0b0e13;       /* page bg */
+    --card:#121720;     /* card bg */
+    --muted:#9aa1ac;    /* secondary text */
+    --line:#223046;     /* borders */
+    --ok:#9cffb0;       /* success */
+    --err:#ff9c9c;      /* error */
   }
   *{box-sizing:border-box}
+  html,body{height:100%}
   body{margin:0;background:linear-gradient(180deg,var(--bg),#101623);color:var(--ink);font-family:system-ui, Inter, Arial, sans-serif;line-height:1.45}
-  a{color:#ffd6bf;text-decoration:none} a:hover{text-decoration:underline}
+
+  a{color:#ffd6bf;text-decoration:none}
+  a:hover{text-decoration:underline}
+
   .container{max-width:1140px;margin:0 auto;padding:20px 16px 48px}
+
+  /* HERO */
+  .hero{
+    background: radial-gradient(80% 60% at 15% 20%, rgba(240,100,7,.18), transparent 60%),
+                radial-gradient(70% 40% at 90% 0%, rgba(74,68,67,.3), transparent 60%),
+                linear-gradient(180deg, #0b0e13, #0f1625);
+    border-bottom:1px solid var(--line);
+  }
+  .hero-inner{max-width:1140px;margin:0 auto;padding:28px 16px 24px}
+  .topbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:18px;flex-wrap:wrap}
+  .brand{display:flex;align-items:center;gap:10px}
+  .brand .name{font-weight:900;letter-spacing:.2px;color:var(--brand);font-size:20px}
+  .badge{background:rgba(240,100,7,.15);color:#ffd9c5;border:1px dashed var(--brand);padding:6px 10px;border-radius:999px;font-size:12px;white-space:nowrap}
+  .hero-grid{display:grid;gap:16px;grid-template-columns:1fr}
+  @media(min-width:980px){.hero-grid{grid-template-columns:1.2fr .8fr}}
+  .hero-copy h1{font-size:clamp(26px,3.4vw,42px);margin:6px 0 8px}
+  .hero-copy p{color:var(--muted);margin:0 0 12px}
+  .trust{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  .trust span{border:1px solid var(--line);padding:6px 10px;border-radius:999px;color:var(--muted);font-size:12px}
+
+  /* CARDS & LAYOUT */
   .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px}
+  .section{margin-top:26px}
+  .section h2{margin:0 0 10px;font-size:clamp(18px,2.6vw,26px)}
+  .two{display:grid;gap:16px;grid-template-columns:1fr}
+  @media(min-width:900px){.two{grid-template-columns:1fr 1fr}}
+
+  /* FORM + FLOW */
   label{display:block;font-weight:700;margin:6px 0}
-  input,button{padding:12px;border-radius:10px;border:1px solid #2a3546;background:#0d121a;color:var(--ink);font-size:16px}
+  input,select,button{padding:12px;border-radius:10px;border:1px solid #2a3546;background:#0d121a;color:var(--ink);font-size:16px}
+  input:focus,select:focus{outline:2px solid var(--brand)}
   button{cursor:pointer;background:var(--brand);color:#111;font-weight:800;border:none}
+  button.ghost{background:transparent;border:1px solid var(--line);color:var(--ink)}
   button[disabled]{opacity:.6;cursor:not-allowed}
+  .plate{display:flex;gap:10px;align-items:center;background:#161b25;border:1px solid #2a3546;padding:10px;border-radius:12px}
+  .plate::before{content:"GB";font-weight:800;background:#1b3ea5;color:#fff;border-radius:6px;padding:6px 8px}
+  .stack{display:grid;gap:12px}
+  .chips{display:flex;gap:8px;flex-wrap:wrap}
+  .chip{display:inline-flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid #314056;border-radius:12px;background:#0e141d;cursor:pointer}
+  .chip input{accent-color:var(--brand)}
+  .skeleton{height:16px;background:#18202b;border-radius:6px;animation:pulse 1.2s infinite}
+  @keyframes pulse{0%{opacity:.6}50%{opacity:1}100%{opacity:.6}}
+  .muted{color:var(--muted)}
+  .fine{font-size:12px;color:#8a93a3}
   .err{color:var(--err)}
+  .ok{color:var(--ok)}
+  .kv{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  .tag{font-size:12px;border:1px solid var(--line);color:var(--muted);padding:6px 8px;border-radius:999px}
+
+  /* CONFIRM BOX */
+  .confirm{margin-top:12px;border:1px solid var(--line);border-radius:12px;padding:12px;background:#0f1520}
+  .confirm h3{margin:0 0 8px;font-size:18px}
+  .grid2{display:grid;grid-template-columns:1fr;gap:8px}
+  @media(min-width:620px){ .grid2{grid-template-columns:1fr 1fr} }
+  .row{display:flex;justify-content:space-between;gap:10px}
+
+  /* HOW IT WORKS & SIDEBAR */
+  .steps{display:grid;gap:10px}
+  .step{background:#0f1520;border:1px dashed var(--line);border-radius:12px;padding:12px}
+  .list{margin:8px 0 0 18px}
+  .grid3{display:grid;grid-template-columns:1fr;gap:12px}
+  @media(min-width:900px){.grid3{grid-template-columns:1fr 1fr 1fr}}
+
+  /* FOOTER */
+  footer{margin-top:28px;color:var(--muted);font-size:14px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:16px}
 </style>
 </head>
 <body>
 
-<div class="container">
-  <h1>Mitch’s Auto Services</h1>
-  <p>Enter your registration to check your vehicle via the <b>official DVLA database</b>.</p>
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="topbar">
+      <div class="brand"><div class="name">Mitch’s Auto Services</div></div>
+      <div class="badge">Mobile mechanic • Stockton‑on‑Tees + 15 miles</div>
+    </div>
 
-  <form id="vrmForm">
-    <label for="vrm">Registration (VRM)</label>
-    <input id="vrm" placeholder="e.g. AB12CDE" maxlength="8" required />
-    <button id="lookupBtn" type="submit">Look up</button>
-  </form>
+    <div class="hero-grid">
+      <div class="hero-copy">
+        <h1>Honest mobile mechanic — clear labour, parts priced to your reg</h1>
+        <p>Pop in your number plate to confirm the exact vehicle via the <b>official DVLA</b> database. Then pick a service, add a quick detail, and send your request by <b>Email</b> or <b>WhatsApp</b>. We’ll reply with a fixed quote before work starts.</p>
+        <div class="trust">
+          <span>Official DVLA vehicle lookup</span>
+          <span>Transparent labour (no hidden mark‑ups)</span>
+          <span>6‑month labour warranty (upgrade available)</span>
+          <span>Card payments accepted</span>
+        </div>
+      </div>
+      <div class="card">
+        <h2 style="margin:0 0 8px;font-size:20px">Start here — Check your number plate</h2>
+        <div class="stack">
+          <!-- STEP 1 -->
+          <form id="vrmForm" novalidate>
+            <label for="vrm">Registration (VRM)</label>
+            <div class="plate">
+              <input id="vrm" placeholder="e.g. AB12 CDE" maxlength="8" autocomplete="off" required />
+              <button id="lookupBtn" type="submit">Look up</button>
+            </div>
+            <small class="fine">Tip: remove spaces if it doesn’t find it first time.</small>
+          </form>
 
-  <div id="error" class="err" style="display:none;margin-top:10px"></div>
+          <div id="vehicleCard" style="display:none">
+            <div id="vehTitle"><div class="skeleton" style="width:240px;height:18px"></div></div>
+            <div id="vehMeta" class="muted" style="margin-top:4px"><div class="skeleton" style="width:300px;height:16px"></div></div>
+            <div id="vehReg" class="muted" style="margin-top:2px"></div>
+          </div>
+          <div id="error" class="err" style="margin-top:6px;display:none"></div>
 
-  <div id="vehicleCard" style="display:none;margin-top:20px">
-    <h2>Vehicle Details</h2>
-    <p id="vehTitle"></p>
-    <p id="vehMeta"></p>
-    <p id="vehReg"></p>
+          <!-- STEP 2 -->
+          <div id="step2" style="display:none">
+            <label>Choose a service</label>
+            <div id="serviceChips" class="chips"></div>
+          </div>
+
+          <!-- STEP 3 -->
+          <div id="step3" style="display:none">
+            <label>A quick detail</label>
+            <div id="clarifierChips" class="chips"></div>
+
+            <div id="pricing" class="muted" style="margin-top:6px">
+              We’ll match parts to your reg and send a fixed quote.
+            </div>
+
+            <div style="margin-top:10px">
+              <label for="warr">Warranty options</label>
+              <select id="warr">
+                <option value="0">6 months (included)</option>
+                <option value="20">12 months (+£20)</option>
+                <option value="40">18 months (+£40)</option>
+              </select>
+              <div class="fine">Warranty covers labour. Full details in our <a href="https://mitchsautoservices.com/page/terms-and-conditions" target="_blank" rel="noopener">Terms & Conditions</a>.</div>
+            </div>
+
+            <!-- REVIEW -->
+            <div class="confirm" id="confirmBox" style="display:none">
+              <h3>Review your request</h3>
+              <div class="grid2">
+                <div>
+                  <div class="row"><span class="muted">Registration</span><b id="c_vrm">—</b></div>
+                  <div class="row"><span class="muted">Vehicle</span><b id="c_vehicle">—</b></div>
+                  <div class="row"><span class="muted">Colour</span><b id="c_colour">—</b></div>
+                </div>
+                <div>
+                  <div class="row"><span class="muted">Service</span><b id="c_service">—</b></div>
+                  <div class="row"><span class="muted">Detail</span><b id="c_detail">—</b></div>
+                  <div class="row"><span class="muted">Warranty</span><b id="c_warranty">6 months (included)</b></div>
+                </div>
+              </div>
+              <div class="kv" style="margin-top:10px">
+                <button id="emailBtn" type="button">Send by Email</button>
+                <button id="waBtn" type="button">Send by WhatsApp</button>
+                <button id="editBtn" type="button" class="ghost">Go back and edit</button>
+              </div>
+              <div class="fine" style="margin-top:6px">We’ll reply with a fixed quote (labour + parts matched to your registration).</div>
+            </div>
+
+            <div class="kv" id="preConfirmBtns">
+              <button id="reviewBtn" type="button">Review &amp; continue</button>
+              <a class="tag" href="https://mitchsautoservices.com/page/services" target="_blank" rel="noopener">View full service list</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /hero-grid -->
   </div>
+</section>
+
+<!-- HOW IT WORKS / SIDEBAR -->
+<div class="container">
+  <section class="section two">
+    <div class="card">
+      <h2>How it works</h2>
+      <div class="steps">
+        <div class="step"><b>1) Check your reg.</b> We verify your vehicle against the DVLA so we quote the right parts first time.</div>
+        <div class="step"><b>2) Pick your service.</b> Choose from brakes, oil & filter, batteries, lights, full service packages, and more.</div>
+        <div class="step"><b>3) Tell us the symptom.</b> A quick detail like “front brakes” or “won’t start” helps us plan parts and time.</div>
+        <div class="step"><b>4) Get a fixed quote.</b> We price labour clearly and charge parts at fair market cost matched to your reg.</div>
+        <div class="step"><b>5) We come to you.</b> Mobile service around Stockton‑on‑Tees (+15 miles). Card payments accepted.</div>
+      </div>
+    </div>
+
+    <aside class="card">
+      <h2>Contact & hours</h2>
+      <div class="kv">
+        <a href="tel:+447926725369"><button type="button">Call 07926 725369</button></a>
+        <a href="mailto:support@mitchsautoservices.co.uk?subject=Service%20enquiry"><button type="button">Email us</button></a>
+      </div>
+      <p class="muted" style="margin-top:10px">Mon–Sat • Mobile call‑outs across Stockton‑on‑Tees and nearby towns (15‑mile radius).</p>
+      <ul class="list muted">
+        <li>Transparent labour; parts priced to your registration</li>
+        <li>Standard <b>6‑month labour warranty</b> (upgrade to 12 or 18 months)</li>
+        <li>Upfront quotes — no surprises</li>
+      </ul>
+      <p class="muted" style="margin-top:10px">See our <a href="https://mitchsautoservices.com/page/terms-and-conditions" target="_blank" rel="noopener">Terms & Conditions</a>.</p>
+    </aside>
+  </section>
+
+  <!-- SERVICES OVERVIEW -->
+  <section class="section">
+    <div class="card">
+      <h2>Popular services</h2>
+      <div class="grid3">
+        <div>
+          <ul class="list">
+            <li>Air Conditioning Top‑Up/Recharge</li>
+            <li>Air Filter Change</li>
+            <li>Battery Replacement</li>
+            <li>Brake Change</li>
+            <li>Brake Fluid Change</li>
+            <li>Coolant Change</li>
+          </ul>
+        </div>
+        <div>
+          <ul class="list">
+            <li>Engine Oil & Filter Change</li>
+            <li>Fuel Filter Change</li>
+            <li>Headlights/Rear Lights Replacement</li>
+            <li>Tyre Health Check</li>
+            <li>Wiper Motor Replacement</li>
+            <li>Dust/Pollen Filter Change</li>
+          </ul>
+        </div>
+        <div>
+          <ul class="list">
+            <li>Basic Service Package</li>
+            <li>Minor / Major / Premium Service Packages</li>
+            <li>Seasonal Maintenance Package</li>
+            <li>Car Refresh Service Package</li>
+            <li><a href="https://mitchsautoservices.com/page/services" target="_blank" rel="noopener">View the full list →</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WARRANTY & AREA -->
+  <section class="section two">
+    <div class="card">
+      <h2>Labour warranty</h2>
+      <p class="muted">Every job includes a <b>6‑month labour warranty</b>. You can upgrade when requesting a quote:</p>
+      <ul class="list muted">
+        <li>12 months (+£20)</li>
+        <li>18 months (+£40)</li>
+      </ul>
+      <p class="fine">Warranty covers labour. Full details in our <a href="https://mitchsautoservices.com/page/terms-and-conditions" target="_blank" rel="noopener">Terms & Conditions</a>.</p>
+    </div>
+    <div class="card">
+      <h2>Areas we cover</h2>
+      <p class="muted">We serve Stockton‑on‑Tees and surrounding areas within a <b>15‑mile radius</b>. If you’re just outside, message us — we can usually help.</p>
+      <div class="trust" style="margin-top:8px">
+        <span>Same‑day slots when available</span>
+        <span>Evening appointments on request</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="section">
+    <div class="card">
+      <h2>FAQ</h2>
+      <details>
+        <summary>Do you show prices on the website?</summary>
+        <p class="muted">We don’t show fixed prices because parts vary by vehicle. We confirm your exact car via the DVLA, match parts to your registration, and then give a clear fixed quote.</p>
+      </details>
+      <details>
+        <summary>What if I don’t see the service I need?</summary>
+        <p class="muted">Choose “Other/Not sure” in the clarifier step or call us. We handle most common repairs and maintenance.</p>
+      </details>
+      <details>
+        <summary>Do you fit customer‑supplied parts?</summary>
+        <p class="muted">We can discuss it, though we recommend parts we know and trust so we can stand behind the work and warranty.</p>
+      </details>
+    </div>
+  </section>
+
+  <footer>
+    <span>© Mitch’s Auto Services — Powered by DVLA Vehicle Enquiry</span>
+    <span>Contact: support@mitchsautoservices.co.uk • 07926 725369</span>
+  </footer>
 </div>
 
 <script>
-const API_URL = '/api/vrm';
+/* ===========================
+   CONFIG
+   =========================== */
+const API_URL = '/api/vrm'; // your serverless function path
 
-const $ = id => document.getElementById(id);
-const form = $('vrmForm'), vrmInput = $('vrm'), btn = $('lookupBtn');
-const errorBox = $('error'), vehicleCard = $('vehicleCard');
-const vehTitle=$('vehTitle'), vehMeta=$('vehMeta'), vehReg=$('vehReg');
+// Your Services (names from your live site; no prices shown)
+const SERVICES = [
+  { id:'ac_recharge',  label:'Air Conditioning Top-Up/Recharge' },
+  { id:'air_filter',   label:'Air Filter Change' },
+  { id:'basic_service',label:'Basic Service Package' },
+  { id:'battery_replacement', label:'Battery Replacement' },
+  { id:'brake_change', label:'Brake Change' },
+  { id:'brake_fluid',  label:'Brake Fluid Change' },
+  { id:'car_refresh',  label:'Car Refresh Service Package' },
+  { id:'coolant_change', label:'Coolant Change' },
+  { id:'pollen_filter',label:'Dust/Pollen Filter Change' },
+  { id:'oil_filter',   label:'Engine Oil and Filter Change' },
+  { id:'fuel_filter',  label:'Fuel Filter Change' },
+  { id:'lights',       label:'Headlights/Rear Lights Replacement' },
+  { id:'major_service',label:'Major Service Package' },
+  { id:'minor_service',label:'Minor Service Package' },
+  { id:'premium_service', label:'Premium Service Package' },
+  { id:'seasonal',     label:'Seasonal Maintenance Package' },
+  { id:'tyre_check',   label:'Tyre Health Check' },
+  { id:'wiper_motor',  label:'Window wiper motor replacement' }
+];
 
-form.addEventListener('submit', async e => {
+// Clarifier suggestions per service
+const CLARIFIERS = {
+  ac_recharge:['Not blowing cold','After winter recharge','Strange smell','Not sure'],
+  air_filter:['Scheduled service','Reduced performance','Not sure'],
+  basic_service:['Annual service','High mileage','Not sure'],
+  battery_replacement:['Slow crank','Dash lights only','Totally dead','Not sure'],
+  brake_change:['Front','Rear','Grinding/Noise','Pulling to one side','Not sure'],
+  brake_fluid:['Scheduled change','Spongy pedal','ABS work done','Not sure'],
+  car_refresh:['Full refresh','Selling car','Just bought car','Not sure'],
+  coolant_change:['Scheduled change','Overheating','Leaking','Not sure'],
+  pollen_filter:['Smelly air','Low airflow','Hayfever relief','Not sure'],
+  oil_filter:['Service due','Oil light on','Leak','Not sure'],
+  fuel_filter:['Hard starting','Power loss','Service due','Not sure'],
+  lights:['Headlight bulb','Rear light','Indicator','Not sure'],
+  major_service:['Major interval','High mileage','Not sure'],
+  minor_service:['Minor interval','Not sure'],
+  premium_service:['Full works','Not sure'],
+  seasonal:['Winter prep','Summer trip','Not sure'],
+  tyre_check:['Uneven wear','Vibration','Slow puncture','Not sure'],
+  wiper_motor:['Stopped working','Slow movement','Intermittent','Not sure']
+};
+
+/* ===========================
+   WIRING
+   =========================== */
+const $=id=>document.getElementById(id);
+const vrmInput=$('vrm'), lookupBtn=$('lookupBtn'), vehicleCard=$('vehicleCard'),
+      vehTitle=$('vehTitle'), vehMeta=$('vehMeta'), vehReg=$('vehReg'),
+      errorBox=$('error'), step2=$('step2'), step3=$('step3'),
+      serviceChips=$('serviceChips'), clarifierChips=$('clarifierChips'),
+      pricing=$('pricing'), warrSel=$('warr'),
+      reviewBtn=$('reviewBtn'), confirmBox=$('confirmBox'),
+      c_vrm=$('c_vrm'), c_vehicle=$('c_vehicle'), c_colour=$('c_colour'),
+      c_service=$('c_service'), c_detail=$('c_detail'), c_warranty=$('c_warranty'),
+      preConfirmBtns=$('preConfirmBtns');
+
+let lastVRM='', chosenService=null, chosenClarifier=null, vehicleSummary='', vehicleColour='';
+
+function normaliseVRM(v){ return (v||'').toUpperCase().replace(/\s+/g,'').replace(/[^A-Z0-9]/g,''); }
+
+function renderServiceChips(list){
+  serviceChips.innerHTML = list.map(s => `
+    <label class="chip">
+      <input type="radio" name="srv" value="${s.id}">
+      <span>${s.label}</span>
+    </label>
+  `).join('');
+}
+
+function renderClarifiers(serviceId){
+  const opts = CLARIFIERS[serviceId] || ['Not sure'];
+  clarifierChips.innerHTML = opts.map(txt => `
+    <label class="chip"><input type="radio" name="clar" value="${txt}"><span>${txt}</span></label>
+  `).join('');
+}
+
+$('vrmForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   errorBox.style.display='none';
-  vehicleCard.style.display='none';
+  const vrm = normaliseVRM(vrmInput.value);
+  if (vrm.length < 5){ errorBox.textContent='Please enter a valid UK registration.'; errorBox.style.display='block'; return; }
 
-  const vrm = vrmInput.value.trim().toUpperCase().replace(/\s+/g,'');
-  if (vrm.length < 3) {
-    errorBox.textContent = 'Please enter a valid UK registration.';
-    errorBox.style.display='block';
-    return;
-  }
+  lookupBtn.disabled=true; lookupBtn.textContent='Looking…';
+  vehicleCard.style.display='block';
+  vehTitle.innerHTML = '<div class="skeleton" style="width:240px;height:18px"></div>';
+  vehMeta.innerHTML  = '<div class="skeleton" style="width:300px;height:16px"></div>';
+  vehReg.textContent = '';
 
-  btn.disabled = true; btn.textContent='Looking…';
-  try {
-    const res = await fetch(API_URL, {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ vrm })
-    });
+  try{
+    const res = await fetch(API_URL, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ vrm })});
     const data = await res.json();
-    if (!res.ok) throw new Error(data.error || 'Lookup failed');
+    if(!res.ok) throw new Error(data?.message || data?.error || 'Lookup failed');
 
-    vehTitle.textContent = `${data.make||''} ${data.model||''}`;
-    vehMeta.textContent = `${data.fuelType||''} • ${data.engineCapacity? (data.engineCapacity/1000).toFixed(1)+'L':''} • ${data.colour||''}`;
-    vehReg.textContent = `Reg: ${vrm}`;
+    lastVRM = vrm;
+    const engine = data.engineCapacity ? (data.engineCapacity/1000).toFixed(1) + 'L' : '';
+    vehicleSummary = `${data.make||''} ${data.model||''}${engine? ' • '+engine:''}${data.fuelType? ' • '+data.fuelType:''}`;
+    vehicleColour = data.colour || '';
 
-    vehicleCard.style.display='block';
-  } catch(err) {
-    errorBox.textContent = err.message.includes('Forbidden')
-      ? 'DVLA says “Forbidden”: your server is not sending a valid API key yet.'
-      : err.message;
+    vehTitle.innerHTML = `<strong>${data.make || ''} ${data.model || ''}</strong>`;
+    vehMeta.innerHTML  = [data.fuelType, engine, data.colour].filter(Boolean).join(' • ') || '<span class="muted">Details unavailable</span>';
+    vehReg.textContent = 'Reg: ' + vrm;
+
+    renderServiceChips(SERVICES);
+    step2.style.display='block';
+    step3.style.display='none';
+    confirmBox.style.display='none';
+    preConfirmBtns.style.display='flex';
+    pricing.textContent='Pick a service to continue.';
+  }catch(err){
+    errorBox.textContent = err.message.includes('Forbidden') ? 'DVLA says “Forbidden”: your server is not sending a valid API key yet.' : err.message;
     errorBox.style.display='block';
-  } finally {
-    btn.disabled = false; btn.textContent='Look up';
+    vehicleCard.style.display='none';
+  }finally{
+    lookupBtn.disabled=false; lookupBtn.textContent='Look up';
   }
+});
+
+serviceChips.addEventListener('change', (e) => {
+  if (e.target.name!=='srv') return;
+  const id = e.target.value;
+  chosenService = SERVICES.find(s => s.id===id);
+  renderClarifiers(id);
+  pricing.textContent = 'We’ll match parts to your reg and send a fixed quote.';
+  step3.style.display='block';
+  confirmBox.style.display='none';
+  preConfirmBtns.style.display='flex';
+});
+
+clarifierChips.addEventListener('change', (e) => {
+  if (e.target.name!=='clar') return;
+  chosenClarifier = e.target.value;
+  confirmBox.style.display='none';
+  preConfirmBtns.style.display='flex';
+});
+
+warrSel.addEventListener('change', () => {
+  confirmBox.style.display='none';
+  preConfirmBtns.style.display='flex';
+});
+
+function urlMsg(){
+  const serviceName = chosenService ? chosenService.label : '';
+  const warranty = Number(warrSel.value)||0;
+  const lines = [
+    `VRM: ${lastVRM}`,
+    `Vehicle: ${vehicleSummary}`,
+    vehicleColour ? `Colour: ${vehicleColour}` : null,
+    `Service: ${serviceName}`,
+    `Detail: ${chosenClarifier||''}`,
+    `Warranty upgrade: £${warranty}`
+  ].filter(Boolean).join('%0A');
+  return lines;
+}
+
+document.getElementById('reviewBtn').addEventListener('click', () => {
+  if(!lastVRM){ alert('Please enter your reg first.'); return; }
+  if(!chosenService){ alert('Please select a service.'); return; }
+
+  document.getElementById('c_vrm').textContent = lastVRM;
+  document.getElementById('c_vehicle').textContent = vehicleSummary || '—';
+  document.getElementById('c_colour').textContent = vehicleColour || '—';
+  document.getElementById('c_service').textContent = chosenService.label || '—';
+  document.getElementById('c_detail').textContent = chosenClarifier || '—';
+  document.getElementById('c_warranty').textContent = (warrSel.value==='0') ? '6 months (included)' : (warrSel.value==='20' ? '12 months (+£20)' : '18 months (+£40)');
+
+  confirmBox.style.display='block';
+  preConfirmBtns.style.display='none';
+});
+
+document.getElementById('editBtn').addEventListener('click', () => {
+  confirmBox.style.display='none';
+  preConfirmBtns.style.display='flex';
+});
+
+document.getElementById('emailBtn').addEventListener('click', () => {
+  window.location = `mailto:support@mitchsautoservices.co.uk?subject=Quote%20${encodeURIComponent(lastVRM)}&body=${urlMsg()}`;
+});
+document.getElementById('waBtn').addEventListener('click', () => {
+  window.open(`https://wa.me/447926725369?text=${urlMsg()}`,'_blank');
 });
 </script>
 </body>

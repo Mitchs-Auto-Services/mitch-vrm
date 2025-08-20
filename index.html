@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Mitch’s Auto Services – Mobile Mechanic • Stockton-on-Tees</title>
-<meta name="description" content="Mobile mechanic in Stockton-on-Tees (+15 miles). Check your car by number plate using official DVLA data. Choose a service, review details, and send a quote request via Email or WhatsApp. Transparent labour, parts matched to your registration.">
+<meta name="description" content="Mobile mechanic in Stockton-on-Tees (+15 mile radius). DVLA number-plate lookup, choose a service with clear 'from' pricing, review details, and request a quote via Email or WhatsApp.">
 <style>
   :root{
     --brand:#F06407;    /* primary */
@@ -20,10 +20,7 @@
   *{box-sizing:border-box}
   html,body{height:100%}
   body{margin:0;background:linear-gradient(180deg,var(--bg),#101623);color:var(--ink);font-family:system-ui, Inter, Arial, sans-serif;line-height:1.45}
-
-  a{color:#ffd6bf;text-decoration:none}
-  a:hover{text-decoration:underline}
-
+  a{color:#ffd6bf;text-decoration:none} a:hover{text-decoration:underline}
   .container{max-width:1140px;margin:0 auto;padding:20px 16px 48px}
 
   /* HERO */
@@ -81,13 +78,6 @@
   @media(min-width:620px){ .grid2{grid-template-columns:1fr 1fr} }
   .row{display:flex;justify-content:space-between;gap:10px}
 
-  /* HOW IT WORKS & SIDEBAR */
-  .steps{display:grid;gap:10px}
-  .step{background:#0f1520;border:1px dashed var(--line);border-radius:12px;padding:12px}
-  .list{margin:8px 0 0 18px}
-  .grid3{display:grid;grid-template-columns:1fr;gap:12px}
-  @media(min-width:900px){.grid3{grid-template-columns:1fr 1fr 1fr}}
-
   /* FOOTER */
   footer{margin-top:28px;color:var(--muted);font-size:14px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:16px}
 </style>
@@ -99,7 +89,7 @@
   <div class="hero-inner">
     <div class="topbar">
       <div class="brand"><div class="name">Mitch’s Auto Services</div></div>
-      <div class="badge">Mobile mechanic • Stockton‑on‑Tees + 15 miles</div>
+      <div class="badge">Mobile mechanic • Stockton‑on‑Tees + 15 mile radius</div>
     </div>
 
     <div class="hero-grid">
@@ -110,7 +100,8 @@
           <span>Official DVLA vehicle lookup</span>
           <span>Transparent labour (no hidden mark‑ups)</span>
           <span>6‑month labour warranty (upgrade available)</span>
-          <span>Card payments accepted</span>
+          <span>Card, cash & bank transfer</span>
+          <span>Loyalty program to win a free service</span>
         </div>
       </div>
       <div class="card">
@@ -120,10 +111,11 @@
           <form id="vrmForm" novalidate>
             <label for="vrm">Registration (VRM)</label>
             <div class="plate">
-              <input id="vrm" placeholder="e.g. AB12 CDE" maxlength="8" autocomplete="off" required />
+              <input id="vrm" placeholder="e.g. AB12 ABC" maxlength="8" autocomplete="off" required />
               <button id="lookupBtn" type="submit">Look up</button>
             </div>
             <small class="fine">Tip: remove spaces if it doesn’t find it first time.</small>
+            <small class="fine">Tip: IF YOUR CAR DOES NOT START, BOOK A DIAGNOSTIC TEST TO FIND OUT THE ISSUE.</small>
           </form>
 
           <div id="vehicleCard" style="display:none">
@@ -192,111 +184,30 @@
   </div>
 </section>
 
-<!-- HOW IT WORKS / SIDEBAR -->
+<!-- EXTRAS -->
 <div class="container">
   <section class="section two">
     <div class="card">
       <h2>How it works</h2>
-      <div class="steps">
-        <div class="step"><b>1) Check your reg.</b> We verify your vehicle against the DVLA so we quote the right parts first time.</div>
-        <div class="step"><b>2) Pick your service.</b> Choose from brakes, oil & filter, batteries, lights, full service packages, and more.</div>
-        <div class="step"><b>3) Tell us the symptom.</b> A quick detail like “front brakes” or “won’t start” helps us plan parts and time.</div>
-        <div class="step"><b>4) Get a fixed quote.</b> We price labour clearly and charge parts at fair market cost matched to your reg.</div>
-        <div class="step"><b>5) We come to you.</b> Mobile service around Stockton‑on‑Tees (+15 miles). Card payments accepted.</div>
-      </div>
+      <ol class="muted">
+        <li>Check your reg — we pull exact vehicle data from DVLA.</li>
+        <li>Pick a service — see clear <b>“from” labour pricing</b>.</li>
+        <li>Add a quick detail — e.g., “front brakes” or “won’t start”.</li>
+        <li>Review & send — we reply with a fixed quote (labour + parts matched to your reg).</li>
+      </ol>
     </div>
-
-    <aside class="card">
+    <div class="card">
       <h2>Contact & hours</h2>
       <div class="kv">
         <a href="tel:+447926725369"><button type="button">Call 07926 725369</button></a>
         <a href="mailto:support@mitchsautoservices.co.uk?subject=Service%20enquiry"><button type="button">Email us</button></a>
       </div>
-      <p class="muted" style="margin-top:10px">Mon–Sat • Mobile call‑outs across Stockton‑on‑Tees and nearby towns (15‑mile radius).</p>
-      <ul class="list muted">
+      <p class="muted" style="margin-top:10px">Mon–Fri • 9am–5pm • Stockton‑on‑Tees + 15 miles.</p>
+      <ul class="muted">
         <li>Transparent labour; parts priced to your registration</li>
         <li>Standard <b>6‑month labour warranty</b> (upgrade to 12 or 18 months)</li>
-        <li>Upfront quotes — no surprises</li>
+        <li>Card, cash & bank transfer accepted</li>
       </ul>
-      <p class="muted" style="margin-top:10px">See our <a href="https://mitchsautoservices.com/page/terms-and-conditions" target="_blank" rel="noopener">Terms & Conditions</a>.</p>
-    </aside>
-  </section>
-
-  <!-- SERVICES OVERVIEW -->
-  <section class="section">
-    <div class="card">
-      <h2>Popular services</h2>
-      <div class="grid3">
-        <div>
-          <ul class="list">
-            <li>Air Conditioning Top‑Up/Recharge</li>
-            <li>Air Filter Change</li>
-            <li>Battery Replacement</li>
-            <li>Brake Change</li>
-            <li>Brake Fluid Change</li>
-            <li>Coolant Change</li>
-          </ul>
-        </div>
-        <div>
-          <ul class="list">
-            <li>Engine Oil & Filter Change</li>
-            <li>Fuel Filter Change</li>
-            <li>Headlights/Rear Lights Replacement</li>
-            <li>Tyre Health Check</li>
-            <li>Wiper Motor Replacement</li>
-            <li>Dust/Pollen Filter Change</li>
-          </ul>
-        </div>
-        <div>
-          <ul class="list">
-            <li>Basic Service Package</li>
-            <li>Minor / Major / Premium Service Packages</li>
-            <li>Seasonal Maintenance Package</li>
-            <li>Car Refresh Service Package</li>
-            <li><a href="https://mitchsautoservices.com/page/services" target="_blank" rel="noopener">View the full list →</a></li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- WARRANTY & AREA -->
-  <section class="section two">
-    <div class="card">
-      <h2>Labour warranty</h2>
-      <p class="muted">Every job includes a <b>6‑month labour warranty</b>. You can upgrade when requesting a quote:</p>
-      <ul class="list muted">
-        <li>12 months (+£20)</li>
-        <li>18 months (+£40)</li>
-      </ul>
-      <p class="fine">Warranty covers labour. Full details in our <a href="https://mitchsautoservices.com/page/terms-and-conditions" target="_blank" rel="noopener">Terms & Conditions</a>.</p>
-    </div>
-    <div class="card">
-      <h2>Areas we cover</h2>
-      <p class="muted">We serve Stockton‑on‑Tees and surrounding areas within a <b>15‑mile radius</b>. If you’re just outside, message us — we can usually help.</p>
-      <div class="trust" style="margin-top:8px">
-        <span>Same‑day slots when available</span>
-        <span>Evening appointments on request</span>
-      </div>
-    </div>
-  </section>
-
-  <!-- FAQ -->
-  <section class="section">
-    <div class="card">
-      <h2>FAQ</h2>
-      <details>
-        <summary>Do you show prices on the website?</summary>
-        <p class="muted">We don’t show fixed prices because parts vary by vehicle. We confirm your exact car via the DVLA, match parts to your registration, and then give a clear fixed quote.</p>
-      </details>
-      <details>
-        <summary>What if I don’t see the service I need?</summary>
-        <p class="muted">Choose “Other/Not sure” in the clarifier step or call us. We handle most common repairs and maintenance.</p>
-      </details>
-      <details>
-        <summary>Do you fit customer‑supplied parts?</summary>
-        <p class="muted">We can discuss it, though we recommend parts we know and trust so we can stand behind the work and warranty.</p>
-      </details>
     </div>
   </section>
 
@@ -307,34 +218,38 @@
 </div>
 
 <script>
-/* ===========================
-   CONFIG
-   =========================== */
-const API_URL = '/api/vrm'; // your serverless function path
+/* ========== CONFIG ========== */
+const API_URL = '/api/vrm'; // if hosting API elsewhere, paste full URL here
 
-// Your Services (names from your live site; no prices shown)
+// Toggle prices on/off globally
+const SHOW_PRICES = true;
+const fmt = n => `£${Number(n).toFixed(2)}`;
+
+// Your services + "from" prices (edit these numbers any time)
 const SERVICES = [
-  { id:'ac_recharge',  label:'Air Conditioning Top-Up/Recharge' },
-  { id:'air_filter',   label:'Air Filter Change' },
-  { id:'basic_service',label:'Basic Service Package' },
-  { id:'battery_replacement', label:'Battery Replacement' },
-  { id:'brake_change', label:'Brake Change' },
-  { id:'brake_fluid',  label:'Brake Fluid Change' },
-  { id:'car_refresh',  label:'Car Refresh Service Package' },
-  { id:'coolant_change', label:'Coolant Change' },
-  { id:'pollen_filter',label:'Dust/Pollen Filter Change' },
-  { id:'oil_filter',   label:'Engine Oil and Filter Change' },
-  { id:'fuel_filter',  label:'Fuel Filter Change' },
-  { id:'lights',       label:'Headlights/Rear Lights Replacement' },
-  { id:'major_service',label:'Major Service Package' },
-  { id:'minor_service',label:'Minor Service Package' },
-  { id:'premium_service', label:'Premium Service Package' },
-  { id:'seasonal',     label:'Seasonal Maintenance Package' },
-  { id:'tyre_check',   label:'Tyre Health Check' },
-  { id:'wiper_motor',  label:'Window wiper motor replacement' }
+  { id:'ac_recharge',  label:'Air Conditioning Top-Up/Recharge',     priceFrom: 85 },
+  { id:'air_filter',   label:'Air Filter Change',                    priceFrom: 31.75 },
+  { id:'basic_service',label:'Basic Service Package',                priceFrom: 103.69 },
+  { id:'battery_replacement', label:'Battery Replacement',           priceFrom: 200 },
+  { id:'brake_change', label:'Brake Change',                         priceFrom: 150.82 },
+  { id:'brake_fluid',  label:'Brake Fluid Change',                   priceFrom: 35.29 },
+  { id:'car_battery_recharge', label:'Car Battery Recharge',         priceFrom: 25.99 },
+  { id:'car_diagnostic',  label:'Car Diagnostic',                    priceFrom: 30 },
+  { id:'car_refresh',  label:'Car Refresh Service Package',          priceFrom: 600.16 },
+  { id:'coolant_change', label:'Coolant Change',                     priceFrom: 30.99 },
+  { id:'pollen_filter',label:'Dust/Pollen Filter Change',            priceFrom: 30.22 },
+  { id:'oil_filter',   label:'Engine Oil and Filter Change',         priceFrom: 65.51 },
+  { id:'fuel_filter',  label:'Fuel Filter Change',                   priceFrom: 40.36 },
+  { id:'headlights',   label:'Headlights/Rear Lights Replacement',   priceFrom: 30 .99},
+  { id:'major_service',label:'Major Service Package',                priceFrom: 350.33 },
+  { id:'minor_service',label:'Minor Service Package',                priceFrom: 115.69 },
+  { id:'premium_service', label:'Premium Service Package',           priceFrom: 340.33 },
+  { id:'seasonal',     label:'Seasonal Maintenance Package',         priceFrom: 149 },
+  { id:'tyre_check',   label:'Tyre Health Check',                    priceFrom: 35 },
+  { id:'wiper_motor',  label:'Window wiper motor replacement',       priceFrom: 90.76 }
 ];
 
-// Clarifier suggestions per service
+// Clarifier suggestions
 const CLARIFIERS = {
   ac_recharge:['Not blowing cold','After winter recharge','Strange smell','Not sure'],
   air_filter:['Scheduled service','Reduced performance','Not sure'],
@@ -356,9 +271,7 @@ const CLARIFIERS = {
   wiper_motor:['Stopped working','Slow movement','Intermittent','Not sure']
 };
 
-/* ===========================
-   WIRING
-   =========================== */
+/* ========== WIRING ========== */
 const $=id=>document.getElementById(id);
 const vrmInput=$('vrm'), lookupBtn=$('lookupBtn'), vehicleCard=$('vehicleCard'),
       vehTitle=$('vehTitle'), vehMeta=$('vehMeta'), vehReg=$('vehReg'),
@@ -375,12 +288,15 @@ let lastVRM='', chosenService=null, chosenClarifier=null, vehicleSummary='', veh
 function normaliseVRM(v){ return (v||'').toUpperCase().replace(/\s+/g,'').replace(/[^A-Z0-9]/g,''); }
 
 function renderServiceChips(list){
-  serviceChips.innerHTML = list.map(s => `
-    <label class="chip">
-      <input type="radio" name="srv" value="${s.id}">
-      <span>${s.label}</span>
-    </label>
-  `).join('');
+  serviceChips.innerHTML = list.map(s => {
+    const priceBit = (SHOW_PRICES && s.priceFrom!=null) ? ` — from ${fmt(s.priceFrom)}` : '';
+    return `
+      <label class="chip">
+        <input type="radio" name="srv" value="${s.id}">
+        <span>${s.label}${priceBit}</span>
+      </label>
+    `;
+  }).join('');
 }
 
 function renderClarifiers(serviceId){
@@ -388,6 +304,15 @@ function renderClarifiers(serviceId){
   clarifierChips.innerHTML = opts.map(txt => `
     <label class="chip"><input type="radio" name="clar" value="${txt}"><span>${txt}</span></label>
   `).join('');
+}
+
+function updatePricingLine(){
+  if (!chosenService) return;
+  if (SHOW_PRICES && chosenService.priceFrom!=null) {
+    pricing.innerHTML = `Labour <b>from ${fmt(chosenService.priceFrom)}</b> + parts matched to your reg`;
+  } else {
+    pricing.textContent = 'We’ll match parts to your reg and send a fixed quote.';
+  }
 }
 
 $('vrmForm').addEventListener('submit', async (e) => {
@@ -436,7 +361,7 @@ serviceChips.addEventListener('change', (e) => {
   const id = e.target.value;
   chosenService = SERVICES.find(s => s.id===id);
   renderClarifiers(id);
-  pricing.textContent = 'We’ll match parts to your reg and send a fixed quote.';
+  updatePricingLine();
   step3.style.display='block';
   confirmBox.style.display='none';
   preConfirmBtns.style.display='flex';
@@ -450,6 +375,7 @@ clarifierChips.addEventListener('change', (e) => {
 });
 
 warrSel.addEventListener('change', () => {
+  updatePricingLine();
   confirmBox.style.display='none';
   preConfirmBtns.style.display='flex';
 });
@@ -472,12 +398,12 @@ document.getElementById('reviewBtn').addEventListener('click', () => {
   if(!lastVRM){ alert('Please enter your reg first.'); return; }
   if(!chosenService){ alert('Please select a service.'); return; }
 
-  document.getElementById('c_vrm').textContent = lastVRM;
-  document.getElementById('c_vehicle').textContent = vehicleSummary || '—';
-  document.getElementById('c_colour').textContent = vehicleColour || '—';
-  document.getElementById('c_service').textContent = chosenService.label || '—';
-  document.getElementById('c_detail').textContent = chosenClarifier || '—';
-  document.getElementById('c_warranty').textContent = (warrSel.value==='0') ? '6 months (included)' : (warrSel.value==='20' ? '12 months (+£20)' : '18 months (+£40)');
+  c_vrm.textContent = lastVRM;
+  c_vehicle.textContent = vehicleSummary || '—';
+  c_colour.textContent = vehicleColour || '—';
+  c_service.textContent = chosenService.label || '—';
+  c_detail.textContent = chosenClarifier || '—';
+  c_warranty.textContent = (warrSel.value==='0') ? '6 months (included)' : (warrSel.value==='20' ? '12 months (+£20)' : '18 months (+£40)');
 
   confirmBox.style.display='block';
   preConfirmBtns.style.display='none';

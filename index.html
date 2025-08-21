@@ -6,33 +6,15 @@
 <title>Mitch’s Auto Services – Mobile Mechanic • Stockton-on-Tees</title>
 <meta name="description" content="Mobile mechanic in Stockton-on-Tees (+15 mile radius). DVLA number-plate lookup, choose a service with clear 'from' pricing, review details, and request a quote via Email or WhatsApp.">
 <style>
-  :root{
-    --brand:#F06407;    /* primary */
-    --accent:#4A4443;   /* secondary */
-    --ink:#EDEDED;      /* text */
-    --bg:#0b0e13;       /* page bg */
-    --card:#121720;     /* card bg */
-    --muted:#9aa1ac;    /* secondary text */
-    --line:#223046;     /* borders */
-    --ok:#9cffb0;       /* success */
-    --err:#ff9c9c;      /* error */
-  }
+  :root{ --brand:#F06407; --accent:#4A4443; --ink:#EDEDED; --bg:#0b0e13; --card:#121720; --muted:#9aa1ac; --line:#223046; --ok:#9cffb0; --err:#ff9c9c; }
   *{box-sizing:border-box}
-  html,body{height:100%}
   body{margin:0;background:linear-gradient(180deg,var(--bg),#101623);color:var(--ink);font-family:system-ui, Inter, Arial, sans-serif;line-height:1.45}
   a{color:#ffd6bf;text-decoration:none} a:hover{text-decoration:underline}
   .container{max-width:1140px;margin:0 auto;padding:20px 16px 48px}
 
-  /* HERO */
-  .hero{
-    background: radial-gradient(80% 60% at 15% 20%, rgba(240,100,7,.18), transparent 60%),
-                radial-gradient(70% 40% at 90% 0%, rgba(74,68,67,.3), transparent 60%),
-                linear-gradient(180deg, #0b0e13, #0f1625);
-    border-bottom:1px solid var(--line);
-  }
+  .hero{background: radial-gradient(80% 60% at 15% 20%, rgba(240,100,7,.18), transparent 60%), radial-gradient(70% 40% at 90% 0%, rgba(74,68,67,.3), transparent 60%), linear-gradient(180deg, #0b0e13, #0f1625); border-bottom:1px solid var(--line)}
   .hero-inner{max-width:1140px;margin:0 auto;padding:28px 16px 24px}
   .topbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:18px;flex-wrap:wrap}
-  .brand{display:flex;align-items:center;gap:10px}
   .brand .name{font-weight:900;letter-spacing:.2px;color:var(--brand);font-size:20px}
   .badge{background:rgba(240,100,7,.15);color:#ffd9c5;border:1px dashed var(--brand);padding:6px 10px;border-radius:999px;font-size:12px;white-space:nowrap}
   .hero-grid{display:grid;gap:16px;grid-template-columns:1fr}
@@ -42,14 +24,12 @@
   .trust{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
   .trust span{border:1px solid var(--line);padding:6px 10px;border-radius:999px;color:var(--muted);font-size:12px}
 
-  /* CARDS & LAYOUT */
   .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px}
   .section{margin-top:26px}
   .section h2{margin:0 0 10px;font-size:clamp(18px,2.6vw,26px)}
   .two{display:grid;gap:16px;grid-template-columns:1fr}
   @media(min-width:900px){.two{grid-template-columns:1fr 1fr}}
 
-  /* FORM + FLOW */
   label{display:block;font-weight:700;margin:6px 0}
   input,select,button{padding:12px;border-radius:10px;border:1px solid #2a3546;background:#0d121a;color:var(--ink);font-size:16px}
   input:focus,select:focus{outline:2px solid var(--brand)}
@@ -67,7 +47,6 @@
   .muted{color:var(--muted)}
   .fine{font-size:12px;color:#8a93a3}
   .err{color:var(--err)}
-  .ok{color:var(--ok)}
   .kv{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
   .tag{font-size:12px;border:1px solid var(--line);color:var(--muted);padding:6px 8px;border-radius:999px}
 
@@ -76,20 +55,17 @@
   .info .price{font-weight:800;color:var(--brand);margin-right:8px}
   .info p{margin:0;color:var(--muted)}
 
-  /* CONFIRM BOX */
   .confirm{margin-top:12px;border:1px solid var(--line);border-radius:12px;padding:12px;background:#0f1520}
   .confirm h3{margin:0 0 8px;font-size:18px}
   .grid2{display:grid;grid-template-columns:1fr;gap:8px}
   @media(min-width:620px){ .grid2{grid-template-columns:1fr 1fr} }
   .row{display:flex;justify-content:space-between;gap:10px}
 
-  /* FOOTER */
   footer{margin-top:28px;color:var(--muted);font-size:14px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:16px}
 </style>
 </head>
 <body>
 
-<!-- HERO -->
 <section class="hero">
   <div class="hero-inner">
     <div class="topbar">
@@ -100,19 +76,17 @@
     <div class="hero-grid">
       <div class="hero-copy">
         <h1>Honest mobile mechanic — clear labour, parts priced to your reg</h1>
-        <p>Pop in your number plate to confirm the exact vehicle via the <b>official DVLA</b> database. Then pick a service, add a quick detail, and send your request by <b>Email</b> or <b>WhatsApp</b>. We’ll reply with a fixed quote before work starts.</p>
+        <p>Enter your number plate to confirm your exact vehicle via the <b>official DVLA</b> database. Then pick a service, add a quick detail, and send by <b>Email</b> or <b>WhatsApp</b>. We reply with a fixed quote before work starts.</p>
         <div class="trust">
           <span>Official DVLA vehicle lookup</span>
-          <span>Transparent labour (no hidden mark‑ups)</span>
+          <span>No hidden mark‑ups</span>
           <span>6‑month labour warranty (upgrade available)</span>
           <span>Card, cash & bank transfer</span>
-          <span>Loyalty program to win a free service</span>
         </div>
       </div>
       <div class="card">
         <h2 style="margin:0 0 8px;font-size:20px">Start here — Check your number plate</h2>
         <div class="stack">
-          <!-- STEP 1 -->
           <form id="vrmForm" novalidate>
             <label for="vrm">Registration (VRM)</label>
             <div class="plate">
@@ -129,27 +103,22 @@
           </div>
           <div id="error" class="err" style="margin-top:6px;display:none"></div>
 
-          <!-- STEP 2 -->
           <div id="step2" style="display:none">
             <label>Choose a service</label>
             <div id="serviceChips" class="chips"></div>
           </div>
 
-          <!-- STEP 3 -->
           <div id="step3" style="display:none">
             <label>A quick detail</label>
             <div id="clarifierChips" class="chips"></div>
 
-            <!-- Dynamic service info panel (appears after choosing a service) -->
             <div id="serviceInfo" class="info" style="display:none">
-              <h4 id="si_title">Service</h4>
+              <h4 id="si_title">Selected service</h4>
               <div><span id="si_price" class="price">From £0</span><span id="si_label" class="muted"></span></div>
               <p id="si_desc">Description will appear here.</p>
             </div>
 
-            <div id="pricing" class="muted" style="margin-top:6px">
-              We’ll match parts to your reg and send a fixed quote.
-            </div>
+            <div id="pricing" class="fine" style="margin-top:6px">We’ll match parts to your reg and send a fixed quote.</div>
 
             <div style="margin-top:10px">
               <label for="warr">Warranty options</label>
@@ -158,10 +127,9 @@
                 <option value="20">12 months (+£20)</option>
                 <option value="40">18 months (+£40)</option>
               </select>
-              <div class="fine">Warranty covers labour. Full details in our <a href="https://mitchsautoservices.com/page/terms-and-conditions" target="_blank" rel="noopener">Terms & Conditions</a>.</div>
+              <div class="fine">Warranty covers labour. See <a href="https://mitchsautoservices.com/page/terms-and-conditions" target="_blank" rel="noopener">Terms & Conditions</a>.</div>
             </div>
 
-            <!-- REVIEW -->
             <div class="confirm" id="confirmBox" style="display:none">
               <h3>Review your request</h3>
               <div class="grid2">
@@ -195,14 +163,13 @@
   </div>
 </section>
 
-<!-- EXTRAS -->
 <div class="container">
   <section class="section two">
     <div class="card">
       <h2>How it works</h2>
       <ol class="muted">
         <li>Check your reg — we pull exact vehicle data from DVLA.</li>
-        <li>Pick a service — see clear <b>“from” labour pricing</b> and description.</li>
+        <li>Pick a service — see clear <b>“from” pricing</b> and a short description.</li>
         <li>Add a quick detail — e.g., “front brakes” or “won’t start”.</li>
         <li>Review & send — we reply with a fixed quote (labour + parts matched to your reg).</li>
       </ol>
@@ -229,10 +196,10 @@
 </div>
 
 <script>
-/* ========== CONFIG ========== */
-const API_URL = '/api/vrm'; // same Vercel project
+/* ===== CONFIG ===== */
+const API_URL = '/api/vrm';
 
-// Services with "From" price + description
+/* Services with price + description */
 const SERVICES = [
   { id:'air_filter', label:'Air Filter Replacement', price:'From £30', desc:'Replacing the air filter helps your engine breathe better and perform more efficiently.' },
   { id:'basic_service', label:'Basic Service Package', price:'From £100', desc:'Includes Engine Oil, Oil Filter, Air Filter, Dust/Pollen Filter, Coolant, Tyre Health Check, Light Inspection, and Battery Inspection.' },
@@ -255,7 +222,7 @@ const SERVICES = [
   { id:'wiper_motor', label:'Window Wiper Motor Replacement', price:'From £50', desc:'If wipers are slow or out of sync, the motor may be failing — we replace and align.' }
 ];
 
-// Clarifier suggestions
+/* Clarifiers */
 const CLARIFIERS = {
   air_filter:['Scheduled service','Reduced performance','Not sure'],
   basic_service:['Annual service','High mileage','Not sure'],
@@ -278,7 +245,7 @@ const CLARIFIERS = {
   wiper_motor:['Stopped working','Slow movement','Intermittent','Not sure']
 };
 
-/* ========== WIRING ========== */
+/* ===== WIRING ===== */
 const $=id=>document.getElementById(id);
 const vrmInput=$('vrm'), lookupBtn=$('lookupBtn'), vehicleCard=$('vehicleCard'),
       vehTitle=$('vehTitle'), vehMeta=$('vehMeta'), vehReg=$('vehReg'),
@@ -293,7 +260,7 @@ const vrmInput=$('vrm'), lookupBtn=$('lookupBtn'), vehicleCard=$('vehicleCard'),
 
 let lastVRM='', chosenService=null, chosenClarifier=null, vehicleSummary='', vehicleColour='';
 
-function normaliseVRM(v){ return (v||'').toUpperCase().replace(/\s+/g,'').replace(/[^A-Z0-9]/g,''); }
+const normaliseVRM = v => (v||'').toUpperCase().replace(/\s+/g,'').replace(/[^A-Z0-9]/g,'');
 
 function renderServiceChips(list){
   serviceChips.innerHTML = list.map(s => `
@@ -301,7 +268,7 @@ function renderServiceChips(list){
       <input type="radio" name="srv" value="${s.id}">
       <span>${s.label}</span>
     </label>
-  ').join('');
+  `).join(''); /* <-- correct backtick quotes */
 }
 
 function renderClarifiers(serviceId){
@@ -357,6 +324,7 @@ document.getElementById('vrmForm').addEventListener('submit', async (e) => {
     errorBox.textContent = err.message.includes('Forbidden') ? 'DVLA says “Forbidden”: your server is not sending a valid API key yet.' : err.message;
     errorBox.style.display='block';
     vehicleCard.style.display='none';
+    console.error('Lookup error:', err);
   }finally{
     lookupBtn.disabled=false; lookupBtn.textContent='Look up';
   }

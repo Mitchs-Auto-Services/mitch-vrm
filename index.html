@@ -575,7 +575,12 @@ document.getElementById('lookupBtn').addEventListener('click', handleLookup);
   vehReg.textContent = '';
 
   try{
-    const res = await fetch(API_URL, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ vrm })});
+const res = await fetch(API_URL, {
+  method:'POST',
+  headers:{'Content-Type':'application/json'},
+  body: JSON.stringify({ vrm }),
+  cache: 'no-store'   // 👈 this forces a fresh request every time
+});
     const data = await res.json();
     if(!res.ok) throw new Error(data?.message || data?.error || 'Lookup failed');
 

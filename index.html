@@ -110,7 +110,7 @@
             <label for="vrm">Registration (VRM)</label>
             <div class="plate">
               <input id="vrm" placeholder="e.g. AB12 CDE" maxlength="8" autocomplete="off" required />
-              <button id="lookupBtn" type="submit">Look up</button>
+              <button id="lookupBtn" type="button">Look up</button>
             </div>
             <small class="fine">Tip: remove spaces if it doesn’t find it first time.</small>
           </form>
@@ -523,11 +523,50 @@ function updateSlotNote(){
 }
 
 /* ===== Events ===== */
-document.getElementById('vrmForm').addEventListener('submit', async (e) => {
-  e.preventDefault();
+const handleLookup = async () => {
   errorBox.style.display='none';
   const vrm = normaliseVRM(vrmInput.value);
   if (vrm.length < 5){ errorBox.textContent='Please enter a valid UK registration.'; errorBox.style.display='block'; return; }
+
+  lookupBtn.disabled=true; lookupBtn.textContent='Looking…';
+  vehicleCard.style.display='block';
+  vehTitle.innerHTML = '<div class="skeleton" style="width:240px;height:18px"></div>';
+  vehTags.innerHTML  = '<div class="skeleton" style="width:300px;height:16px"></div>';
+  vehReg.textContent = '';
+
+  try{
+    const res = await fetch(API_URL, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ vrm })});
+    const data = await res.json();
+    if(!res.ok) throw new Error(data?.message || data?.error || 'Lookup failed');
+
+    lastVRM = vrm; vehicleData = data;
+    const engine = data.engineCapacity ? (data.engineCapacity/1000).toFixed(1) + 'L' : '';
+    fuelType = data.fuelType || '';
+    vehicleSummary = `${data.make||''} ${data.model||''}${engine? ' • '+engine:''}${data.fuelType? ' • '+data.fuelType:''}`;
+    vehicleColour = data.colour || '';
+
+    renderDVLA(data);
+
+    const list = serviceListForFuel(fuelType);
+    renderServiceChips(list);
+    evNote.style.display = (fuelType||'').toLowerCase()==='electric' ? 'block' : 'none';
+
+    step2.style.display='block';
+    step3.style.display='none';
+    confirmBox.style.display='none';
+    preConfirmBtns.style.display='flex';
+    chosenService=null; chosenTier=null; chosenClarifier=null;
+  }catch(err){
+    errorBox.textContent = err.message.includes('Forbidden') ? 'DVLA says “Forbidden”: your server is not sending a valid API key yet.' : err.message;
+    errorBox.style.display='block';
+    vehicleCard.style.display='none';
+    console.error('Lookup error:', err);
+  }finally{
+    lookupBtn.disabled=false; lookupBtn.textContent='Look up';
+  }
+};
+
+document.getElementById('lookupBtn').addEventListener('click', handleLookup);
 
   lookupBtn.disabled=true; lookupBtn.textContent='Looking…';
   vehicleCard.style.display='block';
@@ -747,6 +786,8 @@ remEmailBtn.addEventListener('click', () => {
   const body = encodeURIComponent(`Please add me to MOT/Service reminders.\nEmail: ${email}\nDue date: ${dateVal}`);
   window.location.href = `mailto:support@mitchsautoservices.co.uk?subject=${encodeURIComponent(subject)}&body=${body}`;
 });
+  console.log('Mitch JS loaded');
+window.addEventListener('error', e => console.error('JS error:', e.message));
 </script>
 </body>
 </html>

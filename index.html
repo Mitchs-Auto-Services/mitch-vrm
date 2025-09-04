@@ -4,7 +4,7 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Mitch’s Auto Services – Mobile Mechanic • Stockton-on-Tees</title>
-<meta name="description" content="Mobile mechanic in Stockton-on-Tees (+15 mile radius). DVLA number-plate lookup, choose a service with clear 'from' pricing, review details, and request a quote via Email or WhatsApp.">
+<meta name="description" content="Mobile mechanic in Stockton-on-Tees (+15 mile radius). DVLA number-plate lookup, choose a service with tiered from-pricing, check coverage & availability, then email your request.">
 <style>
   :root{ --brand:#F06407; --accent:#4A4443; --ink:#EDEDED; --bg:#0b0e13; --card:#121720; --muted:#9aa1ac; --line:#223046; --ok:#9cffb0; --err:#ff9c9c; }
   *{box-sizing:border-box}
@@ -31,8 +31,8 @@
   @media(min-width:900px){.two{grid-template-columns:1fr 1fr}}
 
   label{display:block;font-weight:700;margin:6px 0}
-  input,select,button{padding:12px;border-radius:10px;border:1px solid #2a3546;background:#0d121a;color:var(--ink);font-size:16px}
-  input:focus,select:focus{outline:2px solid var(--brand)}
+  input,select,button,textarea{padding:12px;border-radius:10px;border:1px solid #2a3546;background:#0d121a;color:var(--ink);font-size:16px}
+  input:focus,select:focus,textarea:focus{outline:2px solid var(--brand)}
   button{cursor:pointer;background:var(--brand);color:#111;font-weight:800;border:none}
   button.ghost{background:transparent;border:1px solid var(--line);color:var(--ink)}
   button[disabled]{opacity:.6;cursor:not-allowed}
@@ -47,8 +47,10 @@
   .muted{color:var(--muted)}
   .fine{font-size:12px;color:#8a93a3}
   .err{color:var(--err)}
+  .ok{color:var(--ok)}
   .kv{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
   .tag{font-size:12px;border:1px solid var(--line);color:var(--muted);padding:6px 8px;border-radius:999px}
+  .tag.warn{border-color:#5a2b2b;color:#ffb3b3}
 
   .info{margin-top:10px;border:1px solid var(--line);border-radius:12px;background:#0f1520;padding:12px}
   .info h4{margin:0 0 6px;font-size:16px;color:#ffd9c5}
@@ -58,10 +60,26 @@
   .confirm{margin-top:12px;border:1px solid var(--line);border-radius:12px;padding:12px;background:#0f1520}
   .confirm h3{margin:0 0 8px;font-size:18px}
   .grid2{display:grid;grid-template-columns:1fr;gap:8px}
-  @media(min-width:620px){ .grid2{grid-template-columns:1fr 1fr} }
+  @media(min-width:760px){ .grid2{grid-template-columns:1fr 1fr} }
   .row{display:flex;justify-content:space-between;gap:10px}
 
   footer{margin-top:28px;color:var(--muted);font-size:14px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:16px}
+
+  /* Modal */
+  .modal{position:fixed;inset:0;display:none;align-items:flex-end;justify-content:center;background:rgba(0,0,0,.5);z-index:999}
+  .modal.open{display:flex}
+  .sheet{width:100%;max-width:720px;border-top-left-radius:16px;border-top-right-radius:16px;background:#0f1520;border:1px solid var(--line);padding:16px 16px 12px}
+  .sheet h3{margin:0 0 8px}
+  .sheet p{margin:0 0 10px;color:#muted}
+  .tiers{display:grid;gap:8px;margin:10px 0}
+  .tier{display:flex;justify-content:space-between;align-items:center;border:1px solid #314056;background:#0e141d;border-radius:12px;padding:10px}
+  .sheet .kv{justify-content:flex-end}
+  .closeX{position:absolute;right:18px;top:12px;font-size:18px;cursor:pointer;color:#bbb}
+  .thumbs{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+  .thumbs img,.thumbs video{max-width:120px;border:1px solid var(--line);border-radius:8px}
+  details{border:1px solid var(--line);border-radius:12px;padding:10px;background:#0f1520;margin:8px 0}
+  details summary{cursor:pointer;font-weight:700}
+  details p{margin:8px 0 0;color:var(--muted)}
 </style>
 </head>
 <body>
@@ -70,23 +88,24 @@
   <div class="hero-inner">
     <div class="topbar">
       <div class="brand"><div class="name">Mitch’s Auto Services</div></div>
-      <div class="badge">Mobile mechanic • Stockton‑on‑Tees + 15 mile radius</div>
+      <div class="badge">Mobile mechanic • Stockton-on-Tees + 15 mile radius</div>
     </div>
 
     <div class="hero-grid">
       <div class="hero-copy">
         <h1>Honest mobile mechanic — clear labour, parts priced to your reg</h1>
-        <p>Enter your number plate to confirm your exact vehicle via the <b>official DVLA</b> database. Then pick a service, add a quick detail, and send by <b>Email</b> or <b>WhatsApp</b>. We reply with a fixed quote before work starts.</p>
+        <p>Enter your number plate to confirm your exact vehicle via the <b>official DVLA</b> database. Then pick a service, choose a labour tier, add details, check coverage & availability, and send by <b>Email</b>. We reply with a fixed quote before work starts.</p>
         <div class="trust">
           <span>Official DVLA vehicle lookup</span>
-          <span>No hidden mark‑ups</span>
-          <span>6‑month labour warranty (upgrade available)</span>
+          <span>No hidden mark-ups</span>
+          <span>6-month labour warranty (upgrade available)</span>
           <span>Card, cash & bank transfer</span>
         </div>
       </div>
       <div class="card">
         <h2 style="margin:0 0 8px;font-size:20px">Start here — Check your number plate</h2>
         <div class="stack">
+          <!-- STEP 1 -->
           <form id="vrmForm" novalidate>
             <label for="vrm">Registration (VRM)</label>
             <div class="plate">
@@ -96,40 +115,97 @@
             <small class="fine">Tip: remove spaces if it doesn’t find it first time.</small>
           </form>
 
-          <div id="vehicleCard" style="display:none">
-            <div id="vehTitle"><div class="skeleton" style="width:240px;height:18px"></div></div>
-            <div id="vehMeta" class="muted" style="margin-top:4px"><div class="skeleton" style="width:300px;height:16px"></div></div>
-            <div id="vehReg" class="muted" style="margin-top:2px"></div>
+          <!-- Rich DVLA panel -->
+          <div id="vehicleCard" class="info" style="display:none">
+            <h4 id="vehTitle"><div class="skeleton" style="width:240px;height:18px"></div></h4>
+            <div class="kv" id="vehTags"></div>
+            <div class="fine" id="vehReg" style="margin-top:6px"></div>
           </div>
+
           <div id="error" class="err" style="margin-top:6px;display:none"></div>
 
+          <!-- STEP 2: service -->
           <div id="step2" style="display:none">
             <label>Choose a service</label>
             <div id="serviceChips" class="chips"></div>
+            <div id="evNote" class="fine" style="margin-top:6px;display:none">Some services are hidden because your car is electric.</div>
           </div>
 
+          <!-- STEP 3: details -->
           <div id="step3" style="display:none">
-            <label>A quick detail</label>
+            <!-- Smart clarifiers -->
+            <label>Tell us a bit more</label>
             <div id="clarifierChips" class="chips"></div>
 
-            <div id="serviceInfo" class="info" style="display:none">
-              <h4 id="si_title">Selected service</h4>
-              <div><span id="si_price" class="price">From £0</span><span id="si_label" class="muted"></span></div>
-              <p id="si_desc">Description will appear here.</p>
+            <!-- Urgency badges -->
+            <label style="margin-top:6px">How urgent is it?</label>
+            <div id="urgencyChips" class="chips">
+              <label class="chip"><input type="radio" name="urg" value="Won’t start / Unsafe to drive"><span>Won’t start / Unsafe</span></label>
+              <label class="chip"><input type="radio" name="urg" value="Warning light / Noise"><span>Warning light / Noise</span></label>
+              <label class="chip"><input type="radio" name="urg" value="Soon (within a week)"><span>Soon (within a week)</span></label>
+              <label class="chip"><input type="radio" name="urg" value="Routine maintenance"><span>Routine</span></label>
             </div>
 
-            <div id="pricing" class="fine" style="margin-top:6px">We’ll match parts to your reg and send a fixed quote.</div>
-
-            <div style="margin-top:10px">
-              <label for="warr">Warranty options</label>
-              <select id="warr">
-                <option value="0">6 months (included)</option>
-                <option value="20">12 months (+£20)</option>
-                <option value="40">18 months (+£40)</option>
-              </select>
-              <div class="fine">Warranty covers labour. See <a href="https://mitchsautoservices.com/page/terms-and-conditions" target="_blank" rel="noopener">Terms & Conditions</a>.</div>
+            <!-- Coverage checker -->
+            <div class="info">
+              <h4>Coverage & call-out</h4>
+              <div class="kv">
+                <input id="postcode" placeholder="Your postcode (e.g. TS18 1AA)" style="min-width:220px">
+                <button id="pcBtn" type="button">Check coverage</button>
+              </div>
+              <div id="pcResult" class="fine" style="margin-top:6px"></div>
             </div>
 
+            <!-- Availability picker -->
+            <div class="info">
+              <h4>Preferred date & time</h4>
+              <div class="kv">
+                <input id="datePick" type="date">
+                <input id="timePick" type="time" step="900">
+              </div>
+              <div id="slotNote" class="fine" style="margin-top:6px">Mon–Fri 09:00–17:00. Weekends available with a £50 surcharge.</div>
+            </div>
+
+            <!-- Warranty options + explainer -->
+            <div class="info">
+              <h4>Warranty</h4>
+              <div class="kv">
+                <select id="warr">
+                  <option value="0">6 months (included)</option>
+                  <option value="20">12 months (+£20)</option>
+                  <option value="40">18 months (+£40)</option>
+                </select>
+              </div>
+              <ul class="fine" style="margin-top:6px">
+                <li>Warranty covers labour on the work we carry out.</li>
+                <li>Upgrade extends your cover — ideal for higher-mileage or critical parts.</li>
+                <li>Customer-supplied parts are fitted at your risk and are <b>not covered</b>.</li>
+                <li>Full details in our <a href="https://mitchsautoservices.com/page/terms-and-conditions" target="_blank" rel="noopener">Terms & Conditions</a>.</li>
+              </ul>
+            </div>
+
+            <!-- MOT/Service reminders -->
+            <div class="info">
+              <h4>MOT / Service reminders (optional)</h4>
+              <label class="chip"><input type="checkbox" id="remOpt"> <span>Send me reminders by email</span></label>
+              <div class="kv" style="margin-top:6px">
+                <input id="remDue" type="date" title="Next MOT/Service due date">
+              </div>
+              <div class="fine" style="margin-top:6px">We’ll use your email when you contact us to set up reminders. You can opt out anytime.</div>
+            </div>
+
+            <!-- Photos / Videos -->
+            <div class="info">
+              <h4>Photos / videos (optional)</h4>
+              <input id="media" type="file" multiple accept="image/*,video/*">
+              <div class="fine" style="margin-top:6px">After review, you can <b>download a ZIP</b> and attach it to your email.</div>
+              <div id="thumbs" class="thumbs"></div>
+              <div class="kv" style="margin-top:8px">
+                <button id="zipBtn" type="button" class="ghost" disabled>Download ZIP of attachments</button>
+              </div>
+            </div>
+
+            <!-- REVIEW -->
             <div class="confirm" id="confirmBox" style="display:none">
               <h3>Review your request</h3>
               <div class="grid2">
@@ -137,16 +213,22 @@
                   <div class="row"><span class="muted">Registration</span><b id="c_vrm">—</b></div>
                   <div class="row"><span class="muted">Vehicle</span><b id="c_vehicle">—</b></div>
                   <div class="row"><span class="muted">Colour</span><b id="c_colour">—</b></div>
+                  <div class="row"><span class="muted">Postcode</span><b id="c_pc">—</b></div>
+                  <div class="row"><span class="muted">Distance/Call-out</span><b id="c_dist">—</b></div>
                 </div>
                 <div>
                   <div class="row"><span class="muted">Service</span><b id="c_service">—</b></div>
+                  <div class="row"><span class="muted">Tier</span><b id="c_tier">—</b></div>
                   <div class="row"><span class="muted">Detail</span><b id="c_detail">—</b></div>
+                  <div class="row"><span class="muted">Urgency</span><b id="c_urg">—</b></div>
+                  <div class="row"><span class="muted">Preferred slot</span><b id="c_slot">—</b></div>
                   <div class="row"><span class="muted">Warranty</span><b id="c_warranty">6 months (included)</b></div>
+                  <div class="row"><span class="muted">Reminders</span><b id="c_rem">—</b></div>
+                  <div class="row"><span class="muted">Reminder date</span><b id="c_remDate">—</b></div>
                 </div>
               </div>
               <div class="kv" style="margin-top:10px">
                 <button id="emailBtn" type="button">Send by Email</button>
-                <button id="waBtn" type="button">Send by WhatsApp</button>
                 <button id="editBtn" type="button" class="ghost">Go back and edit</button>
               </div>
               <div class="fine" style="margin-top:6px">We’ll reply with a fixed quote (labour + parts matched to your registration).</div>
@@ -164,27 +246,74 @@
 </section>
 
 <div class="container">
+  <!-- FAQ -->
+  <section class="section">
+    <div class="card">
+      <h2>FAQ</h2>
+
+      <details>
+        <summary>How do quotes work and why do prices vary by registration?</summary>
+        <p>We confirm your exact vehicle via DVLA, then match the correct parts. Labour is shown as clear “from” pricing; the final quote depends on your specific engine, fuel system, and parts quality. You’ll always approve the fixed quote before any work.</p>
+      </details>
+
+      <details>
+        <summary>What’s your cancellation and rescheduling policy?</summary>
+        <p>Rescheduling is free — please give as much notice as possible. Cancelling within 20 minutes of your appointment incurs a 25% charge of the job value to cover lost time.</p>
+      </details>
+
+      <details>
+        <summary>Do you fit customer-supplied parts?</summary>
+        <p>Yes — we’ll inspect them first. If a part is unsuitable or unsafe, we may refuse installation. Customer-supplied parts carry no warranty from us, and we don’t refund labour or parts if a supplied part fails.</p>
+      </details>
+
+      <details>
+        <summary>What areas do you cover and are there call-out fees?</summary>
+        <p>We cover Stockton-on-Tees plus a 15-mile radius with no call-out fee. Over 15 miles, a £25 call-out applies. We don’t travel beyond 30 miles.</p>
+      </details>
+
+      <details>
+        <summary>What are your hours and weekend policy?</summary>
+        <p>Mon–Fri, 9am–5pm as standard. Weekend appointments are available with a £50 surcharge.</p>
+      </details>
+
+      <details>
+        <summary>Does a diagnostic include the repair?</summary>
+        <p>No — diagnostics are a separate service to identify the fault. If you proceed with repairs, we’ll quote that work separately.</p>
+      </details>
+
+      <details>
+        <summary>How quickly will I get a quote?</summary>
+        <p>We usually reply within an hour during weekday hours. You can submit a request out of hours, and we’ll respond the next working day. Weekend jobs can’t be booked online directly.</p>
+      </details>
+    </div>
+  </section>
+
   <section class="section two">
     <div class="card">
-      <h2>How it works</h2>
-      <ol class="muted">
-        <li>Check your reg — we pull exact vehicle data from DVLA.</li>
-        <li>Pick a service — see clear <b>“from” pricing</b> and a short description.</li>
-        <li>Add a quick detail — e.g., “front brakes” or “won’t start”.</li>
-        <li>Review & send — we reply with a fixed quote (labour + parts matched to your reg).</li>
-      </ol>
+      <h2>MOT / Service reminders</h2>
+      <div class="kv">
+        <input id="remEmail" type="email" placeholder="Your email (for reminders)">
+        <input id="remDate" type="date" placeholder="Due date">
+      </div>
+      <div class="kv" style="margin-top:8px">
+        <button id="icsBtn" type="button" class="ghost">Add to my Calendar (.ics)</button>
+        <button id="remEmailBtn" type="button" class="ghost">Email us to opt-in</button>
+      </div>
+      <p class="fine" style="margin-top:6px">We’ll only use your details for reminders you request. You can opt out anytime.</p>
     </div>
+
     <div class="card">
       <h2>Contact & hours</h2>
       <div class="kv">
         <a href="tel:+447926725369"><button type="button">Call 07926 725369</button></a>
         <a href="mailto:support@mitchsautoservices.co.uk?subject=Service%20enquiry"><button type="button">Email us</button></a>
       </div>
-      <p class="muted" style="margin-top:10px">Mon–Fri • 9am–5pm • Stockton‑on‑Tees + 15 mile radius.</p>
+      <p class="muted" style="margin-top:10px">Mon–Fri • 9am–5pm. Weekends available for a £50 surcharge. Stockton-on-Tees + 15 mile radius.</p>
       <ul class="muted">
         <li>Transparent labour; parts priced to your registration</li>
-        <li>Standard <b>6‑month labour warranty</b> (upgrade to 12 or 18 months)</li>
+        <li>Standard <b>6-month labour warranty</b> (upgrade to 12 or 18 months)</li>
         <li>Card, cash & bank transfer accepted</li>
+        <li>Customer-supplied parts: fitted at your risk (no warranty on parts)</li>
       </ul>
     </div>
   </section>
@@ -195,34 +324,77 @@
   </footer>
 </div>
 
+<!-- ZIP helper for attachments -->
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js" defer></script>
+
+<!-- Service modal -->
+<div class="modal" id="svcModal" aria-hidden="true">
+  <div class="sheet">
+    <div class="closeX" id="modalClose">✕</div>
+    <h3 id="m_title">Service</h3>
+    <p id="m_desc">Description</p>
+    <div class="tiers" id="m_tiers"></div>
+    <div class="kv">
+      <button id="m_cancel" class="ghost" type="button">Cancel</button>
+      <button id="m_apply" type="button">Apply</button>
+    </div>
+  </div>
+</div>
+
 <script>
 /* ===== CONFIG ===== */
 const API_URL = '/api/vrm';
+const STOCKTON = { lat: 54.569, lon: -1.318 }; // approx town centre
+const COVERAGE_MILES = 15;
+const CALLOUT_FEE = 25;
+const MAX_MILES = 30;
+const WEEKEND_SURCHARGE = 50;
 
-/* Services with price + description */
+/* Services with price + description + tiers (From pricing) */
 const SERVICES = [
-  { id:'air_filter', label:'Air Filter Replacement', price:'From £30', desc:'Replacing the air filter helps your engine breathe better and perform more efficiently.' },
-  { id:'basic_service', label:'Basic Service Package', price:'From £100', desc:'Includes Engine Oil, Oil Filter, Air Filter, Dust/Pollen Filter, Coolant, Tyre Health Check, Light Inspection, and Battery Inspection.' },
-  { id:'battery_replacement', label:'Battery Replacement (with recoding)', price:'From £200', desc:'Modern cars often need new batteries coded to the vehicle. Our price includes full programming.' },
-  { id:'brake_change', label:'Brake Change', price:'From £100', desc:'If the brakes feel soft or unresponsive, it may be time to replace pads/discs.' },
-  { id:'brake_fluid', label:'Brake Fluid Flush', price:'From £20', desc:'Old or contaminated brake fluid reduces braking performance — flushing restores pedal feel.' },
-  { id:'battery_recharge', label:'Car Battery Recharge', price:'From £20', desc:'We take your battery overnight, fully recharge it, and refit it next morning.' },
-  { id:'diagnostic', label:'Car Diagnostic Check', price:'From £30', desc:'If the vehicle won’t start, book this first. We run deep diagnostics and recommend a fix on the spot.' },
-  { id:'car_refresh', label:'Car Refresh Service', price:'From £600', desc:'Full refresh: Oil & filters, coolant, plugs check, brake checks, tyre check, lights replaced, battery replaced.' },
-  { id:'coolant', label:'Coolant Change', price:'From £30', desc:'Low or degraded coolant can cause overheating and engine damage — we flush and replace.' },
-  { id:'pollen_filter', label:'Dust/Pollen Filter Replacement', price:'From £30', desc:'Fresh cabin filters improve airflow and reduce odours and allergens.' },
-  { id:'oil_filter', label:'Engine Oil & Filter Replacement', price:'From £60', desc:'Old oil thickens and increases wear. We replace both oil and filter to protect the engine.' },
-  { id:'fuel_filter', label:'Fuel Filter Replacement', price:'From £40', desc:'A clean fuel filter keeps fuel flowing smoothly and helps maintain performance.' },
-  { id:'lights', label:'Headlights & Rear Lights Replacement', price:'From £60', desc:'Faulty lights are unsafe and illegal. We replace and test for correct operation.' },
-  { id:'major_service', label:'Major Service Package', price:'From £350', desc:'Includes Oil, Filters, Coolant, Brake Fluid, Spark/Glow Plugs, and full brake replacement.' },
-  { id:'minor_service', label:'Minor Service Package', price:'From £110', desc:'Includes Oil, Oil Filter, Air Filter, Dust/Pollen Filter, and Coolant flush.' },
-  { id:'premium_service', label:'Premium Service Package', price:'From £300', desc:'Includes Oil & Filters, Coolant, Spark/Glow Plugs, plus brake/tyre/light/battery health checks.' },
-  { id:'seasonal', label:'Seasonal Maintenance Package', price:'From £150', desc:'Season changes stress vehicles — we check key systems so you stay safe and ready.' },
-  { id:'tyres', label:'Tyre Health Check', price:'From £35', desc:'We check tread depth (legal minimum 1.6mm) and tyre condition to keep you road‑legal.' },
-  { id:'wiper_motor', label:'Window Wiper Motor Replacement', price:'From £50', desc:'If wipers are slow or out of sync, the motor may be failing — we replace and align.' }
+  { id:'ac_recharge', label:'Air Conditioning Top-Up / Recharge', price:'From £85', desc:'Restores cold air performance and system efficiency.',
+    tiers:[ {id:'std', label:'A/C Top-Up', price:'From £85'}, {id:'ns', label:'Not sure — please advise', price:''} ] },
+  { id:'air_filter', label:'Air Filter Replacement', price:'From £30', desc:'Replacing the air filter helps your engine breathe better and perform more efficiently.',
+    tiers:[ {id:'std', label:'Standard', price:'From £31.75'}, {id:'ns', label:'Not sure — please advise', price:''} ] },
+  { id:'basic_service', label:'Basic Service Package', price:'From £100', desc:'Includes Engine Oil, Oil Filter, Air Filter, Dust/Pollen Filter, Coolant, Tyre Health Check, Light Inspection, and Battery Inspection.',
+    tiers:[ {id:'package', label:'Basic package', price:'From £100'} ] },
+  { id:'battery_replacement', label:'Battery Replacement (with recoding)', price:'From £200', desc:'Modern cars often need new batteries coded to the vehicle. Our price includes full programming.',
+    tiers:[ {id:'std', label:'Standard battery', price:'From £50'}, {id:'startstop', label:'Start/Stop battery', price:'From £100'}, {id:'ns', label:'Not sure — please advise', price:''} ] },
+  { id:'brake_change', label:'Brake Change', price:'From £100', desc:'If the brakes feel soft or unresponsive, it may be time to replace pads/discs.',
+    tiers:[ {id:'front', label:'Front only', price:'From £50.56'}, {id:'rear', label:'Rear only', price:'From £70.46'}, {id:'both', label:'Front + Rear', price:'From £155.82'}, {id:'ns', label:'Not sure — please advise', price:''} ] },
+  { id:'brake_fluid', label:'Brake Fluid Flush', price:'From £20', desc:'Old or contaminated brake fluid reduces braking performance — flushing restores pedal feel.',
+    tiers:[ {id:'std', label:'Standard flush', price:'From £20'}, {id:'ns', label:'Not sure — please advise', price:''} ] },
+  { id:'battery_recharge', label:'Car Battery Recharge', price:'From £20', desc:'We take your battery overnight, fully recharge it, and refit it next morning.',
+    tiers:[ {id:'std', label:'Overnight recharge', price:'From £20'}, {id:'ns', label:'Not sure — please advise', price:''} ] },
+  { id:'diagnostic', label:'Car Diagnostic Check', price:'From £30', desc:'If the vehicle won’t start, book this first. We run deep diagnostics and recommend a fix on the spot.',
+    tiers:[ {id:'std', label:'Full diagnostic scan', price:'From £30'} ] },
+  { id:'car_refresh', label:'Car Refresh Service', price:'From £600', desc:'Full refresh: Oil & filters, coolant, plugs check, brake checks, tyre check, lights replaced, battery replaced.',
+    tiers:[ {id:'package', label:'Refresh package', price:'From £600'} ] },
+  { id:'coolant', label:'Coolant Change', price:'From £30', desc:'Low or degraded coolant can cause overheating and engine damage — we flush and replace.',
+    tiers:[ {id:'std', label:'Coolant flush & replace', price:'From £30'}, {id:'ns', label:'Not sure — please advise', price:''} ] },
+  { id:'pollen_filter', label:'Dust/Pollen Filter Replacement', price:'From £30', desc:'Fresh cabin filters improve airflow and reduce odours and allergens.',
+    tiers:[ {id:'std', label:'Standard', price:'From £30'}, {id:'ns', label:'Not sure — please advise', price:''} ] },
+  { id:'oil_filter', label:'Engine Oil & Filter Replacement', price:'From £60', desc:'Old oil thickens and increases wear. We replace both oil and filter to protect the engine.',
+    tiers:[ {id:'std', label:'Oil & filter', price:'From £60'}, {id:'ns', label:'Not sure — please advise', price:''} ] },
+  { id:'fuel_filter', label:'Fuel Filter Replacement', price:'From £40', desc:'A clean fuel filter keeps fuel flowing smoothly and helps maintain performance.',
+    tiers:[ {id:'std', label:'Standard', price:'From £40'}, {id:'ns', label:'Not sure — please advise', price:''} ] },
+  { id:'lights', label:'Headlights & Rear Lights Replacement', price:'From £60', desc:'Faulty lights are unsafe and illegal. We replace and test for correct operation.',
+    tiers:[ {id:'single', label:'Single bulb', price:'From £25'}, {id:'pair', label:'Full pair', price:'From £45'}, {id:'set', label:'Full set (front + rear)', price:'From £80'}, {id:'ns', label:'Not sure — please advise', price:''} ] },
+  { id:'major_service', label:'Major Service Package', price:'From £350', desc:'Includes Oil, Filters, Coolant, Brake Fluid, Spark/Glow Plugs, and full brake replacement.',
+    tiers:[ {id:'package', label:'Major package', price:'From £350'} ] },
+  { id:'minor_service', label:'Minor Service Package', price:'From £110', desc:'Includes Oil, Oil Filter, Air Filter, Dust/Pollen Filter, and Coolant flush.',
+    tiers:[ {id:'package', label:'Minor package', price:'From £110'} ] },
+  { id:'premium_service', label:'Premium Service Package', price:'From £300', desc:'Includes Oil & Filters, Coolant, Spark/Glow Plugs, plus brake/tyre/light/battery health checks.',
+    tiers:[ {id:'package', label:'Premium package', price:'From £300'} ] },
+  { id:'seasonal', label:'Seasonal Maintenance Package', price:'From £150', desc:'Season changes stress vehicles — we check key systems so you stay safe and ready.',
+    tiers:[ {id:'package', label:'Seasonal package', price:'From £150'} ] },
+  { id:'tyres', label:'Tyre Health Check', price:'From £35', desc:'We check tread depth (legal minimum 1.6mm) and tyre condition to keep you road-legal.',
+    tiers:[ {id:'single', label:'Single tyre check', price:'From £10'}, {id:'set', label:'Full set (all four)', price:'From £30'}, {id:'ns', label:'Not sure — please advise', price:''} ] },
+  { id:'wiper_motor', label:'Window Wiper Motor Replacement', price:'From £50', desc:'If wipers are slow or out of sync, the motor may be failing — we replace and align.',
+    tiers:[ {id:'motor', label:'Motor replacement', price:'From £90.76'}, {id:'ns', label:'Not sure — please advise', price:''} ] }
 ];
 
-/* Clarifiers */
+/* Smart clarifiers per service */
 const CLARIFIERS = {
   air_filter:['Scheduled service','Reduced performance','Not sure'],
   basic_service:['Annual service','High mileage','Not sure'],
@@ -242,25 +414,67 @@ const CLARIFIERS = {
   premium_service:['Full works','Not sure'],
   seasonal:['Winter prep','Summer trip','Not sure'],
   tyres:['Uneven wear','Vibration','Slow puncture','Not sure'],
-  wiper_motor:['Stopped working','Slow movement','Intermittent','Not sure']
+  wiper_motor:['Stopped working','Slow movement','Intermittent','Not sure'],
+  ac_recharge:['Not blowing cold','After winter recharge','Strange smell','Not sure']
 };
 
 /* ===== WIRING ===== */
 const $=id=>document.getElementById(id);
-const vrmInput=$('vrm'), lookupBtn=$('lookupBtn'), vehicleCard=$('vehicleCard'),
-      vehTitle=$('vehTitle'), vehMeta=$('vehMeta'), vehReg=$('vehReg'),
-      errorBox=$('error'), step2=$('step2'), step3=$('step3'),
+const vrmInput=$('vrm'), lookupBtn=$('lookupBtn'),
+      vehicleCard=$('vehicleCard'), vehTitle=$('vehTitle'), vehTags=$('vehTags'), vehReg=$('vehReg'),
+      errorBox=$('error'), step2=$('step2'), step3=$('step3'), evNote=$('evNote'),
       serviceChips=$('serviceChips'), clarifierChips=$('clarifierChips'),
-      pricing=$('pricing'), warrSel=$('warr'),
-      reviewBtn=$('reviewBtn'), confirmBox=$('confirmBox'),
+      postcodeInput=$('postcode'), pcBtn=$('pcBtn'), pcResult=$('pcResult'),
+      datePick=$('datePick'), timePick=$('timePick'), slotNote=$('slotNote'),
+      warrSel=$('warr'), reviewBtn=$('reviewBtn'), confirmBox=$('confirmBox'), preConfirmBtns=$('preConfirmBtns'),
       c_vrm=$('c_vrm'), c_vehicle=$('c_vehicle'), c_colour=$('c_colour'),
-      c_service=$('c_service'), c_detail=$('c_detail'), c_warranty=$('c_warranty'),
-      preConfirmBtns=$('preConfirmBtns'),
-      siTitle=$('si_title'), siPrice=$('si_price'), siLabel=$('si_label'), siDesc=$('si_desc'), serviceInfo=$('serviceInfo');
+      c_service=$('c_service'), c_tier=$('c_tier'), c_detail=$('c_detail'), c_warranty=$('c_warranty'),
+      c_pc=$('c_pc'), c_dist=$('c_dist'), c_urg=$('c_urg'), c_slot=$('c_slot'),
+      c_rem=$('c_rem'), c_remDate=$('c_remDate'),
+      emailBtn=$('emailBtn'), editBtn=$('editBtn'),
+      mediaInp=$('media'), thumbs=$('thumbs'), zipBtn=$('zipBtn'),
+      remOpt=$('remOpt'), remDue=$('remDue'),
+      remEmail=$('remEmail'), remDate=$('remDate'), icsBtn=$('icsBtn'), remEmailBtn=$('remEmailBtn'),
+      modal=$('svcModal'), m_title=$('m_title'), m_desc=$('m_desc'), m_tiers=$('m_tiers'), m_apply=$('m_apply'), m_cancel=$('m_cancel'), modalClose=$('modalClose');
 
-let lastVRM='', chosenService=null, chosenClarifier=null, vehicleSummary='', vehicleColour='';
+let lastVRM='', chosenService=null, chosenTier=null, chosenClarifier=null, chosenUrgency='', vehicleData={}, vehicleSummary='', vehicleColour='', fuelType='';
+let coverageMiles = null, coverageFee = 0, outsideMax=false;
+let selectedFiles = [];
 
+/* Helpers */
 const normaliseVRM = v => (v||'').toUpperCase().replace(/\s+/g,'').replace(/[^A-Z0-9]/g,'');
+const fmt = n => `£${Number(n).toFixed(2)}`;
+const fmtMiles = n => `${n.toFixed(1)} mi`;
+const fmtMilesText = n => `${n.toFixed(1)} miles`;
+const haversineMiles = (lat1, lon1, lat2, lon2) => {
+  const R = 3958.761; const toRad = d => d*Math.PI/180;
+  const dLat = toRad(lat2-lat1), dLon = toRad(lon2-lon1);
+  const a = Math.sin(dLat/2)**2 + Math.cos(toRad(lat1))*Math.cos(toRad(lat2))*Math.sin(dLon/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+};
+
+function renderDVLA(v){
+  const tags = [];
+  if (v.fuelType) tags.push(`<span class="tag">${v.fuelType}</span>`);
+  if (v.engineCapacity) tags.push(`<span class="tag">${(v.engineCapacity/1000).toFixed(1)}L</span>`);
+  if (v.colour) tags.push(`<span class="tag">${v.colour}</span>`);
+  if (v.yearOfManufacture) tags.push(`<span class="tag">Year ${v.yearOfManufacture}</span>`);
+  if (v.bodyType) tags.push(`<span class="tag">${v.bodyType}</span>`);
+  if (v.taxStatus) tags.push(`<span class="tag">Tax: ${v.taxStatus}</span>`);
+  if (v.motStatus) tags.push(`<span class="tag ${v.motStatus==='Valid'?'':'warn'}">MOT: ${v.motStatus}${v.motExpiryDate? ' '+v.motExpiryDate:''}</span>`);
+  vehTags.innerHTML = tags.join(' ');
+  vehTitle.innerHTML = `<strong>${v.make||''} ${v.model||''}</strong>`;
+  vehReg.textContent = `Reg: ${lastVRM}`;
+  vehicleCard.style.display='block';
+}
+
+function serviceListForFuel(fuel){
+  const isEV = (fuel||'').toLowerCase()==='electric';
+  if (!isEV) return SERVICES;
+  // EV: hide oil, fuel filter, coolant; keep brake fluid + A/C
+  const hideIds = new Set(['oil_filter','fuel_filter','coolant']);
+  return SERVICES.filter(s => !hideIds.has(s.id));
+}
 
 function renderServiceChips(list){
   serviceChips.innerHTML = list.map(s => `
@@ -268,7 +482,7 @@ function renderServiceChips(list){
       <input type="radio" name="srv" value="${s.id}">
       <span>${s.label}</span>
     </label>
-  `).join(''); /* <-- correct backtick quotes */
+  `).join('');
 }
 
 function renderClarifiers(serviceId){
@@ -278,15 +492,37 @@ function renderClarifiers(serviceId){
   `).join('');
 }
 
-function showServiceInfo(svc){
-  siTitle.textContent = 'Selected service';
-  siPrice.textContent = svc.price || '';
-  siLabel.textContent = svc.label || '';
-  siDesc.textContent = svc.desc || '';
-  serviceInfo.style.display = 'block';
-  pricing.textContent = 'We’ll match parts to your reg and send a fixed quote.';
+function openServiceModal(svc){
+  m_title.textContent = svc.label;
+  m_desc.textContent  = svc.desc;
+  m_tiers.innerHTML = (svc.tiers||[]).map(t => `
+    <label class="tier">
+      <span>${t.label}</span>
+      <span class="muted">${t.price||''}</span>
+      <input type="radio" name="tier" value="${t.id}" style="margin-left:12px">
+    </label>
+  `).join('');
+  const prev = chosenTier && chosenService && chosenService.id===svc.id ? chosenTier.id : null;
+  if (prev){
+    const el = m_tiers.querySelector(\`input[value="${prev}"]\`);
+    if (el) el.checked = true;
+  }
+  modal.classList.add('open'); modal.setAttribute('aria-hidden','false');
+}
+function closeServiceModal(){ modal.classList.remove('open'); modal.setAttribute('aria-hidden','true'); }
+
+function updateSlotNote(){
+  const dVal = datePick.value; const tVal = timePick.value;
+  if (!dVal){ slotNote.textContent='Mon–Fri 09:00–17:00. Weekends available with a £50 surcharge.'; return; }
+  const d = new Date(dVal+'T'+(tVal||'09:00')+':00');
+  const day = d.getDay(); const hour = Number((tVal||'09:00').split(':')[0]);
+  let notes = [];
+  if (day===0 || day===6) notes.push('Weekend surcharge (£50) applies.');
+  if (hour<9 || hour>=17) notes.push('Outside 09:00–17:00; after-hours surcharge may apply.');
+  slotNote.textContent = notes.length ? notes.join(' ') : 'Within standard hours.';
 }
 
+/* ===== Events ===== */
 document.getElementById('vrmForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   errorBox.style.display='none';
@@ -296,7 +532,7 @@ document.getElementById('vrmForm').addEventListener('submit', async (e) => {
   lookupBtn.disabled=true; lookupBtn.textContent='Looking…';
   vehicleCard.style.display='block';
   vehTitle.innerHTML = '<div class="skeleton" style="width:240px;height:18px"></div>';
-  vehMeta.innerHTML  = '<div class="skeleton" style="width:300px;height:16px"></div>';
+  vehTags.innerHTML  = '<div class="skeleton" style="width:300px;height:16px"></div>';
   vehReg.textContent = '';
 
   try{
@@ -304,22 +540,23 @@ document.getElementById('vrmForm').addEventListener('submit', async (e) => {
     const data = await res.json();
     if(!res.ok) throw new Error(data?.message || data?.error || 'Lookup failed');
 
-    lastVRM = vrm;
+    lastVRM = vrm; vehicleData = data;
     const engine = data.engineCapacity ? (data.engineCapacity/1000).toFixed(1) + 'L' : '';
+    fuelType = data.fuelType || '';
     vehicleSummary = `${data.make||''} ${data.model||''}${engine? ' • '+engine:''}${data.fuelType? ' • '+data.fuelType:''}`;
     vehicleColour = data.colour || '';
 
-    vehTitle.innerHTML = `<strong>${data.make || ''} ${data.model || ''}</strong>`;
-    vehMeta.innerHTML  = [data.fuelType, engine, data.colour].filter(Boolean).join(' • ') || '<span class="muted">Details unavailable</span>';
-    vehReg.textContent = 'Reg: ' + vrm;
+    renderDVLA(data);
 
-    renderServiceChips(SERVICES);
+    const list = serviceListForFuel(fuelType);
+    renderServiceChips(list);
+    evNote.style.display = (fuelType||'').toLowerCase()==='electric' ? 'block' : 'none';
+
     step2.style.display='block';
     step3.style.display='none';
     confirmBox.style.display='none';
     preConfirmBtns.style.display='flex';
-    serviceInfo.style.display='none';
-    pricing.textContent='Pick a service to continue.';
+    chosenService=null; chosenTier=null; chosenClarifier=null;
   }catch(err){
     errorBox.textContent = err.message.includes('Forbidden') ? 'DVLA says “Forbidden”: your server is not sending a valid API key yet.' : err.message;
     errorBox.style.display='block';
@@ -333,36 +570,114 @@ document.getElementById('vrmForm').addEventListener('submit', async (e) => {
 serviceChips.addEventListener('change', (e) => {
   if (e.target.name!=='srv') return;
   const id = e.target.value;
-  chosenService = SERVICES.find(s => s.id===id);
+  const svc = SERVICES.find(s => s.id===id);
+  chosenService = svc;
+  openServiceModal(svc);
   renderClarifiers(id);
-  showServiceInfo(chosenService);
   step3.style.display='block';
   confirmBox.style.display='none';
   preConfirmBtns.style.display='flex';
 });
 
+document.getElementById('modalClose').addEventListener('click', closeServiceModal);
+document.getElementById('m_cancel').addEventListener('click', closeServiceModal);
+document.getElementById('m_apply').addEventListener('click', () => {
+  const picked = document.querySelector('#m_tiers input[name="tier"]:checked');
+  if (!picked){ alert('Please pick a tier or choose “Not sure — please advise”.'); return; }
+  const tierId = picked.value;
+  chosenTier = (chosenService.tiers||[]).find(t => t.id===tierId) || null;
+  closeServiceModal();
+});
+
 clarifierChips.addEventListener('change', (e) => {
   if (e.target.name!=='clar') return;
   chosenClarifier = e.target.value;
-  confirmBox.style.display='none';
-  preConfirmBtns.style.display='flex';
 });
 
-warrSel.addEventListener('change', () => {
-  confirmBox.style.display='none';
-  preConfirmBtns.style.display='flex';
+document.getElementById('urgencyChips').addEventListener('change', (e) => {
+  if (e.target.name!=='urg') return;
+  chosenUrgency = e.target.value;
 });
 
+/* Postcode coverage checker (postcodes.io) */
+pcBtn.addEventListener('click', async () => {
+  pcResult.textContent = 'Checking…';
+  coverageMiles = null; coverageFee = 0; outsideMax=false;
+  const pc = (postcodeInput.value||'').trim();
+  if (!pc){ pcResult.textContent='Enter a postcode.'; return; }
+  try{
+    const r = await fetch(`https://api.postcodes.io/postcodes/${encodeURIComponent(pc)}`);
+    const j = await r.json();
+    if (j.status !== 200) throw new Error('Postcode not found');
+    const { latitude, longitude } = j.result;
+    const dist = haversineMiles(STOCKTON.lat, STOCKTON.lon, latitude, longitude);
+    coverageMiles = dist;
+    if (dist <= COVERAGE_MILES){
+      pcResult.innerHTML = `Within coverage: ${fmtMilesText(dist)} (no call-out fee).`;
+    } else if (dist <= MAX_MILES){
+      coverageFee = CALLOUT_FEE;
+      pcResult.innerHTML = `Outside ${COVERAGE_MILES} mi: ${fmtMilesText(dist)} — <b>${fmt(CALLOUT_FEE)} call-out fee applies</b>.`;
+    } else {
+      outsideMax = true;
+      pcResult.innerHTML = `We’re ${fmtMilesText(dist)} away — outside our maximum ${MAX_MILES} miles. Please email us and we’ll advise.`;
+    }
+  }catch(err){
+    pcResult.textContent = 'Could not validate postcode. Please check and try again.';
+  }
+});
+
+/* Availability note */
+datePick.addEventListener('change', updateSlotNote);
+timePick.addEventListener('change', updateSlotNote);
+
+/* Media thumbnails + ZIP */
+mediaInp.addEventListener('change', () => {
+  thumbs.innerHTML = '';
+  selectedFiles = Array.from(mediaInp.files||[]);
+  selectedFiles.forEach(f => {
+    if (f.type.startsWith('image/')){
+      const img = document.createElement('img');
+      img.src = URL.createObjectURL(f);
+      thumbs.appendChild(img);
+    } else if (f.type.startsWith('video/')){
+      const v = document.createElement('video'); v.src = URL.createObjectURL(f); v.controls=true;
+      thumbs.appendChild(v);
+    }
+  });
+  zipBtn.disabled = selectedFiles.length===0;
+});
+zipBtn.addEventListener('click', async () => {
+  if (!window.JSZip || selectedFiles.length===0) return;
+  const zip = new JSZip();
+  const folder = zip.folder(`attachments_${lastVRM||'car'}`) ;
+  await Promise.all(selectedFiles.map(async f => folder.file(f.name, await f.arrayBuffer())));
+  const blob = await zip.generateAsync({type:'blob'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = `mitch-attachments-${lastVRM||'car'}.zip`; a.click();
+});
+
+/* Review & send */
+function summarySlot(){
+  if (!datePick.value && !timePick.value) return '';
+  const dateTxt = datePick.value ? new Date(datePick.value).toLocaleDateString() : '';
+  const t = timePick.value || '';
+  return [dateTxt, t].filter(Boolean).join(' ');
+}
 function urlMsg(){
-  const serviceName = chosenService ? chosenService.label : '';
-  const warranty = Number(warrSel.value)||0;
   const lines = [
     `VRM: ${lastVRM}`,
     `Vehicle: ${vehicleSummary}`,
     vehicleColour ? `Colour: ${vehicleColour}` : null,
-    `Service: ${serviceName}`,
+    `Service: ${chosenService? chosenService.label : ''}`,
+    chosenTier ? `Tier: ${chosenTier.label}${chosenTier.price? ' ('+chosenTier.price+')' : ''}` : 'Tier: —',
     `Detail: ${chosenClarifier||''}`,
-    `Warranty upgrade: £${warranty}`
+    `Urgency: ${chosenUrgency||''}`,
+    postcodeInput.value ? `Postcode: ${postcodeInput.value}` : null,
+    (coverageMiles!=null) ? `Distance: ${fmtMiles(coverageMiles)}${coverageFee? ' • Call-out fee '+fmt(coverageFee) : (outsideMax?' • Outside max range' : ' • No call-out fee')}` : null,
+    summarySlot() ? `Preferred slot: ${summarySlot()}` : null,
+    (warrSel.value==='0') ? 'Warranty: 6 months (included)' : (warrSel.value==='20' ? 'Warranty: 12 months (+£20)' : 'Warranty: 18 months (+£40)'),
+    remOpt.checked ? `Reminder opt-in: Yes${remDue.value? ' • Due date '+remDue.value : ''}` : 'Reminder opt-in: No',
+    selectedFiles.length ? `Attachments: ZIP will be attached in the email` : null
   ].filter(Boolean).join('%0A');
   return lines;
 }
@@ -370,28 +685,67 @@ function urlMsg(){
 document.getElementById('reviewBtn').addEventListener('click', () => {
   if(!lastVRM){ alert('Please enter your reg first.'); return; }
   if(!chosenService){ alert('Please select a service.'); return; }
+  if(!chosenTier){ alert('Please pick a labour tier (or choose “Not sure — please advise”).'); return; }
+  if(outsideMax){ alert('You are outside our maximum 30-mile range. Please email us and we’ll advise.'); return; }
 
   c_vrm.textContent = lastVRM;
   c_vehicle.textContent = vehicleSummary || '—';
   c_colour.textContent = vehicleColour || '—';
   c_service.textContent = chosenService.label || '—';
+  c_tier.textContent = chosenTier ? `${chosenTier.label}${chosenTier.price? ' • '+chosenTier.price:''}` : '—';
   c_detail.textContent = chosenClarifier || '—';
+  c_urg.textContent = chosenUrgency || '—';
+  c_pc.textContent = postcodeInput.value || '—';
+  c_dist.textContent = (coverageMiles!=null) ? `${fmtMiles(coverageMiles)}${coverageFee? ' • Call-out '+fmt(coverageFee) : (outsideMax? ' • Outside max' : ' • No call-out')}` : '—';
+  c_slot.textContent = summarySlot() || '—';
   c_warranty.textContent = (warrSel.value==='0') ? '6 months (included)' : (warrSel.value==='20' ? '12 months (+£20)' : '18 months (+£40)');
+  c_rem.textContent = remOpt.checked ? 'Yes' : 'No';
+  c_remDate.textContent = remDue.value || '—';
 
   confirmBox.style.display='block';
   preConfirmBtns.style.display='none';
 });
 
-document.getElementById('editBtn').addEventListener('click', () => {
+editBtn.addEventListener('click', () => {
   confirmBox.style.display='none';
   preConfirmBtns.style.display='flex';
 });
 
-document.getElementById('emailBtn').addEventListener('click', () => {
-  window.location = `mailto:support@mitchsautoservices.co.uk?subject=Quote%20${encodeURIComponent(lastVRM)}&body=${urlMsg()}`;
+emailBtn.addEventListener('click', () => {
+  const subject = `Quote ${encodeURIComponent(lastVRM)}`;
+  const body = urlMsg();
+  window.location.href = `mailto:support@mitchsautoservices.co.uk?subject=${subject}&body=${body}`;
 });
-document.getElementById('waBtn').addEventListener('click', () => {
-  window.open(`https://wa.me/447926725369?text=${urlMsg()}`,'_blank');
+
+/* Bottom reminders helpers */
+function makeICS(summary, description, startDateISO){
+  const dt = new Date(startDateISO);
+  const pad = n => String(n).padStart(2,'0');
+  const y=dt.getFullYear(), m=pad(dt.getMonth()+1), d=pad(dt.getDate()), hh=pad(dt.getHours()), mm=pad(dt.getMinutes());
+  const dtstart = `${y}${m}${d}T${hh}${mm}00`;
+  return [
+    'BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//MitchAuto//Reminders//EN','BEGIN:VEVENT',
+    `UID:${Date.now()}@mitchsautoservices.co.uk`,
+    `DTSTAMP:${dtstart}Z`,
+    `DTSTART:${dtstart}Z`,
+    `SUMMARY:${summary}`,
+    `DESCRIPTION:${description}`,
+    'END:VEVENT','END:VCALENDAR'
+  ].join('\r\n');
+}
+icsBtn.addEventListener('click', () => {
+  const dateVal = remDate.value;
+  if (!dateVal){ alert('Pick a date for the reminder.'); return; }
+  const ics = makeICS('Vehicle reminder', 'MOT/Service reminder from Mitch’s Auto Services', dateVal+'T09:00:00');
+  const blob = new Blob([ics], {type:'text/calendar'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download='mitch-reminder.ics'; a.click();
+});
+remEmailBtn.addEventListener('click', () => {
+  const email = remEmail.value || '';
+  const dateVal = remDate.value || '';
+  const subject = 'Reminder opt-in';
+  const body = encodeURIComponent(`Please add me to MOT/Service reminders.\nEmail: ${email}\nDue date: ${dateVal}`);
+  window.location.href = `mailto:support@mitchsautoservices.co.uk?subject=${encodeURIComponent(subject)}&body=${body}`;
 });
 </script>
 </body>

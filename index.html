@@ -1,421 +1,113 @@
-<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Mitch’s Auto Services – Mobile Mechanic • Stockton-on-Tees</title>
-<meta name="description" content="Mobile mechanic in Stockton-on-Tees (+15 mile radius). DVLA number-plate lookup, choose a service with 'from' pricing and descriptions, review details, and request a quote via Email or WhatsApp.">
 <style>
   :root{
-    --brand:#F06407;    /* primary */
-    --accent:#4A4443;   /* secondary */
-    --ink:#EDEDED;      /* text */
-    --bg:#0b0e13;       /* page bg */
-    --card:#121720;     /* card bg */
-    --muted:#9aa1ac;    /* secondary text */
-    --line:#223046;     /* borders */
-    --err:#ff9c9c;      /* error */
+    --brand:#F06407;        /* main orange */
+    --brand-dark:#c24d05;
+    --ink:#222;             /* main text */
+    --bg:#f7f8fa;           /* page background */
+    --card:#fff;            /* card background */
+    --muted:#555;           /* muted text */
+    --line:#e2e6ea;         /* border lines */
+    --ok:#2ecc71;           /* green */
+    --warn:#f39c12;         /* amber */
+    --err:#e74c3c;          /* red */
   }
   *{box-sizing:border-box}
-  html,body{height:100%}
-  body{margin:0;background:linear-gradient(180deg,var(--bg),#101623);color:var(--ink);font-family:system-ui, Inter, Arial, sans-serif;line-height:1.45}
-  a{color:#ffd6bf;text-decoration:none} a:hover{text-decoration:underline}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:system-ui, Inter, Arial, sans-serif;
+    line-height:1.5;
+  }
+  a{color:var(--brand);text-decoration:none}
+  a:hover{text-decoration:underline}
+
   .container{max-width:1140px;margin:0 auto;padding:20px 16px 48px}
 
   /* HERO */
   .hero{
-    background: radial-gradient(80% 60% at 15% 20%, rgba(240,100,7,.18), transparent 60%),
-                radial-gradient(70% 40% at 90% 0%, rgba(74,68,67,.3), transparent 60%),
-                linear-gradient(180deg, #0b0e13, #0f1625);
+    background:linear-gradient(135deg, #fff, #f9f9f9);
     border-bottom:1px solid var(--line);
   }
-  .hero-inner{max-width:1140px;margin:0 auto;padding:28px 16px 24px}
+  .hero-inner{max-width:1140px;margin:0 auto;padding:28px 16px 32px}
   .topbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:18px;flex-wrap:wrap}
-  .brand{display:flex;align-items:center;gap:10px}
-  .brand .name{font-weight:900;letter-spacing:.2px;color:var(--brand);font-size:20px}
-  .badge{background:rgba(240,100,7,.15);color:#ffd9c5;border:1px dashed var(--brand);padding:6px 10px;border-radius:999px;font-size:12px;white-space:nowrap}
-  .hero-grid{display:grid;gap:16px;grid-template-columns:1fr}
+  .brand .name{font-weight:900;letter-spacing:.3px;color:var(--brand);font-size:22px}
+  .badge{background:#fff3e9;color:var(--brand-dark);border:1px solid var(--brand);padding:6px 12px;border-radius:999px;font-size:13px}
+  .hero-grid{display:grid;gap:24px;grid-template-columns:1fr}
   @media(min-width:980px){.hero-grid{grid-template-columns:1.2fr .8fr}}
-  .hero-copy h1{font-size:clamp(26px,3.4vw,42px);margin:6px 0 8px}
-  .hero-copy p{color:var(--muted);margin:0 0 12px}
-  .trust{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-  .trust span{border:1px solid var(--line);padding:6px 10px;border-radius:999px;color:var(--muted);font-size:12px}
+  .hero-copy h1{font-size:clamp(28px,3.4vw,44px);margin:6px 0 12px;color:#111}
+  .hero-copy p{color:var(--muted);margin:0 0 12px;font-size:17px}
+  .trust{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+  .trust span{border:1px solid var(--line);padding:6px 12px;border-radius:999px;color:var(--muted);font-size:13px;background:#fff}
 
-  /* CARDS & LAYOUT */
-  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px}
-  .section{margin-top:26px}
-  .section h2{margin:0 0 10px;font-size:clamp(18px,2.6vw,26px)}
-  .two{display:grid;gap:16px;grid-template-columns:1fr}
+  /* CARDS */
+  .card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:20px;
+    box-shadow:0 2px 6px rgba(0,0,0,.05);
+  }
+  .section{margin-top:32px}
+  .section h2{margin:0 0 14px;font-size:clamp(20px,2.4vw,28px);color:#111}
+  .two{display:grid;gap:20px;grid-template-columns:1fr}
   @media(min-width:900px){.two{grid-template-columns:1fr 1fr}}
 
-  /* FORM + FLOW */
-  label{display:block;font-weight:700;margin:6px 0}
-  input,select,button{padding:12px;border-radius:10px;border:1px solid #2a3546;background:#0d121a;color:var(--ink);font-size:16px}
-  input:focus,select:focus{outline:2px solid var(--brand)}
-  button{cursor:pointer;background:var(--brand);color:#111;font-weight:800;border:none}
+  /* FORM ELEMENTS */
+  label{display:block;font-weight:600;margin:6px 0;color:#111}
+  input,select,button,textarea{
+    padding:12px;border-radius:10px;
+    border:1px solid #ccc;
+    background:#fff;color:var(--ink);
+    font-size:16px;
+  }
+  input:focus,select:focus,textarea:focus{outline:2px solid var(--brand)}
+  button{
+    cursor:pointer;
+    background:var(--brand);
+    color:#fff;
+    font-weight:700;
+    border:none;
+    transition:.2s;
+  }
+  button:hover{background:var(--brand-dark)}
   button.ghost{background:transparent;border:1px solid var(--line);color:var(--ink)}
   button[disabled]{opacity:.6;cursor:not-allowed}
-  .plate{display:flex;gap:10px;align-items:center;background:#161b25;border:1px solid #2a3546;padding:10px;border-radius:12px}
-  .plate::before{content:"GB";font-weight:800;background:#1b3ea5;color:#fff;border-radius:6px;padding:6px 8px}
-  .stack{display:grid;gap:12px}
-  .chips{display:flex;gap:8px;flex-wrap:wrap}
-  .chip{display:inline-flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid #314056;border-radius:12px;background:#0e141d;cursor:pointer}
-  .chip input{accent-color:var(--brand)}
-  .muted{color:var(--muted)}
-  .err{color:var(--err)}
-  .fine{font-size:12px;color:#8a93a3}
-  .kv{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-  .tag{font-size:12px;border:1px solid var(--line);color:var(--muted);padding:6px 8px;border-radius:999px}
 
-  /* SERVICE INFO BOX */
-  .svcinfo{margin-top:10px;border:1px solid var(--line);border-radius:12px;padding:12px;background:#0f1520}
-  .svcinfo h3{margin:0 0 6px;font-size:18px}
-  .svcinfo .price{font-weight:800;color:#ffd9c5;margin-right:8px}
+  .plate{
+    display:flex;gap:10px;align-items:center;
+    background:#f3f4f6;
+    border:1px solid #ccc;
+    padding:10px;border-radius:12px
+  }
+  .plate::before{
+    content:"GB";font-weight:800;
+    background:#1b3ea5;color:#fff;
+    border-radius:6px;padding:6px 8px
+  }
+
+  .chips{display:flex;gap:8px;flex-wrap:wrap}
+  .chip{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border:1px solid #ddd;border-radius:12px;background:#fafafa;cursor:pointer}
+  .chip input{accent-color:var(--brand)}
+
+  /* INFO BOXES */
+  .svcinfo{margin-top:12px;border:1px solid var(--line);border-radius:12px;padding:12px;background:#fafafa}
+  .svcinfo h3{margin:0 0 6px;font-size:18px;color:#111}
+  .svcinfo .price{font-weight:800;color:var(--brand-dark);margin-right:8px}
   .svcinfo p{margin:6px 0 0;color:var(--muted)}
 
+  .notice{margin-top:10px;border:1px dashed var(--line);border-radius:10px;padding:12px;background:#fafafa;font-size:14px}
+
   /* CONFIRM BOX */
-  .confirm{margin-top:12px;border:1px solid var(--line);border-radius:12px;padding:12px;background:#0f1520}
-  .confirm h3{margin:0 0 8px;font-size:18px}
-  .grid2{display:grid;grid-template-columns:1fr;gap:8px}
-  @media(min-width:620px){ .grid2{grid-template-columns:1fr 1fr} }
-  .row{display:flex;justify-content:space-between;gap:10px}
+  .confirm{margin-top:12px;border:1px solid var(--line);border-radius:12px;padding:14px;background:#fafafa}
+  .confirm h3{margin:0 0 8px;font-size:20px;color:#111}
+  .row{display:flex;justify-content:space-between;gap:10px;font-size:15px}
+
+  /* STATUS COLORS */
+  .ok{color:var(--ok);font-weight:600}
+  .warn{color:var(--warn);font-weight:600}
+  .err{color:var(--err);font-weight:600}
 
   /* FOOTER */
-  footer{margin-top:28px;color:var(--muted);font-size:14px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:16px}
+  footer{margin-top:32px;color:var(--muted);font-size:14px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:16px}
 </style>
-</head>
-<body>
-
-<!-- HERO -->
-<section class="hero">
-  <div class="hero-inner">
-    <div class="topbar">
-      <div class="brand"><div class="name">Mitch’s Auto Services</div></div>
-      <div class="badge">Mobile mechanic • Stockton-on-Tees + 15 mile radius</div>
-    </div>
-
-    <div class="hero-grid">
-      <div class="hero-copy">
-        <h1>Honest mobile mechanic — clear labour, parts priced to your reg</h1>
-        <p>Pop in your number plate to confirm the exact vehicle via the <b>official DVLA</b> database. Then pick a service, see the <b>from price</b> and description, add a quick detail, and send your request by <b>Email</b> or <b>WhatsApp</b>.</p>
-        <div class="trust">
-          <span>Official DVLA vehicle lookup</span>
-          <span>Transparent labour (no hidden mark-ups)</span>
-          <span>6-month labour warranty (upgrade available)</span>
-          <span>Card, cash & bank transfer</span>
-        </div>
-      </div>
-      <div class="card">
-        <h2 style="margin:0 0 8px;font-size:20px">Start here — Check your number plate</h2>
-        <div class="stack">
-          <!-- STEP 1 -->
-          <form id="vrmForm" novalidate>
-            <label for="vrm">Registration (VRM)</label>
-            <div class="plate">
-              <input id="vrm" placeholder="e.g. AB12 CDE" maxlength="8" autocomplete="off" required />
-              <button id="lookupBtn" type="submit">Look up</button>
-            </div>
-            <small class="fine">Tip: remove spaces if it doesn’t find it first time.</small>
-          </form>
-
-          <div id="vehicleCard" style="display:none">
-            <div id="vehTitle" style="font-weight:800"></div>
-            <div id="vehMeta" class="muted" style="margin-top:4px"></div>
-            <div id="vehReg" class="muted" style="margin-top:2px"></div>
-          </div>
-          <div id="error" class="err" style="margin-top:6px;display:none"></div>
-
-          <!-- STEP 2 -->
-          <div id="step2" style="display:none">
-            <label>Choose a service</label>
-            <div id="serviceChips" class="chips"></div>
-            <!-- Service info box -->
-            <div id="serviceInfo" class="svcinfo" style="display:none">
-              <h3 id="svcTitle"></h3>
-              <div><span id="svcPrice" class="price"></span><span id="svcShort"></span></div>
-            </div>
-          </div>
-
-          <!-- STEP 3 -->
-          <div id="step3" style="display:none">
-            <label>A quick detail</label>
-            <div id="clarifierChips" class="chips"></div>
-
-            <div style="margin-top:10px">
-              <label for="warr">Warranty options</label>
-              <select id="warr">
-                <option value="0">6 months (included)</option>
-                <option value="20">12 months (+£20)</option>
-                <option value="40">18 months (+£40)</option>
-              </select>
-              <div class="fine">Warranty covers labour. Full details in our <a href="https://mitchsautoservices.com/page/terms-and-conditions" target="_blank" rel="noopener">Terms & Conditions</a>.</div>
-            </div>
-
-            <!-- REVIEW -->
-            <div class="confirm" id="confirmBox" style="display:none">
-              <h3>Review your request</h3>
-              <div class="grid2">
-                <div>
-                  <div class="row"><span class="muted">Registration</span><b id="c_vrm">—</b></div>
-                  <div class="row"><span class="muted">Vehicle</span><b id="c_vehicle">—</b></div>
-                  <div class="row"><span class="muted">Colour</span><b id="c_colour">—</b></div>
-                </div>
-                <div>
-                  <div class="row"><span class="muted">Service</span><b id="c_service">—</b></div>
-                  <div class="row"><span class="muted">Detail</span><b id="c_detail">—</b></div>
-                  <div class="row"><span class="muted">Warranty</span><b id="c_warranty">6 months (included)</b></div>
-                </div>
-              </div>
-              <div class="kv" style="margin-top:10px">
-                <button id="emailBtn" type="button">Send by Email</button>
-                <button id="waBtn" type="button">Send by WhatsApp</button>
-                <button id="editBtn" type="button" class="ghost">Go back and edit</button>
-              </div>
-              <div class="fine" style="margin-top:6px">We’ll reply with a fixed quote (labour + parts matched to your reg).</div>
-            </div>
-
-            <div class="kv" id="preConfirmBtns">
-              <button id="reviewBtn" type="button">Review &amp; continue</button>
-              <a class="tag" href="https://mitchsautoservices.com/page/services" target="_blank" rel="noopener">View full service list</a>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div><!-- /hero-grid -->
-  </div>
-</section>
-
-<!-- EXTRAS -->
-<div class="container">
-  <section class="section two">
-    <div class="card">
-      <h2>How it works</h2>
-      <ol class="muted">
-        <li>Check your reg — we pull exact vehicle data from DVLA.</li>
-        <li>Pick a service — see clear <b>“from” pricing + description</b>.</li>
-        <li>Add a quick detail — e.g., “front brakes” or “won’t start”.</li>
-        <li>Review & send — we reply with a fixed quote (labour + parts matched to your reg).</li>
-      </ol>
-    </div>
-    <div class="card">
-      <h2>Contact & hours</h2>
-      <div class="kv">
-        <a href="tel:+447926725369"><button type="button">Call 07926 725369</button></a>
-        <a href="mailto:support@mitchsautoservices.co.uk?subject=Service%20enquiry"><button type="button">Email us</button></a>
-      </div>
-      <p class="muted" style="margin-top:10px">Mon–Fri • 9am–5pm • Stockton-on-Tees + 15 mile radius.</p>
-      <ul class="muted">
-        <li>Transparent labour; parts priced to your registration</li>
-        <li>Standard <b>6-month labour warranty</b> (upgrade to 12 or 18 months)</li>
-        <li>Card, cash & bank transfer accepted</li>
-      </ul>
-    </div>
-  </section>
-
-  <footer>
-    <span>© Mitch’s Auto Services — Powered by DVLA Vehicle Enquiry</span>
-    <span>Contact: support@mitchsautoservices.co.uk • 07926 725369</span>
-  </footer>
-</div>
-
-<script>
-/* ========== CONFIG ========== */
-const API_URL = '/api/vrm'; // same-project API route on Vercel
-
-// Services with "from" price + description
-const SERVICES = [
-  { id:'air_filter', label:'Air Filter Replacement', price:'From £30', desc:'Replacing the air filter helps your engine breathe better and perform more efficiently.' },
-  { id:'basic_service', label:'Basic Service Package', price:'From £100', desc:'Includes Engine Oil, Oil Filter, Air Filter, Dust/Pollen Filter, Coolant, Tyre Health Check, Light Inspection, and Battery Inspection.' },
-  { id:'battery_replacement', label:'Battery Replacement (with recoding)', price:'From £200', desc:'Modern cars need new batteries coded into the system. Our price includes full programming.' },
-  { id:'brake_change', label:'Brake Change', price:'From £100', desc:'If your brakes feel soft or unresponsive, it may be time for a replacement.' },
-  { id:'brake_fluid', label:'Brake Fluid Flush', price:'From £20', desc:'Old brake fluid reduces stopping performance — flushing it restores braking efficiency.' },
-  { id:'battery_recharge', label:'Car Battery Recharge', price:'From £20', desc:'We take your battery overnight and return it fully charged the next morning.' },
-  { id:'diagnostic', label:'Car Diagnostic Check', price:'From £30', desc:'If your car won’t start, book this. Our tools quickly find the fault so we can recommend a fix on the spot.' },
-  { id:'car_refresh', label:'Car Refresh Service', price:'From £600', desc:'Full refresh: Oil, Oil Filter, Air Filter, Dust/Pollen Filter, Coolant, Spark/Glow check, Brakes check, Tyres check, Lights replaced, Battery replaced.' },
-  { id:'coolant', label:'Coolant Change', price:'From £30', desc:'Bad or low coolant can cause overheating and engine damage — we flush and replace it.' },
-  { id:'pollen_filter', label:'Dust/Pollen Filter Replacement', price:'From £30', desc:'Fresh cabin filters improve air quality and remove odours inside the vehicle.' },
-  { id:'oil_filter', label:'Engine Oil & Filter Replacement', price:'From £60', desc:'Old oil can damage your engine. We replace both oil and filter to keep it healthy.' },
-  { id:'fuel_filter', label:'Fuel Filter Replacement', price:'From £40', desc:'A clean fuel filter ensures steady fuel delivery and prevents engine strain.' },
-  { id:'lights', label:'Headlights & Rear Lights Replacement', price:'From £60', desc:'Driving with a faulty light is unsafe and illegal — we’ll replace and test them.' },
-  { id:'major_service', label:'Major Service Package', price:'From £350', desc:'Includes Oil, Filters, Coolant, Brake Fluid, Spark/Glow Plugs, and full Brake replacement.' },
-  { id:'minor_service', label:'Minor Service Package', price:'From £110', desc:'Includes Oil, Filters, Dust/Pollen Filter, and Coolant flush.' },
-  { id:'premium_service', label:'Premium Service Package', price:'From £300', desc:'Includes Oil, Filters, Coolant, Spark/Glow Plugs, Brake check, Tyre & Light check, Battery health check.' },
-  { id:'seasonal', label:'Seasonal Maintenance Package', price:'From £150', desc:'Changing seasons put stress on cars — we check key systems to keep you safe.' },
-  { id:'tyres', label:'Tyre Health Check', price:'From £35', desc:'We check tread depth (legal minimum 1.6mm) and condition to keep you road-legal.' },
-  { id:'wiper_motor', label:'Window Wiper Motor Replacement', price:'From £50', desc:'If your wipers are out of sync or slow, the motor may need replacing.' }
-];
-
-// Clarifier suggestions
-const CLARIFIERS = {
-  air_filter:['Scheduled service','Reduced performance','Not sure'],
-  basic_service:['Annual service','High mileage','Not sure'],
-  battery_replacement:['Slow crank','Dash lights only','Totally dead','Not sure'],
-  brake_change:['Front','Rear','Grinding/Noise','Pulling to one side','Not sure'],
-  brake_fluid:['Scheduled change','Spongy pedal','ABS work done','Not sure'],
-  battery_recharge:['Flat battery','Left lights on','Cold start issue','Not sure'],
-  diagnostic:['Warning light','Won’t start','Intermittent fault','Not sure'],
-  car_refresh:['Full refresh','Selling car','Just bought car','Not sure'],
-  coolant:['Scheduled change','Overheating','Leaking','Not sure'],
-  pollen_filter:['Smelly air','Low airflow','Hayfever relief','Not sure'],
-  oil_filter:['Service due','Oil light on','Leak','Not sure'],
-  fuel_filter:['Hard starting','Power loss','Service due','Not sure'],
-  lights:['Headlight bulb','Rear light','Indicator','Not sure'],
-  major_service:['Major interval','High mileage','Not sure'],
-  minor_service:['Minor interval','Not sure'],
-  premium_service:['Full works','Not sure'],
-  seasonal:['Winter prep','Summer trip','Not sure'],
-  tyres:['Uneven wear','Vibration','Slow puncture','Not sure'],
-  wiper_motor:['Stopped working','Slow movement','Intermittent','Not sure']
-};
-
-/* ========== WIRING ========== */
-const $=id=>document.getElementById(id);
-const vrmInput=$('vrm'), lookupBtn=$('lookupBtn'), vehicleCard=$('vehicleCard'),
-      vehTitle=$('vehTitle'), vehMeta=$('vehMeta'), vehReg=$('vehReg'),
-      errorBox=$('error'), step2=$('step2'), step3=$('step3'),
-      serviceChips=$('serviceChips'), clarifierChips=$('clarifierChips'),
-      warrSel=$('warr'),
-      reviewBtn=$('reviewBtn'), confirmBox=$('confirmBox'),
-      c_vrm=$('c_vrm'), c_vehicle=$('c_vehicle'), c_colour=$('c_colour'),
-      c_service=$('c_service'), c_detail=$('c_detail'), c_warranty=$('c_warranty'),
-      preConfirmBtns=$('preConfirmBtns'),
-      serviceInfo=$('serviceInfo'), svcTitle=$('svcTitle'), svcPrice=$('svcPrice'), svcShort=$('svcShort');
-
-let lastVRM='', chosenService=null, chosenClarifier=null, vehicleSummary='', vehicleColour='';
-
-function normaliseVRM(v){ return (v||'').toUpperCase().replace(/\s+/g,'').replace(/[^A-Z0-9]/g,''); }
-
-function renderServiceChips(list){
-  serviceChips.innerHTML = list.map(s => `
-    <label class="chip">
-      <input type="radio" name="srv" value="${s.id}">
-      <span>${s.label} — ${s.price}</span>
-    </label>
-  `).join('');
-}
-
-function renderClarifiers(serviceId){
-  const opts = CLARIFIERS[serviceId] || ['Not sure'];
-  clarifierChips.innerHTML = opts.map(txt => `
-    <label class="chip"><input type="radio" name="clar" value="${txt}"><span>${txt}</span></label>
-  `).join('');
-}
-
-$('vrmForm').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  errorBox.style.display='none';
-  const vrm = normaliseVRM(vrmInput.value);
-  if (vrm.length < 5){ errorBox.textContent='Please enter a valid UK registration.'; errorBox.style.display='block'; return; }
-
-  lookupBtn.disabled=true; lookupBtn.textContent='Looking…';
-  vehicleCard.style.display='block';
-  vehTitle.textContent='Looking up…';
-  vehMeta.textContent=''; vehReg.textContent='';
-
-  try{
-    const res = await fetch(API_URL, {
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({ vrm }),
-      cache:'no-store' // prevent 304 cache reuse
-    });
-    const data = await res.json();
-    if(!res.ok) throw new Error(data?.message || data?.error || 'Lookup failed');
-
-    lastVRM = vrm;
-    const engine = data.engineCapacity ? (data.engineCapacity/1000).toFixed(1) + 'L' : '';
-    vehicleSummary = `${data.make||''} ${data.model||''}${engine? ' • '+engine:''}${data.fuelType? ' • '+data.fuelType:''}`;
-    vehicleColour = data.colour || '';
-
-    vehTitle.textContent = `${data.make || ''} ${data.model || ''}`;
-    vehMeta.innerHTML  = [data.fuelType, engine, data.colour].filter(Boolean).join(' • ') || '<span class="muted">Details unavailable</span>';
-    vehReg.textContent = 'Reg: ' + vrm;
-
-    renderServiceChips(SERVICES);
-    step2.style.display='block';
-    step3.style.display='none';
-    serviceInfo.style.display='none';
-    confirmBox.style.display='none';
-    preConfirmBtns.style.display='flex';
-  }catch(err){
-    errorBox.textContent = err.message.includes('Forbidden') ? 'DVLA says “Forbidden”: your server is not sending a valid LIVE API key yet.' : err.message;
-    errorBox.style.display='block';
-    vehicleCard.style.display='none';
-  }finally{
-    lookupBtn.disabled=false; lookupBtn.textContent='Look up';
-  }
-});
-
-serviceChips.addEventListener('change', (e) => {
-  if (e.target.name!=='srv') return;
-  const id = e.target.value;
-  chosenService = SERVICES.find(s => s.id===id);
-
-  if (chosenService){
-    svcTitle.textContent = chosenService.label;
-    svcPrice.textContent = chosenService.price;
-    svcShort.textContent = chosenService.desc || '';
-    serviceInfo.style.display='block';
-  }
-
-  renderClarifiers(id);
-  step3.style.display='block';
-  confirmBox.style.display='none';
-  preConfirmBtns.style.display='flex';
-});
-
-clarifierChips.addEventListener('change', (e) => {
-  if (e.target.name!=='clar') return;
-  chosenClarifier = e.target.value;
-  confirmBox.style.display='none';
-  preConfirmBtns.style.display='flex';
-});
-
-warrSel.addEventListener('change', () => {
-  confirmBox.style.display='none';
-  preConfirmBtns.style.display='flex';
-});
-
-function urlMsg(){
-  const serviceName = chosenService ? chosenService.label : '';
-  const warranty = Number(warrSel.value)||0;
-  const lines = [
-    `VRM: ${lastVRM}`,
-    `Vehicle: ${vehicleSummary}`,
-    vehicleColour ? `Colour: ${vehicleColour}` : null,
-    `Service: ${serviceName}`,
-    `Detail: ${chosenClarifier||''}`,
-    `Warranty upgrade: £${warranty}`
-  ].filter(Boolean).join('%0A');
-  return lines;
-}
-
-$('reviewBtn').addEventListener('click', () => {
-  if(!lastVRM){ alert('Please enter your reg first.'); return; }
-  if(!chosenService){ alert('Please select a service.'); return; }
-
-  c_vrm.textContent = lastVRM;
-  c_vehicle.textContent = vehicleSummary || '—';
-  c_colour.textContent = vehicleColour || '—';
-  c_service.textContent = chosenService.label || '—';
-  c_detail.textContent = chosenClarifier || '—';
-  c_warranty.textContent = (warrSel.value==='0') ? '6 months (included)' : (warrSel.value==='20' ? '12 months (+£20)' : '18 months (+£40)');
-
-  confirmBox.style.display='block';
-  preConfirmBtns.style.display='none';
-});
-
-$('editBtn').addEventListener('click', () => {
-  confirmBox.style.display='none';
-  preConfirmBtns.style.display='flex';
-});
-
-$('emailBtn').addEventListener('click', () => {
-  window.location = `mailto:support@mitchsautoservices.co.uk?subject=Quote%20${encodeURIComponent(lastVRM)}&body=${urlMsg()}`;
-});
-$('waBtn').addEventListener('click', () => {
-  window.open(`https://wa.me/447926725369?text=${urlMsg()}`,'_blank');
-});
-</script>
-</body>
-</html>

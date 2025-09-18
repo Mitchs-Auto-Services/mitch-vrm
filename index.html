@@ -4,7 +4,8 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Mitch’s Auto Services – Mobile Mechanic • Stockton-on-Tees</title>
-<meta name="description" content="Mobile mechanic in Stockton-on-Tees (+15 miles). DVLA lookup, EV-aware services with 'from' pricing, MOT & tax reminders, preferred slot, warranty options, and email bookings.">
+<meta name="description" content="DVLA number plate lookup, EV-aware services with 'from' pricing, MOT & tax reminder, preferred slot, and email booking for Stockton-on-Tees.">
+
 <style>
   :root{
     --brand:#F06407; --brand-dark:#c24d05;
@@ -30,13 +31,12 @@
   .trust{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
   .trust span{border:1px solid var(--line);padding:6px 12px;border-radius:999px;color:var(--muted);font-size:13px;background:#fff}
 
-  /* CARDS & LAYOUT */
+  /* CARDS & FORM */
   .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;box-shadow:0 2px 6px rgba(0,0,0,.05)}
   .section{margin-top:32px}
   .two{display:grid;gap:20px;grid-template-columns:1fr}
   @media(min-width:900px){.two{grid-template-columns:1fr 1fr}}
 
-  /* FORM ELEMENTS */
   label{display:block;font-weight:600;margin:6px 0;color:#111}
   input,select,button,textarea{padding:12px;border-radius:10px;border:1px solid #ccc;background:#fff;color:var(--ink);font-size:16px}
   textarea{min-height:90px;resize:vertical}
@@ -52,16 +52,14 @@
   .chip{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border:1px solid #ddd;border-radius:12px;background:#fafafa;cursor:pointer}
   .chip input{accent-color:var(--brand)}
 
-  /* Accordion */
   .accordion{border:1px solid var(--line);border-radius:10px;margin-bottom:10px;overflow:hidden}
   .accordion summary{cursor:pointer;padding:10px;font-weight:600;color:#111;background:#f9f9f9}
   .accordion p{padding:0 12px 12px;margin:0;color:var(--muted)}
 
-  /* Confirm panel */
   .confirm{margin-top:12px;border:1px solid var(--line);border-radius:12px;padding:14px;background:#fafafa}
   .row{display:flex;justify-content:space-between;gap:10px;font-size:15px}
 
-  /* Status colours */
+  /* status colours */
   .ok{color:var(--ok);font-weight:600}
   .warn{color:var(--warn);font-weight:600}
   .err{color:var(--err);font-weight:600}
@@ -71,24 +69,23 @@
 </head>
 <body>
 
-<!-- HERO -->
 <section class="hero">
   <div class="hero-inner">
     <div class="topbar">
       <div class="brand"><div class="name">Mitch’s Auto Services</div></div>
-      <div class="badge">Mobile mechanic • Stockton-on-Tees + 15 miles</div>
+      <div class="badge">Mobile mechanic • Unit 5, Wingate Grange Industrial Estate, TS28 5AH</div>
     </div>
-
     <div class="hero-grid">
       <div class="hero-copy">
         <h1>Honest mobile mechanic — clear labour, parts matched to your reg</h1>
-        <p>Check your car instantly with DVLA. See MOT & tax status, pick a service, choose a time, select warranty, add your details, and request a quote by email.</p>
+        <p>Check your car instantly with DVLA. See MOT & tax status, pick a service (with “from” pricing), choose a time, and email us your booking.</p>
         <div class="trust">
           <span>DVLA verified lookup</span>
           <span>Clear “from” pricing</span>
           <span>MOT + tax reminder</span>
           <span>Card, cash & bank transfer</span>
         </div>
+        <p class="muted" style="margin-top:10px"><b>Call-out:</b> Within 15 miles of TS28 5AH is <b>free</b>. Beyond 15 miles, <b>£25</b> call-out applies.</p>
       </div>
 
       <div class="card">
@@ -113,7 +110,6 @@
   </div>
 </section>
 
-<!-- MAIN CONTENT -->
 <div class="container">
 
   <!-- Services -->
@@ -124,10 +120,10 @@
     </div>
   </section>
 
-  <!-- Preferred slot + Warranty + Lead capture -->
+  <!-- Slot + Warranty + Lead -->
   <section class="section two">
     <div class="card">
-      <h2>Pick date & time</h2>
+      <h2>Preferred date & time</h2>
       <label for="date">Date</label>
       <input type="date" id="date">
       <label for="time">Time</label>
@@ -175,7 +171,7 @@
   </section>
 
   <footer>
-    <span>© Mitch’s Auto Services — Powered by DVLA Vehicle Enquiry</span>
+    <span>© Mitch’s Auto Services — Unit 5, Wingate Grange Industrial Estate, TS28 5AH</span>
     <span>support@mitchsautoservices.co.uk • 07926 725369</span>
   </footer>
 </div>
@@ -187,26 +183,31 @@ const $=id=>document.getElementById(id);
 
 let lastVRM='', vehicleSummary='', chosenService='';
 
-/* ---------- SERVICES (EV-aware) ---------- */
+/* ---------- SERVICES (EV-aware; includes NEW Pre-MOT service) ---------- */
 const SERVICES=[
- {id:'air_filter',label:'Air Filter Replacement',priceFrom:30,desc:'Helps engine breathe better and improve performance.', ev:false},
- {id:'basic_service',label:'Basic Service Package',priceFrom:100,desc:'Includes oil, filters, coolant, tyre and light check.', ev:false},
- {id:'battery',label:'Battery Replacement (with coding)',priceFrom:200,desc:'Includes recoding the 12V battery to your vehicle.', ev:true},
- {id:'brakes',label:'Brake Change',priceFrom:100,desc:'If brakes feel soft or noisy, it’s time for a change.', ev:true},
- {id:'brake_fluid',label:'Brake Fluid Flush',priceFrom:20,desc:'Old brake fluid reduces braking performance.', ev:true},
- {id:'diagnostic',label:'Diagnostic Check',priceFrom:30,desc:'Find the issue using specialist tools before repairs.', ev:true},
- {id:'refresh',label:'Car Refresh Service',priceFrom:600,desc:'Full reset: oil, filters, plugs, brakes, tyres, lights.', ev:false},
- {id:'coolant',label:'Coolant Change',priceFrom:30,desc:'Bad coolant risks overheating and engine damage.', ev:false},
- {id:'oil',label:'Engine Oil & Filter Replacement',priceFrom:60,desc:'Fresh oil keeps engine protected and running smooth.', ev:false},
- {id:'fuel',label:'Fuel Filter Replacement',priceFrom:40,desc:'Keeps fuel clean to reach the engine efficiently.', ev:false},
- {id:'lights',label:'Headlights/Rear Lights Replacement',priceFrom:60,desc:'Driving with lights out is unsafe and illegal.', ev:true},
- {id:'tyres',label:'Tyre Health Check',priceFrom:35,desc:'Ensure tread above legal 1.6mm limit for safety.', ev:true},
- {id:'wipers',label:'Wiper Motor Replacement',priceFrom:50,desc:'Fixes uneven or stopped wipers for clear vision.', ev:true},
- {id:'seasonal',label:'Seasonal Maintenance Package',priceFrom:150,desc:'Stay safe with seasonal fluid and component checks.', ev:true},
- {id:'ev_check',label:'EV System Check',priceFrom:80,desc:'Specialist check for electric vehicles only.', ev:true}
+  {id:'premot',label:'Pre-MOT Diagnosis & Repair',priceFrom:150,desc:'If you have your MOT coming up and are worried you may fail, bring it down and we will do a full MOT check to make sure you pass first time, so you don’t waste your money going back twice.', ev:true},
+
+  {id:'air_filter',label:'Air Filter Replacement',priceFrom:30,desc:'Helps engine breathe better and improve performance.', ev:false},
+  {id:'basic_service',label:'Basic Service Package',priceFrom:100,desc:'Includes oil, filters, coolant, tyre and light check.', ev:false},
+  {id:'battery',label:'Battery Replacement (with coding)',priceFrom:200,desc:'Includes recoding the 12V battery to your vehicle.', ev:true},
+  {id:'brakes',label:'Brake Change',priceFrom:100,desc:'If brakes feel soft or noisy, it’s time for a change.', ev:true},
+  {id:'brake_fluid',label:'Brake Fluid Flush',priceFrom:20,desc:'Old brake fluid reduces braking performance.', ev:true},
+  {id:'diagnostic',label:'Diagnostic Check',priceFrom:30,desc:'Find the issue using specialist tools before repairs.', ev:true},
+  {id:'refresh',label:'Car Refresh Service',priceFrom:600,desc:'Full reset: oil, filters, plugs, brakes, tyres, lights.', ev:false},
+  {id:'coolant',label:'Coolant Change',priceFrom:30,desc:'Bad coolant risks overheating and engine damage.', ev:false},
+  {id:'oil',label:'Engine Oil & Filter Replacement',priceFrom:60,desc:'Fresh oil keeps engine protected and running smooth.', ev:false},
+  {id:'fuel',label:'Fuel Filter Replacement',priceFrom:40,desc:'Keeps fuel clean to reach the engine efficiently.', ev:false},
+  {id:'lights',label:'Headlights/Rear Lights Replacement',priceFrom:60,desc:'Driving with lights out is unsafe and illegal.', ev:true},
+  {id:'tyres',label:'Tyre Health Check',priceFrom:35,desc:'Ensure tread above legal 1.6mm limit for safety.', ev:true},
+  {id:'wipers',label:'Wiper Motor Replacement',priceFrom:50,desc:'Fixes uneven or stopped wipers for clear vision.', ev:true},
+  {id:'seasonal',label:'Seasonal Maintenance Package',priceFrom:150,desc:'Stay safe with seasonal fluid and component checks.', ev:true},
+  {id:'ev_check',label:'EV System Check',priceFrom:80,desc:'Specialist check for electric vehicles only.', ev:true}
 ];
 
-function isEVFuel(ft){ const s=(ft||'').toLowerCase(); return s.includes('electric') && !s.includes('hybrid'); }
+function isEVFuel(ft){
+  const s=(ft||'').toLowerCase();
+  return s.includes('electric') && !s.includes('hybrid');
+}
 
 function renderServices(vehicle){
   const ev = isEVFuel(vehicle?.fuelType);
@@ -237,12 +238,12 @@ function saveDraft(){
   localStorage.setItem(LS.warr, warr);
 }
 function loadDraft(){
-  if($('name')) $('name').value = localStorage.getItem(LS.name)||'';
-  if($('email')) $('email').value = localStorage.getItem(LS.email)||'';
-  if($('phone')) $('phone').value = localStorage.getItem(LS.phone)||'';
-  if($('notes')) $('notes').value = localStorage.getItem(LS.notes)||'';
-  if($('date')) $('date').value = localStorage.getItem(LS.date)||'';
-  if($('time')) $('time').value = localStorage.getItem(LS.time)||'';
+  $('name').value = localStorage.getItem(LS.name)||'';
+  $('email').value = localStorage.getItem(LS.email)||'';
+  $('phone').value = localStorage.getItem(LS.phone)||'';
+  $('notes').value = localStorage.getItem(LS.notes)||'';
+  $('date').value = localStorage.getItem(LS.date)||'';
+  $('time').value = localStorage.getItem(LS.time)||'';
   const savedW = localStorage.getItem(LS.warr);
   if(savedW){
     const el = document.querySelector(`input[name="warranty"][value="${savedW}"]`);
@@ -295,14 +296,16 @@ $('vrmForm').addEventListener('submit', async (e)=>{
     if(!res.ok) throw new Error(data?.error || data?.message || 'Lookup failed');
 
     lastVRM = vrm;
-    vehicleSummary = `${data.make||''} ${data.model||''}`.trim();
-
-    $('vehTitle').textContent = vehicleSummary;
+    // Build readable summary
     const engine = data.engineCapacity ? (data.engineCapacity/1000).toFixed(1)+'L' : '';
-    $('vehMeta').textContent = [data.fuelType||'', engine].filter(Boolean).join(' • ');
+    vehicleSummary = [data.make, data.model].filter(Boolean).join(' ');
+    const meta = [data.fuelType||'', engine, data.colour||''].filter(Boolean).join(' • ');
+
+    $('vehTitle').textContent = vehicleSummary || 'Vehicle';
+    $('vehMeta').textContent = meta || '';
     $('vehReg').textContent = 'Reg: ' + vrm;
 
-    // MOT status with colours
+    // MOT status with colours + days
     const motDate = data.motExpiryDate || data.motExpiry;
     let motClass='warn', motText='Unknown';
     if(motDate){
@@ -313,7 +316,7 @@ $('vrmForm').addEventListener('submit', async (e)=>{
     $('motStatus').className = motClass;
     $('motStatus').textContent = motText;
 
-    // Tax status with colours
+    // Tax status with colours + due date
     const taxStatus = (data.taxStatus || 'Unknown').toUpperCase();
     const taxDate = data.taxDueDate || data.taxDue;
     let taxClass='warn', taxText=taxStatus;
@@ -330,7 +333,7 @@ $('vrmForm').addEventListener('submit', async (e)=>{
     // EV-aware services
     renderServices(data);
 
-    // show updated confirm panel if ready
+    // If details already filled, show confirm
     refreshConfirm();
 
   }catch(err){
@@ -357,6 +360,7 @@ $('emailBtn').addEventListener('click', ()=>{
     `Name: ${$('name').value||'-'}`,
     `Email: ${$('email').value||'-'}`,
     `Phone: ${$('phone').value||'-'}`,
+    `Call-out: Within 15 miles of TS28 5AH = FREE; beyond 15 miles = £25`,
     $('notes').value ? '', `Notes: ${$('notes').value}`
   ].filter(Boolean).join('%0A');
   window.location = `mailto:support@mitchsautoservices.co.uk?subject=Booking%20Request%20${encodeURIComponent(lastVRM)}&body=${lines}`;

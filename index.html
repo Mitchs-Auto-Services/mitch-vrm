@@ -1,219 +1,672 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Mitch’s Auto Services – Mobile Mechanic Stockton-on-Tees</title>
-<style>
-  :root {
-    --brand: #F06407;
-    --bg: #1b1b1b;
-    --card: #2a2a2a;
-    --text: #ededed;
-    --muted: #aaa;
-    --ok: #4caf50;
-    --warn: #ff9800;
-    --err: #f44336;
-  }
-  body {
-    margin: 0; font-family: Arial, sans-serif; color: var(--text);
-    background: linear-gradient(180deg, var(--brand), #000);
-    min-height: 100vh;
-  }
-  .container { max-width: 1000px; margin: auto; padding: 20px; }
-  .card {
-    background: var(--card); border-radius: 10px; padding: 20px; margin-bottom: 20px;
-  }
-  h1,h2 { margin: 0 0 10px; }
-  label { font-weight: bold; display: block; margin: 10px 0 5px; }
-  input,button,select { padding: 10px; font-size: 16px; border-radius: 5px; border: none; }
-  input,select { width: 100%; }
-  button { background: var(--brand); color: #fff; cursor: pointer; }
-  button:disabled { opacity: 0.5; cursor: not-allowed; }
-  .status { margin-top: 10px; font-weight: bold; }
-  .ok { color: var(--ok); }
-  .warn { color: var(--warn); }
-  .err { color: var(--err); }
-  .chip { margin: 4px 0; }
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Mitch’s Auto Services – Book a Service</title>
+  <style>
+    :root {
+      --orange: #f47a1f;
+      --orange-dark: #d9650e;
+      --bg-top: #4a4a4a;
+      --bg-bottom: #060606;
+      --text: #ffffff;
+      --muted: rgba(255,255,255,0.75);
+      --border: rgba(255,255,255,0.25);
+      --error: #ffb4b4;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: var(--text);
+      background: linear-gradient(180deg, var(--bg-top), var(--bg-bottom));
+      min-height: 100vh;
+    }
+    a { color: inherit; }
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 32px 20px 48px;
+    }
+    header.topbar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    header.topbar h1 {
+      margin: 0 0 8px;
+      font-size: 2.4rem;
+    }
+    header.topbar p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 1rem;
+    }
+    .coverage {
+      max-width: 320px;
+      margin-left: auto;
+      text-align: right;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .card {
+      background: var(--orange);
+      border: 2px solid var(--orange-dark);
+      border-radius: 18px;
+      padding: 24px;
+      margin-bottom: 26px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.35);
+    }
+    .card h2 {
+      margin-top: 0;
+      margin-bottom: 12px;
+      font-size: 1.8rem;
+    }
+    label {
+      font-weight: 700;
+      display: block;
+      margin-bottom: 6px;
+    }
+    input, button, select, textarea {
+      font-size: 1rem;
+      padding: 12px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: rgba(0,0,0,0.35);
+      color: var(--text);
+      width: 100%;
+    }
+    input::placeholder { color: rgba(255,255,255,0.6); }
+    button {
+      background: var(--orange-dark);
+      border: 1px solid rgba(255,255,255,0.35);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      transition: transform 0.1s ease, box-shadow 0.1s ease;
+    }
+    button:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+    }
+    button:disabled {
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+    .hint {
+      font-size: 0.9rem;
+      color: rgba(255,255,255,0.85);
+      margin-top: 6px;
+    }
+    .alert {
+      margin-top: 14px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: rgba(0,0,0,0.35);
+      border: 1px solid rgba(0,0,0,0.4);
+      font-weight: 600;
+    }
+    .alert.error {
+      color: #250000;
+      background: rgba(255,215,215,0.8);
+      border-color: rgba(255,255,255,0.5);
+    }
+    .alert.warn {
+      background: rgba(0,0,0,0.45);
+      border-color: rgba(255,255,255,0.5);
+    }
+    .result {
+      margin-top: 20px;
+      border-top: 1px solid rgba(255,255,255,0.35);
+      padding-top: 18px;
+    }
+    .grid-two {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: rgba(0,0,0,0.35);
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-right: 8px;
+    }
+    .service-list {
+      display: grid;
+      gap: 16px;
+      margin-top: 18px;
+    }
+    .service-item {
+      background: rgba(0,0,0,0.35);
+      border-radius: 16px;
+      padding: 18px;
+      border: 1px solid rgba(255,255,255,0.35);
+      display: grid;
+      gap: 10px;
+    }
+    .service-item header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+    }
+    .service-item h3 {
+      margin: 0;
+      font-size: 1.25rem;
+    }
+    .service-item input[type="radio"] {
+      width: auto;
+      margin-right: 10px;
+    }
+    .service-item .applicable {
+      font-size: 0.9rem;
+      color: rgba(255,255,255,0.8);
+      font-weight: 600;
+    }
+    .service-item .symptoms {
+      margin: 0;
+      color: rgba(255,255,255,0.85);
+      font-size: 0.95rem;
+      line-height: 1.4;
+    }
+    .option {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: rgba(0,0,0,0.35);
+      border: 1px solid rgba(255,255,255,0.35);
+      margin-bottom: 10px;
+    }
+    .option input[type="radio"] {
+      width: auto;
+    }
+    .hidden { display: none !important; }
+    .footer-note {
+      margin-top: 14px;
+      font-size: 0.95rem;
+      color: rgba(255,255,255,0.85);
+    }
+    @media (max-width: 640px) {
+      header.topbar {
+        text-align: center;
+      }
+      .coverage {
+        text-align: center;
+        margin-left: 0;
+      }
+      button {
+        width: 100%;
+      }
+    }
+  </style>
 </head>
 <body>
-<div class="container">
-  <h1>Mitch’s Auto Services</h1>
-  <p>Unit 5, Wingate Grange Industrial Estate, TS28 5AH — Free call-out within 15 miles, £25 beyond.</p>
+  <div class="container">
+    <header class="topbar">
+      <div>
+        <h1>Mitch’s Auto Services</h1>
+        <p>Trusted mobile and garage mechanic support — loyalty programme gives you a chance to win a free service!</p>
+        <div class="badge">Mobile Work</div>
+        <div class="badge">Garage Work</div>
+      </div>
+      <div class="coverage">We work within a 15 mile radius from Unit 5, Wingate Grange Industrial Estate, TS28 5AH. Anything further is £25 for call out.</div>
+    </header>
 
-  <div class="card">
-    <h2>Check your car</h2>
-    <form id="vrmForm" onsubmit="event.preventDefault();lookupVRM();">
-      <label for="vrm">Registration (VRM)</label>
-      <input id="vrm" placeholder="e.g. AB12 CDE" maxlength="8" required>
-      <button id="lookupBtn" type="button" onclick="lookupVRM()">Look up</button>
-    </form>
-    <div id="error" class="err" style="display:none;"></div>
+    <section class="card">
+      <h2>Check your vehicle</h2>
+      <form id="vrmForm" onsubmit="event.preventDefault(); lookupVRM();" class="grid-two">
+        <div>
+          <label for="vrm">Vehicle Registration (Reg)</label>
+          <input id="vrm" name="vrm" placeholder="Enter your registration" maxlength="8" autocomplete="off" required>
+          <div class="hint">We don’t do electric cars right now.</div>
+        </div>
+        <div style="align-self: end;">
+          <button id="lookupBtn" type="submit">Look up</button>
+        </div>
+      </form>
+      <div id="error" class="alert error hidden"></div>
 
-    <div id="vehicleCard" style="display:none;margin-top:15px;">
-      <h3 id="vehTitle"></h3>
-      <p id="vehMeta"></p>
-      <p id="vehReg"></p>
-      <p>MOT: <span id="motStatus" class="status"></span></p>
-      <p>Tax: <span id="taxStatus" class="status"></span></p>
-    </div>
+      <div id="vehicleCard" class="result hidden">
+        <h3 id="vehTitle"></h3>
+        <p id="vehMeta"></p>
+        <p id="vehReg"></p>
+        <p id="evNotice" class="alert warn hidden"></p>
+        <div class="grid-two">
+          <div>
+            <strong>MOT:</strong>
+            <div id="motStatus"></div>
+          </div>
+          <div>
+            <strong>Tax:</strong>
+            <div id="taxStatus"></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="warrantySection" class="hidden" style="margin-top:24px;">
+        <h3>Warranty options</h3>
+        <p class="hint">My standard (free) warranty is 6 months. Upgrade for longer cover.</p>
+        <label class="option"><input type="radio" name="warr" value="6 months (included)" checked> 6 Months (included)</label>
+        <label class="option"><input type="radio" name="warr" value="12 months (+£20)"> 1 Year for £20</label>
+        <label class="option"><input type="radio" name="warr" value="18 months (+£40)"> 1 Year 6 Months for £40</label>
+        <label class="option"><input type="radio" name="warr" value="Lifetime (price on request)"> Lifetime warranty (price on request – depends on make & model)</label>
+      </div>
+    </section>
+
+    <section id="servicesCard" class="card hidden">
+      <h2>Select a service</h2>
+      <p>Once we’ve confirmed your vehicle, choose the service you need. All descriptions include symptoms to help you pick the right option.</p>
+      <p class="hint">We carry out both mobile and garage work depending on what suits you best.</p>
+      <div id="servicesMessage" class="alert warn hidden"></div>
+      <div id="serviceList" class="service-list"></div>
+      <div style="margin-top:24px;" id="finishContainer" class="hidden">
+        <button id="finishBtn" onclick="finishBooking()">Finish</button>
+        <p class="footer-note">Tap Finish to send us an email with everything we need at <a href="mailto:support@mitchsautoservices.co.uk">support@mitchsautoservices.co.uk</a>.</p>
+      </div>
+    </section>
   </div>
 
-  <div class="card" id="servicesCard" style="display:none;">
-    <h2>Choose a Service</h2>
-    <div id="serviceChips"></div>
+  <script>
+    const API_URL = '/api/vrm';
 
-    <div id="clarifierBox" style="margin-top:15px;display:none;">
-      <h3>Details</h3>
-      <div id="clarifierChips"></div>
-    </div>
+    const SERVICES = [
+      {
+        id: 'air_filter',
+        title: 'Air Filter Replacement',
+        price: 'From £80',
+        applicable: ['Petrol', 'Diesel'],
+        desc: 'A clogged air filter chokes the engine and hurts performance and MPG.',
+        symptoms: 'Symptoms: sluggish acceleration, rough idle, dirty filter on inspection, poor fuel economy.'
+      },
+      {
+        id: 'basic_service',
+        title: 'Basic Service Package',
+        price: 'From £100',
+        applicable: ['Petrol', 'Diesel'],
+        desc: 'Oil & filter, air filter, pollen filter, coolant, tyre/light/battery checks to keep everything healthy.',
+        symptoms: 'Symptoms: overdue service light, dark/dirty oil, noisy running, uneven wear on tyres.'
+      },
+      {
+        id: 'battery_replacement',
+        title: 'Battery Replacement (includes recoding)',
+        price: 'From £200',
+        applicable: ['Petrol', 'Diesel'],
+        desc: 'New batteries on modern cars often need coding to the ECU — included here.',
+        symptoms: 'Symptoms: slow crank, repeated jump-starts, random electrical faults, battery warning light.'
+      },
+      {
+        id: 'brake_change',
+        title: 'Brake Change',
+        price: 'From £100',
+        applicable: ['Petrol', 'Diesel'],
+        desc: 'Fresh pads/discs restore stopping power and safety.',
+        symptoms: 'Symptoms: scraping/squeaking, vibration under braking, longer stopping distance, warning light.'
+      },
+      {
+        id: 'brake_fluid',
+        title: 'Brake Fluid Flush',
+        price: 'From £70',
+        applicable: ['Petrol', 'Diesel'],
+        desc: 'Old/contaminated fluid reduces braking performance and pedal feel.',
+        symptoms: 'Symptoms: soft/spongy pedal, brake fade on long stops, ABS warnings.'
+      },
+      {
+        id: 'battery_recharge',
+        title: 'Car Battery Recharge (overnight)',
+        price: 'From £80',
+        applicable: ['Petrol', 'Diesel'],
+        desc: 'We charge your battery overnight and return it ready to fit the next morning.',
+        symptoms: 'Symptoms: hard starting after sitting, low voltage, short trips that never fully recharge.'
+      },
+      {
+        id: 'diagnostic',
+        title: 'Car Diagnostic Check',
+        price: 'From £50',
+        applicable: ['Petrol', 'Diesel'],
+        desc: 'Full scan with professional tools; diagnostic report sent to your email for full transparency — “if you’re not sure what’s wrong and you want a mechanic to just give it a check this is the one for you”.',
+        symptoms: 'Symptoms: engine light on, won’t start, misfires, strange noises, mystery electrical issues.'
+      },
+      {
+        id: 'refresh',
+        title: 'Car Refresh Service',
+        price: 'From £600',
+        applicable: ['Petrol', 'Diesel'],
+        desc: 'Big reset: oil/filters/coolant, plugs check, brake check, tyres, lights, battery — great before selling or after buying.',
+        symptoms: 'Symptoms: multiple overdue items, inconsistent maintenance history, general tired running.'
+      },
+      {
+        id: 'coolant',
+        title: 'Coolant Change',
+        price: 'From £80',
+        applicable: ['Petrol', 'Diesel'],
+        desc: 'Fresh coolant prevents overheating/corrosion and protects the engine.',
+        symptoms: 'Symptoms: high temp gauge, sweet smell, visible leaks, rusty/dirty coolant.'
+      },
+      {
+        id: 'pollen',
+        title: 'Dust/Pollen Filter Replacement',
+        price: 'From £80',
+        applicable: ['Petrol', 'Diesel'],
+        desc: 'Improves cabin air, reduces smells, helps demist more efficiently.',
+        symptoms: 'Symptoms: musty smells, weak airflow, allergies worse in the car, noisy blower.'
+      },
+      {
+        id: 'oil',
+        title: 'Engine Oil & Filter Change',
+        price: 'From £60',
+        applicable: ['Petrol', 'Diesel'],
+        desc: 'Clean oil protects against wear and keeps the engine smooth and efficient.',
+        symptoms: 'Symptoms: engine feels rough/noisy, service light, very dark oil, ticking on cold starts.'
+      },
+      {
+        id: 'fuel_filter',
+        title: 'Fuel Filter Replacement',
+        price: 'From £50',
+        applicable: ['Petrol', 'Diesel'],
+        desc: 'Keeps debris out of the fuel system for smoother running.',
+        symptoms: 'Symptoms: hesitation under load, poor MPG, hard starting, stalling at junctions.'
+      },
+      {
+        id: 'lights',
+        title: 'Headlights & Rear Lights Replacement',
+        price: 'From £60',
+        applicable: ['Petrol', 'Diesel'],
+        desc: 'Stay legal and safe with bright, working lights.',
+        symptoms: 'Symptoms: dim or failed bulbs, warnings on dash, poor night visibility.'
+      },
+      {
+        id: 'major_service',
+        title: 'Major Service Package',
+        price: 'From £350',
+        applicable: ['Petrol', 'Diesel'],
+        desc: 'Oil/filters, coolant & brake fluid flushes, plugs, and full brake replacement where needed.',
+        symptoms: 'Symptoms: high mileage or long interval since last big service, noisy/harsh running.'
+      },
+      {
+        id: 'minor_service',
+        title: 'Minor Service Package',
+        price: 'From £110',
+        applicable: ['Petrol', 'Diesel'],
+        desc: 'Oil/filters and coolant refreshed — ideal between major services.',
+        symptoms: 'Symptoms: due for an interim service, moderate mileage increase since last visit.'
+      },
+      {
+        id: 'premium_service',
+        title: 'Premium Service Package',
+        price: 'From £300',
+        applicable: ['Petrol', 'Diesel'],
+        desc: 'Oil/filters, coolant, plugs, plus brake/tyre/light/battery health checks.',
+        symptoms: 'Symptoms: general tune-up needed, inconsistent performance, long trip coming up.'
+      },
+      {
+        id: 'pre_mot',
+        title: 'Pre-MOT Diagnosis & Repair',
+        price: '£150',
+        applicable: ['Petrol', 'Diesel'],
+        desc: 'Full MOT-style check so you don’t waste money failing and retesting.',
+        symptoms: 'Symptoms: MOT due soon, unsure what might fail, known issues not yet fixed.'
+      },
+      {
+        id: 'seasonal',
+        title: 'Seasonal Maintenance Package',
+        price: 'From £150',
+        applicable: ['Petrol', 'Diesel'],
+        desc: 'Prep for winter/summer: fluids, battery, tyres, wipers — safe and ready for the season.',
+        symptoms: 'Symptoms: heading into cold snaps or heatwaves, long road trip planned.'
+      },
+      {
+        id: 'tyre_check',
+        title: 'Tyre Health Check',
+        price: 'From £35',
+        applicable: ['Petrol', 'Diesel'],
+        desc: 'Legal tread (1.6mm min), wear pattern, pressures, valve/sidewall condition.',
+        symptoms: 'Symptoms: pulling to one side, vibration at speed, uneven/rapid wear, visible cracks.'
+      },
+      {
+        id: 'wiper_motor',
+        title: 'Window Wiper Motor Replacement',
+        price: 'From £50',
+        applicable: ['Petrol', 'Diesel'],
+        desc: 'Get consistent, smooth wiper operation for clear visibility.',
+        symptoms: 'Symptoms: wipers slow, stop mid-sweep, out of sync, burning smell from wiper area.'
+      },
+      {
+        id: 'ac',
+        title: 'Air Conditioning Top-Up/Recharge',
+        price: 'From £85',
+        applicable: ['Petrol', 'Diesel'],
+        desc: 'Restore cold air, improve demisting, and check for obvious leaks.',
+        symptoms: 'Symptoms: weak/no cold air, bad odours through vents, windows slow to clear, groaning compressor.'
+      },
+      {
+        id: 'fuel_injector',
+        title: 'Fuel Injector Replacement (includes Recoding)',
+        price: 'From £150',
+        applicable: ['Petrol', 'Diesel'],
+        desc: 'Modern injectors often need coding to the ECU after replacement — included in this price.',
+        symptoms: 'Symptoms: rough idle, misfiring, poor MPG, fuel smell, hard starting, loss of power.'
+      },
+      {
+        id: 'glow_plug',
+        title: 'Glow Plug Replacement',
+        price: 'From £50',
+        applicable: ['Diesel'],
+        desc: 'Essential for cold starts on diesel engines.',
+        symptoms: 'Symptoms: hard starting in cold weather, white smoke on start-up, rough running until warm.'
+      },
+      {
+        id: 'spark_plug',
+        title: 'Spark Plug Replacement',
+        price: 'From £50',
+        applicable: ['Petrol'],
+        desc: 'Healthy spark plugs keep your petrol engine smooth and efficient.',
+        symptoms: 'Symptoms: misfires, poor acceleration, high fuel consumption, trouble starting.'
+      },
+      {
+        id: 'ignition',
+        title: 'Ignition Coils / Leads Replacement',
+        price: 'From £80',
+        applicable: ['Petrol', 'Diesel'],
+        desc: 'Faulty coils/leads can cause misfiring and poor engine performance.',
+        symptoms: 'Symptoms: engine misfire, check engine light, jerky acceleration, fuel smell from exhaust.'
+      },
+      {
+        id: 'handbrake',
+        title: 'Handbrake Adjustment',
+        price: 'From £150',
+        applicable: ['Petrol', 'Diesel'],
+        desc: 'Keeps your parking brake working safely and holding the car securely.',
+        symptoms: 'Symptoms: handbrake pulls up too high, car rolls on hills, poor MOT handbrake result.'
+      }
+    ];
 
-    <div style="margin-top:15px;">
-      <h3>Warranty</h3>
-      <label class="chip"><input type="radio" name="warr" value="0" checked> 6 months (included)</label>
-      <label class="chip"><input type="radio" name="warr" value="20"> 12 months (+£20)</label>
-      <label class="chip"><input type="radio" name="warr" value="40"> 18 months (+£40)</label>
-    </div>
+    let vehicleDetails = null;
 
-    <div style="margin-top:15px;">
-      <h3>Book Date & Time</h3>
-      <input type="date" id="bookDate">
-      <input type="time" id="bookTime">
-    </div>
-
-    <div style="margin-top:15px;">
-      <button onclick="reviewEmail()">Review & Send by Email</button>
-    </div>
-  </div>
-</div>
-
-<script>
-const API_URL = '/api/vrm';
-
-const SERVICES = [
-  { id:'air_filter', label:'Air Filter Replacement', price:'From £30', desc:'Helps engine breathe better and improve performance.' },
-  { id:'basic_service', label:'Basic Service Package', price:'From £100', desc:'Oil, filters, coolant, tyres, lights & battery check.' },
-  { id:'battery', label:'Battery Replacement (with coding)', price:'From £200', desc:'New batteries need programming; included in price.' },
-  { id:'brakes', label:'Brake Change', price:'From £100', desc:'If brakes feel soft or noisy, it may be time to change.' },
-  { id:'brake_fluid', label:'Brake Fluid Flush', price:'From £20', desc:'Old brake fluid reduces performance and safety.' },
-  { id:'battery_recharge', label:'Car Battery Recharge', price:'From £20', desc:'We recharge your battery overnight, ready next day.' },
-  { id:'diagnostic', label:'Car Diagnostic Check', price:'From £30', desc:'Find the fault using specialised tools before repair.' },
-  { id:'refresh', label:'Car Refresh Service', price:'From £600', desc:'Full replacement of key fluids, filters, brakes, lights & battery.' },
-  { id:'coolant', label:'Coolant Change', price:'From £30', desc:'Keeps your engine from overheating or freezing.' },
-  { id:'pollen', label:'Dust/Pollen Filter Replacement', price:'From £30', desc:'Improves cabin air smell & filtration.' },
-  { id:'oil', label:'Engine Oil & Filter Change', price:'From £60', desc:'Fresh oil prevents engine wear and damage.' },
-  { id:'fuel', label:'Fuel Filter Replacement', price:'From £40', desc:'Clean filter keeps fuel flowing smoothly to engine.' },
-  { id:'lights', label:'Headlights & Rear Lights Replacement', price:'From £60', desc:'Stay legal & safe—replace failed bulbs promptly.' },
-  { id:'major', label:'Major Service Package', price:'From £350', desc:'Comprehensive fluids, filters, brakes & plugs replaced.' },
-  { id:'minor', label:'Minor Service Package', price:'From £110', desc:'Oil, filters & coolant refreshed.' },
-  { id:'premium', label:'Premium Service Package', price:'From £300', desc:'Expanded service incl. spark plugs & checks.' },
-  { id:'seasonal', label:'Seasonal Maintenance Package', price:'From £150', desc:'Prepare your car for seasonal changes safely.' },
-  { id:'tyres', label:'Tyre Health Check', price:'From £35', desc:'Ensure tread depth (min 1.6mm) to pass MOT & stay safe.' },
-  { id:'wipers', label:'Window Wiper Motor Replacement', price:'From £50', desc:'Fix uneven or failing wiper motors.' },
-  { id:'mot_prep', label:'Pre-MOT Diagnosis & Repair', price:'£150', desc:'We check your car before MOT to avoid costly failures.' }
-];
-
-const CLARIFIERS = {
-  brakes:['Front','Rear','Grinding','Pulling','Not sure'],
-  battery:['Slow crank','Dead','Dash lights only','Not sure'],
-  diagnostic:['Won’t start','Warning light','Noise','Not sure'],
-  mot_prep:['MOT due soon','Failed before','Not sure'],
-  // EV-specific
-  ev:['Battery health','Charging issue','Software fault','Not sure']
-};
-
-function renderServices(data){
-  const fuel = (data.fuelType||'').toUpperCase();
-  let list = SERVICES;
-  if (fuel.includes('ELECTRIC')) {
-    list = SERVICES.filter(s => !['oil','fuel','coolant','brake_fluid'].includes(s.id));
-  }
-  const box = document.getElementById('serviceChips');
-  box.innerHTML = list.map(s=>`
-    <label class="chip">
-      <input type="radio" name="srv" value="${s.id}" onclick="renderClarifiers('${s.id}')">
-      <b>${s.label}</b> — ${s.price}<br><small>${s.desc}</small>
-    </label>
-  `).join('');
-  document.getElementById('servicesCard').style.display='block';
-}
-function renderClarifiers(serviceId){
-  const opts = CLARIFIERS[serviceId] || (serviceId==='ev'?CLARIFIERS.ev:['Not sure']);
-  const box = document.getElementById('clarifierChips');
-  box.innerHTML = opts.map(o=>`
-    <label class="chip"><input type="radio" name="clar" value="${o}"> ${o}</label>
-  `).join('');
-  document.getElementById('clarifierBox').style.display='block';
-}
-
-window.lookupVRM = async function(){
-  const vrm = (document.getElementById('vrm').value||'').toUpperCase().replace(/\s+/g,'');
-  const err = document.getElementById('error');
-  err.style.display='none';
-  if (vrm.length<5){ err.textContent='Enter a valid reg.'; err.style.display='block'; return; }
-
-  const btn=document.getElementById('lookupBtn');
-  btn.disabled=true; btn.textContent='Looking…';
-
-  try{
-    const res = await fetch(API_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({vrm})});
-    const data=await res.json();
-    if(!res.ok) throw new Error(data?.error||'Lookup failed');
-
-    document.getElementById('vehTitle').textContent = `${data.make||''} ${data.model||''}`;
-    const engine = data.engineCapacity ? (data.engineCapacity/1000).toFixed(1)+'L' : '';
-    document.getElementById('vehMeta').textContent = [data.fuelType||'', engine, data.colour||''].filter(Boolean).join(' • ');
-    document.getElementById('vehReg').textContent = 'Reg: '+vrm;
-    document.getElementById('vehicleCard').style.display='block';
-
-    // MOT
-    const motDate = data.motExpiryDate;
-    if(motDate){
-      const d=new Date(motDate), diff=Math.round((d-new Date())/86400000);
-      const el=document.getElementById('motStatus');
-      el.textContent = d.toLocaleDateString('en-GB')+` (${diff} days left)`;
-      el.className = diff>30?'ok':(diff>=0?'warn':'err');
+    function normaliseFuel(fuel) {
+      const value = (fuel || '').toUpperCase();
+      if (value.includes('ELECTRIC')) return 'Electric';
+      if (value.includes('DIESEL')) return 'Diesel';
+      if (value.includes('PETROL')) return 'Petrol';
+      if (value.includes('HYBRID')) {
+        return value.includes('DIESEL') ? 'Diesel' : 'Petrol';
+      }
+      return 'Both';
     }
 
-    // Tax
-    const taxStat=(data.taxStatus||'').toUpperCase();
-    const el=document.getElementById('taxStatus');
-    if(taxStat==='TAXED'){ el.textContent='Taxed'; el.className='ok'; }
-    else if(taxStat==='UNTAXED'||taxStat==='SORN'){ el.textContent=taxStat; el.className='err'; }
-    else { el.textContent=taxStat||'Unknown'; el.className='warn'; }
+    function renderVehicle(data, vrm) {
+      vehicleDetails = data;
+      const title = [data.make, data.model].filter(Boolean).join(' ');
+      document.getElementById('vehTitle').textContent = title || 'Vehicle details';
+      const engine = data.engineCapacity ? `${(data.engineCapacity/1000).toFixed(1)}L` : '';
+      const metaBits = [data.fuelType, engine, data.colour].filter(Boolean).join(' • ');
+      document.getElementById('vehMeta').textContent = metaBits;
+      document.getElementById('vehReg').textContent = `Reg: ${vrm}`;
 
-    renderServices(data);
-  }catch(e){
-    err.textContent=e.message; err.style.display='block';
-  }finally{
-    btn.disabled=false; btn.textContent='Look up';
-  }
-}
+      // MOT
+      const motStatus = document.getElementById('motStatus');
+      if (data.motExpiryDate) {
+        const motDate = new Date(data.motExpiryDate);
+        const days = Math.round((motDate - new Date()) / 86400000);
+        const dayText = isNaN(days) ? '' : ` (${days} days left)`;
+        motStatus.textContent = `${motDate.toLocaleDateString('en-GB')}${dayText}`;
+      } else {
+        motStatus.textContent = 'Unknown';
+      }
 
-function reviewEmail(){
-  const srv=document.querySelector('input[name="srv"]:checked');
-  if(!srv){ alert('Pick a service.'); return; }
-  const clar=document.querySelector('input[name="clar"]:checked');
-  const warr=document.querySelector('input[name="warr"]:checked');
-  const date=document.getElementById('bookDate').value;
-  const time=document.getElementById('bookTime').value;
+      // Tax
+      const taxStatus = document.getElementById('taxStatus');
+      taxStatus.textContent = (data.taxStatus || 'Unknown');
 
-  const body=[
-    'Service Request:',
-    'Service: '+srv.value,
-    clar?'Detail: '+clar.value:'',
-    'Warranty: '+(warr.value==='0'?'6 months':warr.value==='20'?'12 months':'18 months'),
-    date&&time?'Preferred slot: '+date+' '+time:'',
-    document.getElementById('vehTitle').textContent,
-    document.getElementById('vehMeta').textContent,
-    document.getElementById('vehReg').textContent,
-    'MOT: '+document.getElementById('motStatus').textContent,
-    'Tax: '+document.getElementById('taxStatus').textContent
-  ].filter(Boolean).join('%0A');
+      const evNotice = document.getElementById('evNotice');
+      if (normaliseFuel(data.fuelType) === 'Electric') {
+        evNotice.textContent = 'We do not do electric just yet but we are hoping to expand to them soon.';
+        evNotice.classList.remove('hidden');
+      } else {
+        evNotice.classList.add('hidden');
+        evNotice.textContent = '';
+      }
 
-  window.location=`mailto:support@mitchsautoservices.co.uk?subject=New Service Request&body=${body}`;
-}
-</script>
+      document.getElementById('vehicleCard').classList.remove('hidden');
+    }
+
+    function renderServices(data) {
+      const messageBox = document.getElementById('servicesMessage');
+      const listBox = document.getElementById('serviceList');
+      const warranty = document.getElementById('warrantySection');
+      const finish = document.getElementById('finishContainer');
+
+      listBox.innerHTML = '';
+
+      const fuel = normaliseFuel(data.fuelType);
+      if (fuel === 'Electric') {
+        messageBox.textContent = 'We do not do electric just yet but we are hoping to expand to them soon. Please check back later!';
+        messageBox.classList.remove('hidden');
+        warranty.classList.add('hidden');
+        finish.classList.add('hidden');
+        return;
+      }
+
+      warranty.classList.add('hidden');
+      finish.classList.add('hidden');
+
+      const available = SERVICES.filter(service =>
+        fuel === 'Both' || service.applicable.length === 2 || service.applicable.includes(fuel)
+      );
+
+      if (available.length === 0) {
+        messageBox.textContent = 'No services available for this vehicle type just yet — please contact us for help.';
+        messageBox.classList.remove('hidden');
+        warranty.classList.add('hidden');
+        finish.classList.add('hidden');
+        return;
+      }
+
+      const typeText = fuel === 'Both' ? 'your vehicle type' : `${fuel.toLowerCase()} vehicles`;
+      messageBox.textContent = `Showing services for ${typeText}.`;
+      messageBox.classList.remove('hidden');
+
+      listBox.innerHTML = available.map(service => `
+        <label class="service-item">
+          <header>
+            <div>
+              <h3>${service.title}</h3>
+              <div class="applicable">${service.price} (${service.applicable.length === 2 ? 'Both' : service.applicable.join(', ')})</div>
+            </div>
+            <input type="radio" class="service-radio" name="srv" value="${service.id}" data-title="${service.title}" data-price="${service.price}">
+          </header>
+          <div>${service.desc}</div>
+          <p class="symptoms">${service.symptoms}</p>
+        </label>
+      `).join('');
+
+      listBox.querySelectorAll('input[name="srv"]').forEach(input => {
+        input.addEventListener('change', () => {
+          warranty.classList.remove('hidden');
+          finish.classList.remove('hidden');
+        });
+      });
+
+      document.getElementById('servicesCard').classList.remove('hidden');
+    }
+
+    async function lookupVRM() {
+      const input = document.getElementById('vrm');
+      const vrm = (input.value || '').toUpperCase().replace(/\s+/g, '');
+      const errorBox = document.getElementById('error');
+      errorBox.classList.add('hidden');
+      errorBox.textContent = '';
+
+      if (vrm.length < 5) {
+        errorBox.textContent = 'Please enter a valid registration (at least 5 characters).';
+        errorBox.classList.remove('hidden');
+        return;
+      }
+
+      const button = document.getElementById('lookupBtn');
+      button.disabled = true;
+      button.textContent = 'Looking…';
+
+      try {
+        const response = await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ vrm })
+        });
+
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data?.error || 'Lookup failed');
+        }
+
+        renderVehicle(data, vrm);
+        renderServices(data);
+      } catch (err) {
+        errorBox.textContent = err.message || 'Something went wrong while looking up the registration.';
+        errorBox.classList.remove('hidden');
+      } finally {
+        button.disabled = false;
+        button.textContent = 'Look up';
+      }
+    }
+
+    function finishBooking() {
+      const serviceInput = document.querySelector('input[name="srv"]:checked');
+      if (!serviceInput) {
+        alert('Please pick a service.');
+        return;
+      }
+
+      const warrantyInput = document.querySelector('input[name="warr"]:checked');
+      const details = [
+        `Vehicle: ${document.getElementById('vehTitle').textContent}`,
+        document.getElementById('vehMeta').textContent ? `Details: ${document.getElementById('vehMeta').textContent}` : '',
+        document.getElementById('vehReg').textContent,
+        `MOT: ${document.getElementById('motStatus').textContent}`,
+        `Tax: ${document.getElementById('taxStatus').textContent}`,
+        `Service: ${serviceInput.dataset.title} (${serviceInput.dataset.price})`,
+        warrantyInput ? `Warranty: ${warrantyInput.value}` : ''
+      ].filter(Boolean).join('\n');
+
+      const subject = encodeURIComponent('Service Booking Request');
+      const body = encodeURIComponent(`${details}\n\nPlease contact me to confirm availability.`);
+      window.location.href = `mailto:support@mitchsautoservices.co.uk?subject=${subject}&body=${body}`;
+    }
+
+    window.lookupVRM = lookupVRM;
+    window.finishBooking = finishBooking;
+  </script>
 </body>
 </html>

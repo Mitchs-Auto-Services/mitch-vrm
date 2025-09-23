@@ -256,14 +256,6 @@
         </div>
       </div>
 
-      <div id="warrantySection" class="hidden" style="margin-top:24px;">
-        <h3>Warranty options</h3>
-        <p class="hint">My standard (free) warranty is 6 months. Upgrade for longer cover.</p>
-        <label class="option"><input type="radio" name="warr" value="6 months (included)" checked> 6 Months (included)</label>
-        <label class="option"><input type="radio" name="warr" value="12 months (+£20)"> 1 Year for £20</label>
-        <label class="option"><input type="radio" name="warr" value="18 months (+£40)"> 1 Year 6 Months for £40</label>
-        <label class="option"><input type="radio" name="warr" value="Lifetime (price on request)"> Lifetime warranty (price on request – depends on make & model)</label>
-      </div>
     </section>
 
     <section id="servicesCard" class="card hidden">
@@ -272,6 +264,14 @@
       <p class="hint">We carry out both mobile and garage work depending on what suits you best.</p>
       <div id="servicesMessage" class="alert warn hidden"></div>
       <div id="serviceList" class="service-list"></div>
+      <div id="warrantySection" class="hidden" style="margin-top:24px;">
+        <h3>Warranty options</h3>
+        <p class="hint">My standard (free) warranty is 6 months. Upgrade for longer cover.</p>
+        <label class="option"><input type="radio" name="warr" value="6 months (included)" checked> 6 Months (included)</label>
+        <label class="option"><input type="radio" name="warr" value="12 months (+£20)"> 1 Year for £20</label>
+        <label class="option"><input type="radio" name="warr" value="18 months (+£40)"> 1 Year 6 Months for £40</label>
+        <label class="option"><input type="radio" name="warr" value="Lifetime (price on request)"> Lifetime warranty (price on request – depends on make & model)</label>
+      </div>
       <div style="margin-top:24px;" id="finishContainer" class="hidden">
         <button id="finishBtn" onclick="finishBooking()">Finish</button>
         <p class="footer-note">Tap Finish to send us an email with everything we need at <a href="mailto:support@mitchsautoservices.co.uk">support@mitchsautoservices.co.uk</a>.</p>
@@ -558,6 +558,10 @@
         finish.classList.add('hidden');
         return;
       }
+
+      warranty.querySelectorAll('input[name="warr"]').forEach((input, index) => {
+        input.checked = index === 0;
+      });
 
       warranty.classList.add('hidden');
       finish.classList.add('hidden');

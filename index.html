@@ -281,6 +281,8 @@
 
   <script>
     const API_URL = '/api/vrm';
+    const DVLA_FALLBACK_URL = 'https://driver-vehicle-licensing.api.gov.uk/vehicle-enquiry/v1/vehicles';
+    const DVLA_FALLBACK_KEY = 'ZQHFV22Ym6ao1CfyyqEol2oxzpoWQM2w59rAkPro';
 
     const SERVICES = [
       {
@@ -495,6 +497,64 @@
 
     let vehicleDetails = null;
 
+    async function fetchVehicleDetails(vrm) {
+      let fallbackReason = null;
+      try {
+        const response = await fetch(API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ vrm }),
+          cache: 'no-store'
+        });
+
+        let data = null;
+        try {
+          data = await response.json();
+        } catch (parseError) {
+          data = null;
+        }
+
+        if (!response.ok) {
+          if (response.status >= 400 && response.status < 500) {
+            throw new Error(data?.error || data?.message || 'Lookup failed');
+          }
+
+          fallbackReason = `API responded with status ${response.status}`;
+          throw new Error(data?.error || data?.message || 'Lookup failed');
+        }
+
+        return data || {};
+      } catch (err) {
+        if (!fallbackReason && !(err instanceof TypeError)) {
+          throw err;
+        }
+
+        const fallbackResponse = await fetch(DVLA_FALLBACK_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-api-key': DVLA_FALLBACK_KEY
+          },
+          body: JSON.stringify({ registrationNumber: vrm }),
+          mode: 'cors',
+          cache: 'no-store'
+        });
+
+        let fallbackData = null;
+        try {
+          fallbackData = await fallbackResponse.json();
+        } catch (parseError) {
+          fallbackData = null;
+        }
+
+        if (!fallbackResponse.ok) {
+          throw new Error(fallbackData?.message || fallbackData?.error || 'Lookup failed');
+        }
+
+        return fallbackData || {};
+      }
+    }
+
     function normaliseFuel(fuel) {
       const value = (fuel || '').toUpperCase();
       if (value.includes('ELECTRIC')) return 'Electric';
@@ -624,17 +684,7 @@
       button.textContent = 'Looking…';
 
       try {
-        const response = await fetch(API_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ vrm })
-        });
-
-        const data = await response.json();
-        if (!response.ok) {
-          throw new Error(data?.error || 'Lookup failed');
-        }
-
+        const data = await fetchVehicleDetails(vrm);
         renderVehicle(data, vrm);
         renderServices(data);
       } catch (err) {

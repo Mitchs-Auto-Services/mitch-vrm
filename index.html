@@ -23,6 +23,19 @@
       background: linear-gradient(180deg, var(--bg-top), var(--bg-bottom));
       min-height: 100vh;
     }
+    .site-banner {
+      background: #000;
+      color: #fff;
+      text-align: center;
+      padding: 18px 16px;
+      font-size: 1.75rem;
+      font-weight: 800;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+    .site-banner__title {
+      margin: 0;
+    }
     a { color: inherit; }
     .container {
       max-width: 1100px;
@@ -172,6 +185,12 @@
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
       gap: 16px;
+    }
+    .address-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      margin-top: 8px;
     }
     .full-width {
       grid-column: 1 / -1;
@@ -421,6 +440,9 @@
   </style>
 </head>
 <body>
+  <header class="site-banner">
+    <div class="site-banner__title">Mitchs Auto Services</div>
+  </header>
   <div class="container">
     <header class="topbar">
       <div class="brand-intro">
@@ -594,8 +616,21 @@
               <input id="phoneNumber" name="phoneNumber" type="tel" autocomplete="tel" placeholder="07...">
             </div>
             <div id="mobileAddressGroup" class="full-width hidden">
-              <label for="serviceAddress">Service address</label>
-              <textarea id="serviceAddress" name="serviceAddress" rows="3" placeholder="Enter the address where the vehicle will be located"></textarea>
+              <label for="serviceAddressLine1">Service address</label>
+              <div class="address-grid">
+                <div>
+                  <input id="serviceAddressLine1" name="serviceAddressLine1" autocomplete="address-line1" placeholder="Street address">
+                </div>
+                <div>
+                  <input id="serviceAddressLine2" name="serviceAddressLine2" autocomplete="address-line2" placeholder="Apartment, suite, etc (optional)">
+                </div>
+                <div>
+                  <input id="serviceCity" name="serviceCity" autocomplete="address-level2" placeholder="City">
+                </div>
+                <div>
+                  <input id="servicePostcode" name="servicePostcode" autocomplete="postal-code" placeholder="Postcode">
+                </div>
+              </div>
               <div class="hint">Include the postcode so we can plan our visit.</div>
             </div>
             <div id="garageAddressNotice" class="full-width hidden">
@@ -643,7 +678,10 @@
     const LAST_NAME_INPUT = document.getElementById('lastName');
     const EMAIL_INPUT = document.getElementById('emailAddress');
     const PHONE_INPUT = document.getElementById('phoneNumber');
-    const SERVICE_ADDRESS_INPUT = document.getElementById('serviceAddress');
+    const SERVICE_ADDRESS_LINE1_INPUT = document.getElementById('serviceAddressLine1');
+    const SERVICE_ADDRESS_LINE2_INPUT = document.getElementById('serviceAddressLine2');
+    const SERVICE_CITY_INPUT = document.getElementById('serviceCity');
+    const SERVICE_POSTCODE_INPUT = document.getElementById('servicePostcode');
     const MOBILE_ADDRESS_GROUP = document.getElementById('mobileAddressGroup');
     const GARAGE_ADDRESS_NOTICE = document.getElementById('garageAddressNotice');
     const EXTRA_COMMENTS_INPUT = document.getElementById('extraComments');
@@ -662,12 +700,25 @@
     }
 
     function handleModeChange(modeKey) {
+      const addressInputs = [
+        SERVICE_ADDRESS_LINE1_INPUT,
+        SERVICE_ADDRESS_LINE2_INPUT,
+        SERVICE_CITY_INPUT,
+        SERVICE_POSTCODE_INPUT
+      ];
+
       if (modeKey === 'mobile') {
         if (MOBILE_ADDRESS_GROUP) {
           MOBILE_ADDRESS_GROUP.classList.remove('hidden');
         }
-        if (SERVICE_ADDRESS_INPUT) {
-          SERVICE_ADDRESS_INPUT.required = true;
+        if (SERVICE_ADDRESS_LINE1_INPUT) {
+          SERVICE_ADDRESS_LINE1_INPUT.required = true;
+        }
+        if (SERVICE_CITY_INPUT) {
+          SERVICE_CITY_INPUT.required = true;
+        }
+        if (SERVICE_POSTCODE_INPUT) {
+          SERVICE_POSTCODE_INPUT.required = true;
         }
         if (GARAGE_ADDRESS_NOTICE) {
           GARAGE_ADDRESS_NOTICE.classList.add('hidden');
@@ -676,10 +727,12 @@
         if (MOBILE_ADDRESS_GROUP) {
           MOBILE_ADDRESS_GROUP.classList.add('hidden');
         }
-        if (SERVICE_ADDRESS_INPUT) {
-          SERVICE_ADDRESS_INPUT.required = false;
-          SERVICE_ADDRESS_INPUT.value = '';
-        }
+        addressInputs.forEach(input => {
+          if (input) {
+            input.required = false;
+            input.value = '';
+          }
+        });
         if (GARAGE_ADDRESS_NOTICE) {
           GARAGE_ADDRESS_NOTICE.classList.remove('hidden');
         }
@@ -687,10 +740,12 @@
         if (MOBILE_ADDRESS_GROUP) {
           MOBILE_ADDRESS_GROUP.classList.add('hidden');
         }
-        if (SERVICE_ADDRESS_INPUT) {
-          SERVICE_ADDRESS_INPUT.required = false;
-          SERVICE_ADDRESS_INPUT.value = '';
-        }
+        addressInputs.forEach(input => {
+          if (input) {
+            input.required = false;
+            input.value = '';
+          }
+        });
         if (GARAGE_ADDRESS_NOTICE) {
           GARAGE_ADDRESS_NOTICE.classList.add('hidden');
         }
@@ -703,10 +758,17 @@
       if (EMAIL_INPUT) EMAIL_INPUT.value = '';
       if (PHONE_INPUT) PHONE_INPUT.value = '';
       if (EXTRA_COMMENTS_INPUT) EXTRA_COMMENTS_INPUT.value = '';
-      if (SERVICE_ADDRESS_INPUT) {
-        SERVICE_ADDRESS_INPUT.value = '';
-        SERVICE_ADDRESS_INPUT.required = false;
-      }
+      [
+        SERVICE_ADDRESS_LINE1_INPUT,
+        SERVICE_ADDRESS_LINE2_INPUT,
+        SERVICE_CITY_INPUT,
+        SERVICE_POSTCODE_INPUT
+      ].forEach(input => {
+        if (input) {
+          input.value = '';
+          input.required = false;
+        }
+      });
       if (MOBILE_ADDRESS_GROUP) {
         MOBILE_ADDRESS_GROUP.classList.add('hidden');
       }
@@ -1804,11 +1866,32 @@
 
       let serviceAddress = '';
       if (modeKey === 'mobile') {
-        serviceAddress = SERVICE_ADDRESS_INPUT ? SERVICE_ADDRESS_INPUT.value.trim() : '';
-        if (!serviceAddress) {
-          alert('Please enter the address where the vehicle will be located.');
+        const addressLine1 = SERVICE_ADDRESS_LINE1_INPUT ? SERVICE_ADDRESS_LINE1_INPUT.value.trim() : '';
+        const addressLine2 = SERVICE_ADDRESS_LINE2_INPUT ? SERVICE_ADDRESS_LINE2_INPUT.value.trim() : '';
+        const city = SERVICE_CITY_INPUT ? SERVICE_CITY_INPUT.value.trim() : '';
+        const postcodeRaw = SERVICE_POSTCODE_INPUT ? SERVICE_POSTCODE_INPUT.value.trim() : '';
+        const postcode = postcodeRaw ? postcodeRaw.toUpperCase() : '';
+
+        if (!addressLine1) {
+          alert('Please enter the street address for the mobile booking.');
           return;
         }
+        if (!city) {
+          alert('Please enter the city for the mobile booking.');
+          return;
+        }
+        if (!postcode) {
+          alert('Please enter the postcode for the mobile booking.');
+          return;
+        }
+
+        if (SERVICE_ADDRESS_LINE1_INPUT) SERVICE_ADDRESS_LINE1_INPUT.value = addressLine1;
+        if (SERVICE_ADDRESS_LINE2_INPUT) SERVICE_ADDRESS_LINE2_INPUT.value = addressLine2;
+        if (SERVICE_CITY_INPUT) SERVICE_CITY_INPUT.value = city;
+        if (SERVICE_POSTCODE_INPUT) SERVICE_POSTCODE_INPUT.value = postcode;
+
+        const cityPostcode = [city, postcode].filter(Boolean).join(' ');
+        serviceAddress = [addressLine1, addressLine2, cityPostcode].filter(Boolean).join(', ');
       }
 
       const extraComments = EXTRA_COMMENTS_INPUT ? EXTRA_COMMENTS_INPUT.value.trim() : '';

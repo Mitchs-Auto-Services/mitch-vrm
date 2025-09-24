@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="360" viewBox="0 0 360 360" role="img" aria-labelledby="title desc">
+  <title id="title">Mitch's Auto Services everyday logo</title>
+  <desc id="desc">Circular orange emblem with MAS initials and a stylised spanner.</desc>
+  <defs>
+    <radialGradient id="grad" cx="50%" cy="45%" r="60%">
+      <stop offset="0%" stop-color="#fca553" />
+      <stop offset="55%" stop-color="#f47a1f" />
+      <stop offset="100%" stop-color="#d9650e" />
+    </radialGradient>
+  </defs>
+  <rect width="360" height="360" rx="48" fill="#050505" />
+  <circle cx="180" cy="178" r="128" fill="url(#grad)" />
+  <g fill="#ffffff" font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-weight="700">
+    <text x="180" y="164" text-anchor="middle" font-size="96" letter-spacing="6">MAS</text>
+  </g>
+  <g transform="translate(92,212)" fill="#050505">
+    <rect x="0" y="46" width="176" height="24" rx="12" fill="#050505" opacity="0.65" />
+    <path d="M14 36l36-36h32l40 40-28 28z" fill="#fff" opacity="0.9"/>
+    <path d="M138 26c12.15 0 22 9.85 22 22s-9.85 22-22 22-22-9.85-22-22 9.85-22 22-22zm0 14a8 8 0 100 16 8 8 0 000-16z" fill="#fff"/>
+  </g>
+</svg>

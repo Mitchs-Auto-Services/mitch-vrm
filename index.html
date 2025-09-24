@@ -29,6 +29,29 @@
       margin: 0 auto;
       padding: 32px 20px 48px;
     }
+    .brand-intro {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+    }
+    .brand-copy {
+      flex: 1;
+    }
+    .logo-main {
+      width: 260px;
+      max-width: 100%;
+      height: auto;
+      display: block;
+      filter: drop-shadow(0 8px 18px rgba(0,0,0,0.45));
+    }
+    .logo-mark {
+      width: 140px;
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin: 0 auto 18px;
+      filter: drop-shadow(0 10px 28px rgba(0,0,0,0.45));
+    }
     header.topbar {
       display: flex;
       flex-wrap: wrap;
@@ -263,6 +286,19 @@
       margin: 12px 0 0;
       font-weight: 600;
     }
+    .mode-select-wrapper {
+      display: none;
+      margin-top: 16px;
+    }
+    .mode-select-description {
+      margin-top: 12px;
+      padding: 16px;
+      border-radius: 12px;
+      background: rgba(0,0,0,0.35);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: rgba(255,255,255,0.9);
+      line-height: 1.5;
+    }
     .mode-list {
       display: grid;
       gap: 16px;
@@ -348,6 +384,12 @@
       header.topbar {
         text-align: center;
       }
+      .brand-intro {
+        flex-direction: column;
+      }
+      .logo-main {
+        margin: 0 auto;
+      }
       .coverage {
         text-align: center;
         margin-left: 0;
@@ -371,15 +413,24 @@
       button {
         width: 100%;
       }
+      .mode-select-wrapper {
+        display: block;
+      }
+      .mode-list {
+        display: none;
+      }
     }
   </style>
 </head>
 <body>
   <div class="container">
     <header class="topbar">
-      <div>
-        <h1>Mitch’s Auto Services</h1>
-        <p>Trusted mobile and garage mechanic support — our loyalty programme even gives you a chance to win a free service.</p>
+      <div class="brand-intro">
+        <img src="assets/logo-main.svg" alt="Mitch's Auto Services logo" class="logo-main">
+        <div class="brand-copy">
+          <h1>Mitch’s Auto Services</h1>
+          <p>Trusted mobile and garage mechanic support — our loyalty programme even gives you a chance to win a free service.</p>
+        </div>
       </div>
       <div class="coverage">
         <p>We work within a 15 mile radius from Unit 5, Wingate Grange Industrial Estate, TS28 5AH.</p>
@@ -451,6 +502,15 @@
       <div id="fulfilmentSection" class="hidden" style="margin-top:24px;">
         <h3>How would you like us to carry out the work?</h3>
         <p class="hint">Choose the style that suits you — appointments run between 9am and 5pm in 30-minute slots.</p>
+        <div class="mode-select-wrapper">
+          <label for="modeSelect">Choose your service style</label>
+          <select id="modeSelect" name="modeSelect">
+            <option value="">Select service style</option>
+            <option value="mobile" data-value="Mobile mechanic visit" data-label="Mobile mechanic visit">Mobile mechanic — we come to you</option>
+            <option value="garage" data-value="Garage drop-off" data-label="Garage drop-off service">Garage service — drop off with us</option>
+          </select>
+          <div id="modeSelectDescription" class="mode-select-description hidden"></div>
+        </div>
         <div class="mode-list">
           <label class="mode-item" data-mode="mobile">
             <div class="mode-summary">
@@ -518,6 +578,7 @@
         </div>
       </div>
       <div style="margin-top:24px;" id="finishContainer" class="hidden">
+        <img src="assets/logo-mark.svg" alt="Mitch's Auto Services everyday logo" class="logo-mark">
         <button id="finishBtn" onclick="finishBooking()">Finish</button>
         <p class="footer-note">Tap Finish to send us an email with everything we need at <a href="mailto:support@mitchsautoservices.co.uk">support@mitchsautoservices.co.uk</a>.</p>
       </div>
@@ -535,7 +596,55 @@
     const DATE_INPUT = document.getElementById('appointmentDate');
     const TIME_INPUT = document.getElementById('appointmentTime');
     const MODE_ITEMS = Array.from(document.querySelectorAll('#fulfilmentSection .mode-item'));
-    const MODE_RADIOS = MODE_ITEMS.map(item => item.querySelector('input[name="mode"]'));
+    const MODE_SELECT = document.getElementById('modeSelect');
+    const MODE_SELECT_DESCRIPTION = document.getElementById('modeSelectDescription');
+    const MODE_DESCRIPTIONS = MODE_ITEMS.reduce((map, item) => {
+      const key = item.dataset.mode;
+      const body = item.querySelector('.mode-body');
+      if (key && body) {
+        map[key] = body.textContent.trim();
+      }
+      return map;
+    }, {});
+
+    function updateModeDescription(modeKey) {
+      if (!MODE_SELECT_DESCRIPTION) {
+        return;
+      }
+      if (modeKey && MODE_DESCRIPTIONS[modeKey]) {
+        MODE_SELECT_DESCRIPTION.textContent = MODE_DESCRIPTIONS[modeKey];
+        MODE_SELECT_DESCRIPTION.classList.remove('hidden');
+      } else {
+        MODE_SELECT_DESCRIPTION.textContent = '';
+        MODE_SELECT_DESCRIPTION.classList.add('hidden');
+      }
+    }
+
+    function setModeSelection(modeKey, options = {}) {
+      const { expand = true } = options;
+      const value = modeKey || '';
+
+      MODE_ITEMS.forEach(item => {
+        const match = Boolean(value) && item.dataset.mode === value;
+        const radio = item.querySelector('input[name="mode"]');
+        if (radio) {
+          radio.checked = match;
+        }
+        if (expand) {
+          item.classList.toggle('expanded', match);
+        } else if (!match) {
+          item.classList.remove('expanded');
+        } else if (match) {
+          item.classList.add('expanded');
+        }
+      });
+
+      if (MODE_SELECT && MODE_SELECT.value !== value) {
+        MODE_SELECT.value = value;
+      }
+
+      updateModeDescription(value);
+    }
     const ALLOWED_TIMES = [
       '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
       '12:00', '12:30', '13:00', '13:30', '14:00', '14:30',
@@ -571,25 +680,39 @@
 
     MODE_ITEMS.forEach(item => {
       const radio = item.querySelector('input[name="mode"]');
-      const expand = () => {
-        MODE_ITEMS.forEach(other => other.classList.remove('expanded'));
-        item.classList.add('expanded');
-        radio.checked = true;
+      const modeKey = item.dataset.mode;
+      const handleSelect = () => {
+        if (modeKey) {
+          setModeSelection(modeKey, { expand: true });
+        }
       };
 
       item.addEventListener('click', event => {
         if (event.target && event.target.matches('input[type="radio"]')) {
           return;
         }
-        expand();
+        handleSelect();
       });
 
-      radio.addEventListener('change', () => {
-        if (radio.checked) {
-          expand();
+      if (radio) {
+        radio.addEventListener('change', () => {
+          if (radio.checked) {
+            handleSelect();
+          }
+        });
+      }
+    });
+
+    if (MODE_SELECT) {
+      MODE_SELECT.addEventListener('change', () => {
+        const value = MODE_SELECT.value;
+        if (value) {
+          setModeSelection(value, { expand: true });
+        } else {
+          setModeSelection('', { expand: false });
         }
       });
-    });
+    }
 
     function resolveErrorMessage(value) {
       if (!value) {
@@ -1269,8 +1392,7 @@
       if (TIME_INPUT) {
         TIME_INPUT.value = '';
       }
-      MODE_ITEMS.forEach(item => item.classList.remove('expanded'));
-      MODE_RADIOS.forEach(radio => { radio.checked = false; });
+      setModeSelection('', { expand: false });
       if (FULFILMENT_SECTION) {
         FULFILMENT_SECTION.classList.add('hidden');
       }
@@ -1456,7 +1578,22 @@
       }
 
       const modeInput = document.querySelector('input[name="mode"]:checked');
-      if (!modeInput) {
+      let modeLabel = '';
+      let modeValue = '';
+
+      if (modeInput) {
+        modeLabel = modeInput.dataset.label || modeInput.value;
+        modeValue = modeInput.value;
+      } else if (MODE_SELECT && MODE_SELECT.value) {
+        const option = MODE_SELECT.selectedOptions[0];
+        modeValue = option?.dataset.value || MODE_SELECT.value;
+        modeLabel = option?.dataset.label || option?.textContent?.trim() || modeValue;
+        if (modeValue) {
+          setModeSelection(MODE_SELECT.value, { expand: true });
+        }
+      }
+
+      if (!modeLabel) {
         alert('Please choose whether you would like a mobile mechanic or to drop the vehicle at the garage.');
         return;
       }
@@ -1491,7 +1628,7 @@
         `Tax: ${document.getElementById('taxStatus').textContent}`,
         `Service: ${serviceInput.dataset.title} (${serviceInput.dataset.price})`,
         warrantyInput ? `Warranty: ${warrantyInput.value}` : '',
-        `Service mode: ${modeInput.dataset.label || modeInput.value}`,
+        `Service mode: ${modeLabel}`,
         `Preferred appointment: ${formattedDate} at ${formattedTime}`
       ].filter(Boolean).join('\n');
 

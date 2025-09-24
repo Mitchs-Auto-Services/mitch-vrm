@@ -168,6 +168,14 @@
       grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
       gap: 16px;
     }
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+    }
+    .full-width {
+      grid-column: 1 / -1;
+    }
     .service-list {
       display: grid;
       gap: 16px;
@@ -360,6 +368,13 @@
       width: auto;
     }
     .hidden { display: none !important; }
+    .info-callout {
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: rgba(0,0,0,0.35);
+      border: 1px solid rgba(255,255,255,0.35);
+      line-height: 1.45;
+    }
     .footer-note {
       margin-top: 14px;
       font-size: 0.95rem;
@@ -558,6 +573,41 @@
             </select>
           </div>
         </div>
+        <div id="infoSection" class="hidden" style="margin-top:24px;">
+          <h3>Your details</h3>
+          <p class="hint">Please share your contact information so we can confirm the booking with you.</p>
+          <div class="info-grid">
+            <div>
+              <label for="firstName">First name</label>
+              <input id="firstName" name="firstName" autocomplete="given-name" placeholder="First name">
+            </div>
+            <div>
+              <label for="lastName">Last name</label>
+              <input id="lastName" name="lastName" autocomplete="family-name" placeholder="Last name">
+            </div>
+            <div>
+              <label for="emailAddress">Email address</label>
+              <input id="emailAddress" name="emailAddress" type="email" autocomplete="email" placeholder="name@example.com">
+            </div>
+            <div>
+              <label for="phoneNumber">Phone number</label>
+              <input id="phoneNumber" name="phoneNumber" type="tel" autocomplete="tel" placeholder="07...">
+            </div>
+            <div id="mobileAddressGroup" class="full-width hidden">
+              <label for="serviceAddress">Service address</label>
+              <textarea id="serviceAddress" name="serviceAddress" rows="3" placeholder="Enter the address where the vehicle will be located"></textarea>
+              <div class="hint">Include the postcode so we can plan our visit.</div>
+            </div>
+            <div id="garageAddressNotice" class="full-width hidden">
+              <label>Garage drop-off location</label>
+              <div class="info-callout">Unit 5, Wingate Grange Industrial Estate, TS28 5AH</div>
+            </div>
+            <div class="full-width">
+              <label for="extraComments">Extra comments</label>
+              <textarea id="extraComments" name="extraComments" rows="4" placeholder="Let us know anything else about your vehicle or the booking"></textarea>
+            </div>
+          </div>
+        </div>
       </div>
       <div style="margin-top:24px;" id="finishContainer" class="hidden">
         <button id="finishBtn" onclick="finishBooking()">Finish</button>
@@ -571,6 +621,7 @@
     const DVLA_FALLBACK_URL = 'https://driver-vehicle-licensing.api.gov.uk/vehicle-enquiry/v1/vehicles';
     const DVLA_FALLBACK_KEY = 'ZQHFV22Ym6ao1CfyyqEol2oxzpoWQM2w59rAkPro';
     const VEHICLE_NOT_FOUND_MESSAGE = 'We are unable to find your vehicle, please check you have entered the reg correctly.';
+    const GARAGE_ADDRESS_TEXT = 'Unit 5, Wingate Grange Industrial Estate, TS28 5AH';
 
     const FULFILMENT_SECTION = document.getElementById('fulfilmentSection');
     const BOOKING_SECTION = document.getElementById('bookingSection');
@@ -587,6 +638,15 @@
       }
       return map;
     }, {});
+    const INFO_SECTION = document.getElementById('infoSection');
+    const FIRST_NAME_INPUT = document.getElementById('firstName');
+    const LAST_NAME_INPUT = document.getElementById('lastName');
+    const EMAIL_INPUT = document.getElementById('emailAddress');
+    const PHONE_INPUT = document.getElementById('phoneNumber');
+    const SERVICE_ADDRESS_INPUT = document.getElementById('serviceAddress');
+    const MOBILE_ADDRESS_GROUP = document.getElementById('mobileAddressGroup');
+    const GARAGE_ADDRESS_NOTICE = document.getElementById('garageAddressNotice');
+    const EXTRA_COMMENTS_INPUT = document.getElementById('extraComments');
 
     function updateModeDescription(modeKey) {
       if (!MODE_SELECT_DESCRIPTION) {
@@ -600,6 +660,65 @@
         MODE_SELECT_DESCRIPTION.classList.add('hidden');
       }
     }
+
+    function handleModeChange(modeKey) {
+      if (modeKey === 'mobile') {
+        if (MOBILE_ADDRESS_GROUP) {
+          MOBILE_ADDRESS_GROUP.classList.remove('hidden');
+        }
+        if (SERVICE_ADDRESS_INPUT) {
+          SERVICE_ADDRESS_INPUT.required = true;
+        }
+        if (GARAGE_ADDRESS_NOTICE) {
+          GARAGE_ADDRESS_NOTICE.classList.add('hidden');
+        }
+      } else if (modeKey === 'garage') {
+        if (MOBILE_ADDRESS_GROUP) {
+          MOBILE_ADDRESS_GROUP.classList.add('hidden');
+        }
+        if (SERVICE_ADDRESS_INPUT) {
+          SERVICE_ADDRESS_INPUT.required = false;
+          SERVICE_ADDRESS_INPUT.value = '';
+        }
+        if (GARAGE_ADDRESS_NOTICE) {
+          GARAGE_ADDRESS_NOTICE.classList.remove('hidden');
+        }
+      } else {
+        if (MOBILE_ADDRESS_GROUP) {
+          MOBILE_ADDRESS_GROUP.classList.add('hidden');
+        }
+        if (SERVICE_ADDRESS_INPUT) {
+          SERVICE_ADDRESS_INPUT.required = false;
+          SERVICE_ADDRESS_INPUT.value = '';
+        }
+        if (GARAGE_ADDRESS_NOTICE) {
+          GARAGE_ADDRESS_NOTICE.classList.add('hidden');
+        }
+      }
+    }
+
+    function resetCustomerForm() {
+      if (FIRST_NAME_INPUT) FIRST_NAME_INPUT.value = '';
+      if (LAST_NAME_INPUT) LAST_NAME_INPUT.value = '';
+      if (EMAIL_INPUT) EMAIL_INPUT.value = '';
+      if (PHONE_INPUT) PHONE_INPUT.value = '';
+      if (EXTRA_COMMENTS_INPUT) EXTRA_COMMENTS_INPUT.value = '';
+      if (SERVICE_ADDRESS_INPUT) {
+        SERVICE_ADDRESS_INPUT.value = '';
+        SERVICE_ADDRESS_INPUT.required = false;
+      }
+      if (MOBILE_ADDRESS_GROUP) {
+        MOBILE_ADDRESS_GROUP.classList.add('hidden');
+      }
+      if (GARAGE_ADDRESS_NOTICE) {
+        GARAGE_ADDRESS_NOTICE.classList.add('hidden');
+      }
+      if (INFO_SECTION) {
+        INFO_SECTION.classList.add('hidden');
+      }
+    }
+
+    handleModeChange('');
 
     function setModeSelection(modeKey, options = {}) {
       const { expand = true } = options;
@@ -625,6 +744,7 @@
       }
 
       updateModeDescription(value);
+      handleModeChange(value);
     }
     const ALLOWED_TIMES = [
       '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
@@ -1241,6 +1361,32 @@
           'Poor MOT handbrake results or advisories',
           'Rear brakes feel weak or uneven'
         ]
+      },
+      {
+        id: 'not_sure',
+        title: "I'm not sure",
+        price: 'Quote provided',
+        applicable: ['Petrol', 'Diesel'],
+        overview: 'Not certain what you need? Tell us what the vehicle is doing and we\'ll guide you towards the right repair or service package.',
+        includes: [
+          'Listen to your concerns and review the vehicle symptoms',
+          'Recommend the most suitable service or repair before any work starts',
+          'Provide an estimate for parts and labour once the issue is identified',
+          'Keep you updated with transparent findings and next steps'
+        ],
+        symptoms: [
+          'Warning lights or messages without a clear cause',
+          'New noises, vibrations or handling changes',
+          'Intermittent faults that are hard to pin down',
+          'Any other issue where you just want expert advice first'
+        ],
+        notes: 'Use this option if you want us to investigate and advise on the best fix before committing to a service.',
+        requiresDetails: true,
+        extraField: {
+          id: 'notSureDetails',
+          label: 'Tell us what is happening',
+          placeholder: 'Please explain the issue you are experiencing.'
+        }
       }
     ];
 
@@ -1365,6 +1511,7 @@
       const finish = document.getElementById('finishContainer');
 
       listBox.innerHTML = '';
+      resetCustomerForm();
       refreshDateLimits();
 
       if (DATE_INPUT) {
@@ -1440,6 +1587,9 @@
           ? `<div class="service-section"><h4>When to book</h4><ul>${service.symptoms.map(item => `<li>${item}</li>`).join('')}</ul></div>`
           : '';
         const notesHtml = service.notes ? `<p class="service-note">${service.notes}</p>` : '';
+        const extraHtml = service.extraField
+          ? `<div class="service-section"><h4>${service.extraField.label}</h4><textarea id="${service.extraField.id}" name="${service.extraField.id}" rows="4" placeholder="${service.extraField.placeholder}" data-service-extra="${service.id}"></textarea></div>`
+          : '';
 
         return `
           <label class="service-item" data-service="${service.id}">
@@ -1453,7 +1603,7 @@
               </div>
               <div class="service-controls">
                 <span class="chevron" aria-hidden="true">&#9662;</span>
-                <input type="radio" class="service-radio" name="srv" value="${service.id}" data-title="${service.title}" data-price="${service.price}">
+                <input type="radio" class="service-radio" name="srv" value="${service.id}" data-title="${service.title}" data-price="${service.price}" data-require-details="${service.requiresDetails ? 'true' : 'false'}" data-extra-field-id="${service.extraField ? service.extraField.id : ''}">
               </div>
             </div>
             <div class="service-body">
@@ -1462,6 +1612,7 @@
               ${includesHtml}
               ${notesHtml}
               ${symptomsHtml}
+              ${extraHtml}
             </div>
           </label>
         `;
@@ -1482,6 +1633,9 @@
           }
           if (BOOKING_SECTION) {
             BOOKING_SECTION.classList.remove('hidden');
+          }
+          if (INFO_SECTION) {
+            INFO_SECTION.classList.remove('hidden');
           }
           if (DATE_INPUT && !DATE_INPUT.value) {
             refreshDateLimits();
@@ -1558,25 +1712,44 @@
         return;
       }
 
+      const requiresDetails = serviceInput.dataset.requireDetails === 'true';
+      const extraFieldId = serviceInput.dataset.extraFieldId;
+      let serviceDetails = '';
+      if (extraFieldId) {
+        const extraField = document.getElementById(extraFieldId);
+        if (extraField) {
+          serviceDetails = extraField.value.trim();
+        }
+      }
+      if (requiresDetails && !serviceDetails) {
+        alert('Please explain the issue you are experiencing so we can help.');
+        return;
+      }
+
       const modeInput = document.querySelector('input[name="mode"]:checked');
       let modeLabel = '';
-      let modeValue = '';
+      let modeKey = '';
 
       if (modeInput) {
         modeLabel = modeInput.dataset.label || modeInput.value;
-        modeValue = modeInput.value;
+        modeKey = modeInput.closest('.mode-item')?.dataset.mode || '';
       } else if (MODE_SELECT && MODE_SELECT.value) {
         const option = MODE_SELECT.selectedOptions[0];
-        modeValue = option?.dataset.value || MODE_SELECT.value;
-        modeLabel = option?.dataset.label || option?.textContent?.trim() || modeValue;
-        if (modeValue) {
-          setModeSelection(MODE_SELECT.value, { expand: true });
+        const optionValue = MODE_SELECT.value;
+        modeLabel = option?.dataset.label || option?.textContent?.trim() || optionValue;
+        modeKey = optionValue;
+        if (optionValue) {
+          setModeSelection(optionValue, { expand: true });
         }
       }
 
       if (!modeLabel) {
         alert('Please choose whether you would like a mobile mechanic or to drop the vehicle at the garage.');
         return;
+      }
+
+      if (!modeKey) {
+        modeKey = MODE_SELECT?.value || '';
       }
 
       refreshDateLimits();
@@ -1600,21 +1773,73 @@
       const formattedDate = dateParts.length === 3 ? `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}` : DATE_INPUT.value;
       const formattedTime = TIME_INPUT.value ? TIME_INPUT.value.slice(0, 5) : '';
 
+      const firstName = FIRST_NAME_INPUT ? FIRST_NAME_INPUT.value.trim() : '';
+      if (!firstName) {
+        alert('Please enter your first name.');
+        return;
+      }
+
+      const lastName = LAST_NAME_INPUT ? LAST_NAME_INPUT.value.trim() : '';
+      if (!lastName) {
+        alert('Please enter your last name.');
+        return;
+      }
+
+      const email = EMAIL_INPUT ? EMAIL_INPUT.value.trim() : '';
+      if (!email) {
+        alert('Please provide your email address so we can get back to you.');
+        return;
+      }
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailPattern.test(email)) {
+        alert('Please enter a valid email address.');
+        return;
+      }
+
+      const phone = PHONE_INPUT ? PHONE_INPUT.value.trim() : '';
+      if (!phone) {
+        alert('Please enter your phone number.');
+        return;
+      }
+
+      let serviceAddress = '';
+      if (modeKey === 'mobile') {
+        serviceAddress = SERVICE_ADDRESS_INPUT ? SERVICE_ADDRESS_INPUT.value.trim() : '';
+        if (!serviceAddress) {
+          alert('Please enter the address where the vehicle will be located.');
+          return;
+        }
+      }
+
+      const extraComments = EXTRA_COMMENTS_INPUT ? EXTRA_COMMENTS_INPUT.value.trim() : '';
       const warrantyInput = document.querySelector('input[name="warr"]:checked');
-      const details = [
+
+      const customerDetails = [
+        `Customer name: ${firstName} ${lastName}`,
+        `Customer email: ${email}`,
+        `Customer phone: ${phone}`,
+        modeKey === 'mobile' ? `Service address: ${serviceAddress}` : '',
+        modeKey === 'garage' ? `Drop-off location: ${GARAGE_ADDRESS_TEXT}` : '',
+        extraComments ? `Extra comments: ${extraComments}` : ''
+      ].filter(Boolean).join('\\n');
+
+      const bookingDetails = [
         `Vehicle: ${document.getElementById('vehTitle').textContent}`,
         document.getElementById('vehMeta').textContent ? `Details: ${document.getElementById('vehMeta').textContent}` : '',
         document.getElementById('vehReg').textContent,
         `MOT: ${document.getElementById('motStatus').textContent}`,
         `Tax: ${document.getElementById('taxStatus').textContent}`,
         `Service: ${serviceInput.dataset.title} (${serviceInput.dataset.price})`,
+        serviceDetails ? `Service notes: ${serviceDetails}` : '',
         warrantyInput ? `Warranty: ${warrantyInput.value}` : '',
         `Service mode: ${modeLabel}`,
         `Preferred appointment: ${formattedDate} at ${formattedTime}`
-      ].filter(Boolean).join('\n');
+      ].filter(Boolean).join('\\n');
+
+      const details = [customerDetails, bookingDetails].filter(Boolean).join('\\n\\n');
 
       const subject = encodeURIComponent('Service Booking Request');
-      const body = encodeURIComponent(`${details}\n\nPlease contact me to confirm availability.`);
+      const body = encodeURIComponent(`${details}\\n\\nPlease contact me to confirm availability.`);
       window.location.href = `mailto:support@mitchsautoservices.co.uk?subject=${subject}&body=${body}`;
     }
 

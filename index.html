@@ -486,7 +486,7 @@
       </div>
       <div id="bookingSection" class="hidden" style="margin-top:24px;">
         <h3>Select a date and time</h3>
-        <p class="hint">Pick a day from today onwards and a slot between 9am and 5pm that works for you.</p>
+        <p class="hint">Pick a day from today onwards and choose either a 9am or 5pm slot that works for you.</p>
         <div class="grid-two">
           <div>
             <label for="appointmentDate">Preferred date</label>
@@ -494,7 +494,11 @@
           </div>
           <div>
             <label for="appointmentTime">Preferred time</label>
-            <input type="time" id="appointmentTime" name="appointmentTime" min="09:00" max="17:00" step="1800">
+            <select id="appointmentTime" name="appointmentTime">
+              <option value="">Select a time</option>
+              <option value="09:00">09:00</option>
+              <option value="17:00">17:00</option>
+            </select>
           </div>
         </div>
       </div>
@@ -1437,16 +1441,9 @@
         return;
       }
 
-      if (!TIME_INPUT || !TIME_INPUT.value) {
-        alert('Please pick a preferred time between 09:00 and 17:00.');
-        return;
-      }
-
-      const [hourStr, minuteStr] = TIME_INPUT.value.split(':');
-      const hour = Number.parseInt(hourStr, 10);
-      const minute = Number.parseInt(minuteStr || '0', 10);
-      if (Number.isNaN(hour) || hour < 9 || hour > 17 || (hour === 17 && minute > 0)) {
-        alert('Please pick a preferred time between 09:00 and 17:00.');
+      const allowedTimes = ['09:00', '17:00'];
+      if (!TIME_INPUT || !TIME_INPUT.value || !allowedTimes.includes(TIME_INPUT.value)) {
+        alert('Please choose either a 09:00 or 17:00 appointment.');
         return;
       }
 

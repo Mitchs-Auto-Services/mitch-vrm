@@ -37,21 +37,6 @@
     .brand-copy {
       flex: 1;
     }
-    .logo-main {
-      width: 260px;
-      max-width: 100%;
-      height: auto;
-      display: block;
-      filter: drop-shadow(0 8px 18px rgba(0,0,0,0.45));
-    }
-    .logo-mark {
-      width: 140px;
-      max-width: 100%;
-      height: auto;
-      display: block;
-      margin: 0 auto 18px;
-      filter: drop-shadow(0 10px 28px rgba(0,0,0,0.45));
-    }
     header.topbar {
       display: flex;
       flex-wrap: wrap;
@@ -386,9 +371,7 @@
       }
       .brand-intro {
         flex-direction: column;
-      }
-      .logo-main {
-        margin: 0 auto;
+        align-items: flex-start;
       }
       .coverage {
         text-align: center;
@@ -426,7 +409,6 @@
   <div class="container">
     <header class="topbar">
       <div class="brand-intro">
-        <img src="assets/logo-main.svg" alt="Mitch's Auto Services logo" class="logo-main">
         <div class="brand-copy">
           <h1>Mitch’s Auto Services</h1>
           <p>Trusted mobile and garage mechanic support — our loyalty programme even gives you a chance to win a free service.</p>
@@ -578,7 +560,6 @@
         </div>
       </div>
       <div style="margin-top:24px;" id="finishContainer" class="hidden">
-        <img src="assets/logo-mark.svg" alt="Mitch's Auto Services everyday logo" class="logo-mark">
         <button id="finishBtn" onclick="finishBooking()">Finish</button>
         <p class="footer-note">Tap Finish to send us an email with everything we need at <a href="mailto:support@mitchsautoservices.co.uk">support@mitchsautoservices.co.uk</a>.</p>
       </div>

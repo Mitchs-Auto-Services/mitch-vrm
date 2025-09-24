@@ -47,11 +47,41 @@
       font-size: 1rem;
     }
     .coverage {
-      max-width: 320px;
+      max-width: 360px;
       margin-left: auto;
       text-align: right;
       font-weight: 600;
       color: var(--text);
+    }
+    .coverage p {
+      margin: 0 0 8px;
+      color: rgba(255,255,255,0.9);
+    }
+    .coverage .contact {
+      font-weight: 700;
+    }
+    .modes-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+      margin-bottom: 26px;
+    }
+    .mode-card {
+      background: rgba(0,0,0,0.35);
+      border: 1px solid rgba(255,255,255,0.35);
+      border-radius: 16px;
+      padding: 18px;
+      box-shadow: 0 10px 24px rgba(0,0,0,0.25);
+    }
+    .mode-card h3 {
+      margin-top: 0;
+      margin-bottom: 8px;
+      font-size: 1.2rem;
+    }
+    .mode-card p {
+      margin: 0;
+      color: rgba(255,255,255,0.85);
+      line-height: 1.45;
     }
     .card {
       background: var(--orange);
@@ -130,17 +160,6 @@
       grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
       gap: 16px;
     }
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 6px 12px;
-      border-radius: 999px;
-      background: rgba(0,0,0,0.35);
-      font-size: 0.85rem;
-      font-weight: 600;
-      margin-right: 8px;
-    }
     .service-list {
       display: grid;
       gap: 16px;
@@ -149,36 +168,100 @@
     .service-item {
       background: rgba(0,0,0,0.35);
       border-radius: 16px;
-      padding: 18px;
       border: 1px solid rgba(255,255,255,0.35);
-      display: grid;
-      gap: 10px;
+      padding: 18px;
+      display: block;
+      cursor: pointer;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      position: relative;
     }
-    .service-item header {
+    .service-item.expanded {
+      border-color: var(--text);
+      box-shadow: 0 10px 28px rgba(0,0,0,0.4);
+    }
+    .service-summary {
       display: flex;
-      flex-wrap: wrap;
       justify-content: space-between;
-      gap: 10px;
       align-items: center;
+      gap: 16px;
     }
-    .service-item h3 {
-      margin: 0;
+    .service-summary h3 {
+      margin: 0 0 6px;
       font-size: 1.25rem;
+    }
+    .service-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-weight: 600;
+    }
+    .service-meta .price {
+      font-size: 1.1rem;
+    }
+    .applicable-tag {
+      font-size: 0.85rem;
+      color: rgba(255,255,255,0.85);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .service-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
     }
     .service-item input[type="radio"] {
       width: auto;
-      margin-right: 10px;
+      transform: scale(1.1);
     }
-    .service-item .applicable {
-      font-size: 0.9rem;
-      color: rgba(255,255,255,0.8);
+    .chevron {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      height: 20px;
+      font-size: 0.85rem;
+      transition: transform 0.2s ease;
+    }
+    .service-item.expanded .chevron {
+      transform: rotate(180deg);
+    }
+    .service-body {
+      display: none;
+      margin-top: 14px;
+      padding: 16px;
+      border-radius: 12px;
+      background: rgba(0,0,0,0.35);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: rgba(255,255,255,0.9);
+      line-height: 1.5;
+    }
+    .service-item.expanded .service-body {
+      display: block;
+    }
+    .service-overview {
+      margin: 0 0 10px;
+    }
+    .service-suitability {
+      margin: 0;
       font-weight: 600;
     }
-    .service-item .symptoms {
+    .service-section {
+      margin-top: 12px;
+    }
+    .service-section h4 {
+      margin: 0 0 6px;
+      font-size: 1rem;
+    }
+    .service-section ul {
       margin: 0;
-      color: rgba(255,255,255,0.85);
-      font-size: 0.95rem;
-      line-height: 1.4;
+      padding-left: 20px;
+    }
+    .service-section li {
+      margin-bottom: 6px;
+    }
+    .service-note {
+      margin: 12px 0 0;
+      font-weight: 600;
     }
     .option {
       display: flex;
@@ -207,6 +290,14 @@
         text-align: center;
         margin-left: 0;
       }
+      .service-summary {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .service-controls {
+        width: 100%;
+        justify-content: space-between;
+      }
       button {
         width: 100%;
       }
@@ -218,12 +309,26 @@
     <header class="topbar">
       <div>
         <h1>Mitch’s Auto Services</h1>
-        <p>Trusted mobile and garage mechanic support — loyalty programme gives you a chance to win a free service!</p>
-        <div class="badge">Mobile Work</div>
-        <div class="badge">Garage Work</div>
+        <p>Trusted mobile and garage mechanic support — our loyalty programme even gives you a chance to win a free service.</p>
       </div>
-      <div class="coverage">We work within a 15 mile radius from Unit 5, Wingate Grange Industrial Estate, TS28 5AH. Anything further is £25 for call out.</div>
+      <div class="coverage">
+        <p>We work within a 15 mile radius from Unit 5, Wingate Grange Industrial Estate, TS28 5AH.</p>
+        <p>Anything further is £25 for call out.</p>
+        <p class="contact">Call or WhatsApp: <a href="tel:07926725369">07926725369</a></p>
+        <p>Email: <a href="mailto:support@mitchsautoservices.co.uk">support@mitchsautoservices.co.uk</a></p>
+      </div>
     </header>
+
+    <div class="modes-grid">
+      <div class="mode-card">
+        <h3>Mobile service</h3>
+        <p>Our fully equipped van brings the workshop to your driveway or workplace, perfect for servicing, diagnostics, battery work and brake repairs without the travel hassle.</p>
+      </div>
+      <div class="mode-card">
+        <h3>Garage service</h3>
+        <p>Drop the car with us at Unit 5 for ramp access, larger repairs and longer jobs. We keep you updated throughout and get you back on the road quickly.</p>
+      </div>
+    </div>
 
     <section class="card">
       <h2>Check your vehicle</h2>
@@ -260,7 +365,7 @@
 
     <section id="servicesCard" class="card hidden">
       <h2>Select a service</h2>
-      <p>Once we’ve confirmed your vehicle, choose the service you need. All descriptions include symptoms to help you pick the right option.</p>
+      <p>Once we've confirmed your vehicle, tap a service to open the full description, see what's included and check the typical symptoms.</p>
       <p class="hint">We carry out both mobile and garage work depending on what suits you best.</p>
       <div id="servicesMessage" class="alert warn hidden"></div>
       <div id="serviceList" class="service-list"></div>
@@ -290,208 +395,521 @@
         title: 'Air Filter Replacement',
         price: 'From £80',
         applicable: ['Petrol', 'Diesel'],
-        desc: 'A clogged air filter chokes the engine and hurts performance and MPG.',
-        symptoms: 'Symptoms: sluggish acceleration, rough idle, dirty filter on inspection, poor fuel economy.'
+        overview: 'A fresh air filter keeps the engine breathing freely so it can deliver proper power and fuel economy again.',
+        includes: [
+          'Remove the old air filter and inspect the air box for debris or damage',
+          'Install an OEM-quality filter matched to your vehicle',
+          'Clean the housing and check ducting and seals for leaks'
+        ],
+        symptoms: [
+          'Sluggish acceleration or flat performance',
+          'Rough idle or hesitation when pulling away',
+          'Dirty or clogged filter element on inspection',
+          'Noticeable drop in fuel economy or fumes from the intake'
+        ]
       },
       {
         id: 'basic_service',
         title: 'Basic Service Package',
         price: 'From £100',
         applicable: ['Petrol', 'Diesel'],
-        desc: 'Oil & filter, air filter, pollen filter, coolant, tyre/light/battery checks to keep everything healthy.',
-        symptoms: 'Symptoms: overdue service light, dark/dirty oil, noisy running, uneven wear on tyres.'
+        overview: 'The perfect service to reset the essentials and keep your daily driver running smoothly between major visits.',
+        includes: [
+          'Engine oil replacement',
+          'Oil filter replacement',
+          'Air filter replacement',
+          'Dust/pollen filter replacement',
+          'Coolant replacement',
+          'Tyre pressure & tread inspection',
+          'Headlights/rear lights inspection',
+          'Battery inspection'
+        ],
+        symptoms: [
+          'Overdue service reminder or warning light illuminated',
+          'Engine oil that is dark, dirty or low on the dipstick',
+          'Noisy running or the car feeling a bit tired',
+          'Uneven tyre wear or poor fuel economy compared with normal'
+        ]
       },
       {
         id: 'battery_replacement',
         title: 'Battery Replacement (includes recoding)',
         price: 'From £200',
         applicable: ['Petrol', 'Diesel'],
-        desc: 'New batteries on modern cars often need coding to the ECU — included here.',
-        symptoms: 'Symptoms: slow crank, repeated jump-starts, random electrical faults, battery warning light.'
+        overview: 'Modern batteries need the right setup so the smart charging system knows what has been fitted. We handle the heavy lifting and the coding.',
+        includes: [
+          'Battery health test and charging system check',
+          'Supply and install the correct capacity replacement battery',
+          'Code/register the new battery to the vehicle where required',
+          'Verify starting and charging performance before handover'
+        ],
+        symptoms: [
+          'Slow crank or clicking when starting the engine',
+          'Needing repeated jump-starts or booster packs',
+          'Random electrical faults or warning messages',
+          'Battery or charging light showing on the dash'
+        ]
       },
       {
         id: 'brake_change',
         title: 'Brake Change',
         price: 'From £100',
         applicable: ['Petrol', 'Diesel'],
-        desc: 'Fresh pads/discs restore stopping power and safety.',
-        symptoms: 'Symptoms: scraping/squeaking, vibration under braking, longer stopping distance, warning light.'
+        overview: 'Fresh pads and discs restore confident stopping power so you can brake smoothly and safely again.',
+        includes: [
+          'Inspect calipers, slides and brake hoses for wear or leaks',
+          'Replace pads and discs on the affected axle with quality parts',
+          'Clean and lubricate contact points so everything moves freely',
+          'Road-test the vehicle to bed in the new brakes and verify performance'
+        ],
+        notes: 'Price covers both sides of the brake pads and discs on the axle serviced.',
+        symptoms: [
+          'Scraping, squeaking or grinding noises under braking',
+          'Vibration through the pedal or steering wheel',
+          'Longer stopping distances or a soft brake pedal',
+          'Brake wear warning light or MOT advisories for pads/discs'
+        ]
       },
       {
         id: 'brake_fluid',
         title: 'Brake Fluid Flush',
         price: 'From £70',
         applicable: ['Petrol', 'Diesel'],
-        desc: 'Old/contaminated fluid reduces braking performance and pedal feel.',
-        symptoms: 'Symptoms: soft/spongy pedal, brake fade on long stops, ABS warnings.'
+        overview: 'Moisture-contaminated fluid boils quicker and gives you a spongy pedal. A flush restores a firm feel and keeps internal components protected.',
+        includes: [
+          'Check brake fluid moisture content and boiling point',
+          'Flush the entire hydraulic system with fresh DOT-rated fluid',
+          'Bleed each wheel circuit to remove trapped air',
+          'Final pedal feel and ABS operation check'
+        ],
+        symptoms: [
+          'Soft or spongy brake pedal feel',
+          'Brake fade during longer stops or downhill driving',
+          'ABS warning lights appearing intermittently',
+          'Brake fluid older than 2 years or dark in colour'
+        ]
       },
       {
         id: 'battery_recharge',
         title: 'Car Battery Recharge (overnight)',
         price: 'From £80',
         applicable: ['Petrol', 'Diesel'],
-        desc: 'We charge your battery overnight and return it ready to fit the next morning.',
-        symptoms: 'Symptoms: hard starting after sitting, low voltage, short trips that never fully recharge.'
+        overview: 'Slow, controlled charging brings tired batteries back to life and avoids over-stressing the cells.',
+        includes: [
+          'Remove and bench-test your battery',
+          'Carry out an overnight slow charge with professional equipment',
+          'Load-test and certify the recovered capacity',
+          'Refit the battery and reset clock/windows as needed'
+        ],
+        symptoms: [
+          'Hard starting after the car sits for a couple of days',
+          'Low voltage readings or dim interior lights',
+          'Doing short trips that never fully recharge the battery',
+          'Battery warning appearing even after long drives'
+        ]
       },
       {
         id: 'diagnostic',
         title: 'Car Diagnostic Check',
         price: 'From £50',
         applicable: ['Petrol', 'Diesel'],
-        desc: 'Full scan with professional tools; diagnostic report sent to your email for full transparency — “if you’re not sure what’s wrong and you want a mechanic to just give it a check this is the one for you”.',
-        symptoms: 'Symptoms: engine light on, won’t start, misfires, strange noises, mystery electrical issues.'
+        overview: 'If you are not sure what is wrong, this in-depth scan points you in the right direction with a full written report.',
+        includes: [
+          'Plug in professional diagnostics and read fault codes from all modules',
+          'Live-data monitoring to spot intermittent or sensor-related issues',
+          'Targeted electrical and mechanical checks based on findings',
+          'Email you a transparent report with next-step recommendations'
+        ],
+        symptoms: [
+          'Engine light or other dashboard warnings',
+          'Misfires, cutting out or refusing to start',
+          'Unusual noises, vibrations or smells',
+          'Mystery electrical gremlins that appear and disappear'
+        ]
       },
       {
         id: 'refresh',
         title: 'Car Refresh Service',
         price: 'From £600',
         applicable: ['Petrol', 'Diesel'],
-        desc: 'Big reset: oil/filters/coolant, plugs check, brake check, tyres, lights, battery — great before selling or after buying.',
-        symptoms: 'Symptoms: multiple overdue items, inconsistent maintenance history, general tired running.'
+        overview: 'A top-to-bottom rejuvenation that brings neglected or newly purchased cars back to their best.',
+        includes: [
+          'Engine oil replacement',
+          'Oil filter replacement',
+          'Air filter replacement',
+          'Dust/pollen filter replacement',
+          'Coolant replacement',
+          'Spark plugs replacement (if needed)',
+          'Brake pads (front & rear) replacement (if needed)',
+          'Brake discs (front & rear) replacement (if needed)',
+          'Tyre pressure & tread inspection',
+          'Headlights/rear lights inspection',
+          'Battery inspection',
+          'Battery replacement',
+          'Headlights/rear lights replacement'
+        ],
+        symptoms: [
+          'Multiple overdue maintenance items or poor service history',
+          'General tired running or noisy operation',
+          'Preparing the car for sale or after purchasing a used vehicle',
+          'Wanting maximum confidence before a long trip or big change of use'
+        ]
       },
       {
         id: 'coolant',
         title: 'Coolant Change',
         price: 'From £80',
         applicable: ['Petrol', 'Diesel'],
-        desc: 'Fresh coolant prevents overheating/corrosion and protects the engine.',
-        symptoms: 'Symptoms: high temp gauge, sweet smell, visible leaks, rusty/dirty coolant.'
+        overview: 'Correct coolant protects your engine from overheating, corrosion and freezing damage.',
+        includes: [
+          'Drain the old coolant and safely dispose of it',
+          'Flush the cooling system if needed to remove sludge and scale',
+          'Refill with the correct antifreeze mix for your vehicle',
+          'Bleed the system and verify heater performance'
+        ],
+        symptoms: [
+          'Temperature gauge running high or fluctuating',
+          'Sweet smells from the engine bay or visible coolant leaks',
+          'Rusty, dirty or oily coolant in the expansion tank',
+          'Coolant older than the recommended service interval'
+        ]
       },
       {
         id: 'pollen',
         title: 'Dust/Pollen Filter Replacement',
         price: 'From £80',
         applicable: ['Petrol', 'Diesel'],
-        desc: 'Improves cabin air, reduces smells, helps demist more efficiently.',
-        symptoms: 'Symptoms: musty smells, weak airflow, allergies worse in the car, noisy blower.'
+        overview: 'Breathe easier with clean cabin filters that keep smells and allergens at bay.',
+        includes: [
+          'Remove the old cabin filter and clean out debris',
+          'Fit a fresh pollen filter matched to the vehicle',
+          'Treat the ventilation box to prevent mould build-up',
+          'Check blower motor operation and vent direction control'
+        ],
+        symptoms: [
+          'Musty or damp smells through the vents',
+          'Weak airflow even on higher fan speeds',
+          'Allergies or sneezing worsening inside the car',
+          'Noisy blower motor struggling to push air'
+        ]
       },
       {
         id: 'oil',
         title: 'Engine Oil & Filter Change',
         price: 'From £60',
         applicable: ['Petrol', 'Diesel'],
-        desc: 'Clean oil protects against wear and keeps the engine smooth and efficient.',
-        symptoms: 'Symptoms: engine feels rough/noisy, service light, very dark oil, ticking on cold starts.'
+        overview: 'Clean oil is the cheapest insurance against premature engine wear and noisy running.',
+        includes: [
+          'Drain the old engine oil and remove the filter',
+          'Install a new quality filter and sump washer',
+          'Fill with manufacturer-approved oil to the correct level',
+          'Reset service indicators and inspect for leaks'
+        ],
+        symptoms: [
+          'Engine sounding rougher or noisier than usual',
+          'Service reminder illuminated on the dashboard',
+          'Very dark or sludgy oil on the dipstick',
+          'Ticking noises on cold starts or after hard driving'
+        ]
       },
       {
         id: 'fuel_filter',
         title: 'Fuel Filter Replacement',
         price: 'From £50',
         applicable: ['Petrol', 'Diesel'],
-        desc: 'Keeps debris out of the fuel system for smoother running.',
-        symptoms: 'Symptoms: hesitation under load, poor MPG, hard starting, stalling at junctions.'
+        overview: 'Keeping the fuel clean protects injectors and pumps, especially on modern high-pressure systems.',
+        includes: [
+          'Depressurise the fuel system safely',
+          'Swap out the fuel filter for a fresh unit',
+          'Inspect fuel lines and fittings for leaks or corrosion',
+          'Prime the system and verify leak-free operation'
+        ],
+        symptoms: [
+          'Hesitation or stuttering when accelerating',
+          'Poor fuel economy compared with normal',
+          'Hard starting or extended cranking',
+          'Engine stalling at junctions or under load'
+        ]
       },
       {
         id: 'lights',
         title: 'Headlights & Rear Lights Replacement',
         price: 'From £60',
         applicable: ['Petrol', 'Diesel'],
-        desc: 'Stay legal and safe with bright, working lights.',
-        symptoms: 'Symptoms: dim or failed bulbs, warnings on dash, poor night visibility.'
+        overview: 'Stay safe and legal with bright bulbs and working light units front and rear.',
+        includes: [
+          'Check which bulbs or units have failed and why',
+          'Supply and fit quality replacements matched to your vehicle',
+          'Clean lens covers and check for moisture ingress',
+          'Test beam pattern, alignment and warning systems'
+        ],
+        symptoms: [
+          'Dim, flickering or failed bulbs',
+          'Warning lights on the dashboard for exterior lamps',
+          'Poor night visibility or other drivers flashing you',
+          'MOT advisories for lights or reflectors'
+        ]
       },
       {
         id: 'major_service',
         title: 'Major Service Package',
         price: 'From £350',
         applicable: ['Petrol', 'Diesel'],
-        desc: 'Oil/filters, coolant & brake fluid flushes, plugs, and full brake replacement where needed.',
-        symptoms: 'Symptoms: high mileage or long interval since last big service, noisy/harsh running.'
+        overview: 'Our most in-depth scheduled service covers every key fluid and wear item so you can reset the maintenance clock.',
+        includes: [
+          'Engine oil replacement',
+          'Oil filter replacement',
+          'Air filter replacement',
+          'Dust/pollen filter replacement',
+          'Coolant replacement',
+          'Brake fluid replacement',
+          'Spark plugs replacement (if needed)',
+          'Brake pads (front & rear) replacement (if needed)',
+          'Brake discs (front & rear) replacement (if needed)'
+        ],
+        symptoms: [
+          'High mileage since the last big service',
+          'Harsh, noisy running or reduced performance',
+          'Recently purchased vehicle with unknown history',
+          'Planning a long trip and want everything refreshed'
+        ]
       },
       {
         id: 'minor_service',
         title: 'Minor Service Package',
         price: 'From £110',
         applicable: ['Petrol', 'Diesel'],
-        desc: 'Oil/filters and coolant refreshed — ideal between major services.',
-        symptoms: 'Symptoms: due for an interim service, moderate mileage increase since last visit.'
+        overview: 'Ideal between major visits to keep core fluids and filters in shape without the full overhaul.',
+        includes: [
+          'Engine oil replacement',
+          'Oil filter replacement',
+          'Air filter replacement',
+          'Dust/pollen filter replacement',
+          'Coolant replacement'
+        ],
+        symptoms: [
+          'Due for an interim service based on mileage or time',
+          'Noticeable drop in MPG or throttle response',
+          'Mild engine noise or vibration starting to appear',
+          'Want a mid-year refresh between major services'
+        ]
       },
       {
         id: 'premium_service',
         title: 'Premium Service Package',
         price: 'From £300',
         applicable: ['Petrol', 'Diesel'],
-        desc: 'Oil/filters, coolant, plugs, plus brake/tyre/light/battery health checks.',
-        symptoms: 'Symptoms: general tune-up needed, inconsistent performance, long trip coming up.'
+        overview: 'Adds extra safety checks on top of the basics so you can drive away confident everything is in good health.',
+        includes: [
+          'Engine oil replacement',
+          'Oil filter replacement',
+          'Air filter replacement',
+          'Dust/pollen filter replacement',
+          'Coolant replacement',
+          'Spark plugs replacement (if needed)',
+          'Brake pads (front & rear) replacement (if needed)',
+          'Brake discs (front & rear) replacement (if needed)',
+          'Tyre pressure & tread inspection',
+          'Headlights/rear lights inspection',
+          'Battery inspection'
+        ],
+        symptoms: [
+          'General tune-up needed before a road trip',
+          'Inconsistent performance or poor MPG',
+          'Car feels fine but you want peace of mind checks',
+          'Mix of city and motorway driving putting extra strain on components'
+        ]
       },
       {
         id: 'pre_mot',
         title: 'Pre-MOT Diagnosis & Repair',
         price: '£150',
         applicable: ['Petrol', 'Diesel'],
-        desc: 'Full MOT-style check so you don’t waste money failing and retesting.',
-        symptoms: 'Symptoms: MOT due soon, unsure what might fail, known issues not yet fixed.'
+        overview: 'Beat the test with a full MOT-style inspection and fixes before you book the official slot.',
+        includes: [
+          'Carry out an MOT-style check on brakes, suspension, steering and emissions',
+          'Plug in diagnostics to clear historic faults and find hidden issues',
+          'Inspect lights, tyres, wipers and seatbelts for legal compliance',
+          'Provide a repair plan or carry out minor fixes so you pass first time'
+        ],
+        symptoms: [
+          'MOT due soon and unsure what might fail',
+          'Known issues not yet resolved',
+          'Previous MOT advisories you want sorted',
+          'Want confidence before spending on the official test'
+        ]
       },
       {
         id: 'seasonal',
         title: 'Seasonal Maintenance Package',
         price: 'From £150',
         applicable: ['Petrol', 'Diesel'],
-        desc: 'Prep for winter/summer: fluids, battery, tyres, wipers — safe and ready for the season.',
-        symptoms: 'Symptoms: heading into cold snaps or heatwaves, long road trip planned.'
+        overview: 'Get ready for heatwaves or cold snaps with preventative checks that keep you moving whatever the weather.',
+        includes: [
+          'Battery check',
+          'Brake inspection',
+          'Tyre inspection and pressure adjustment',
+          'Cooling system check',
+          'Lights inspection'
+        ],
+        symptoms: [
+          'Heading into winter or summer and want peace of mind',
+          'Planning a long seasonal road trip',
+          'Car struggles to start or fogs up in extreme weather',
+          'Want to prevent weather-related breakdowns'
+        ]
       },
       {
         id: 'tyre_check',
         title: 'Tyre Health Check',
         price: 'From £35',
         applicable: ['Petrol', 'Diesel'],
-        desc: 'Legal tread (1.6mm min), wear pattern, pressures, valve/sidewall condition.',
-        symptoms: 'Symptoms: pulling to one side, vibration at speed, uneven/rapid wear, visible cracks.'
+        overview: 'Keep tyres legal and even-wearing so you stay safe and avoid unnecessary replacements.',
+        includes: [
+          'Inspect tread depth across each tyre',
+          'Check for cracks, punctures and sidewall damage',
+          'Set pressures to the correct loaded settings',
+          'Torque wheel nuts and inspect valves and caps'
+        ],
+        symptoms: [
+          'Vehicle pulling to one side or vibrating at speed',
+          'Uneven or rapid tyre wear patterns',
+          'Visible cracks, bulges or embedded objects',
+          'Just bought used tyres or haven\'t checked pressures in a while'
+        ]
       },
       {
         id: 'wiper_motor',
         title: 'Window Wiper Motor Replacement',
         price: 'From £50',
         applicable: ['Petrol', 'Diesel'],
-        desc: 'Get consistent, smooth wiper operation for clear visibility.',
-        symptoms: 'Symptoms: wipers slow, stop mid-sweep, out of sync, burning smell from wiper area.'
+        overview: 'Reliable wipers mean clear screens in all weather, keeping you safe and legal.',
+        includes: [
+          'Test the wiper system to confirm a motor fault',
+          'Remove the failed motor and inspect linkages',
+          'Install the new motor and set the park position',
+          'Lubricate pivots and verify smooth, synchronised operation'
+        ],
+        symptoms: [
+          'Wipers slow down, stall or stop mid-sweep',
+          'Arms move out of sync or judder across the glass',
+          'Burning smell or noises from the scuttle area',
+          'Wipers refuse to start even with a good fuse'
+        ]
       },
       {
         id: 'ac',
         title: 'Air Conditioning Top-Up/Recharge',
         price: 'From £85',
         applicable: ['Petrol', 'Diesel'],
-        desc: 'Restore cold air, improve demisting, and check for obvious leaks.',
-        symptoms: 'Symptoms: weak/no cold air, bad odours through vents, windows slow to clear, groaning compressor.'
+        overview: 'Fresh refrigerant keeps the cabin cool, clears mist quickly and protects the AC compressor.',
+        includes: [
+          'Recover any remaining refrigerant and measure what\'s left',
+          'Vacuum-test the system to check for major leaks',
+          'Recharge with the correct gas and compressor oil',
+          'Check cabin vent temperatures and system pressures'
+        ],
+        symptoms: [
+          'Weak or no cold air even with AC on',
+          'Bad odours coming through the vents',
+          'Windows taking ages to demist',
+          'Groaning compressor or AC cycling rapidly'
+        ]
       },
       {
         id: 'fuel_injector',
         title: 'Fuel Injector Replacement (includes Recoding)',
         price: 'From £150',
         applicable: ['Petrol', 'Diesel'],
-        desc: 'Modern injectors often need coding to the ECU after replacement — included in this price.',
-        symptoms: 'Symptoms: rough idle, misfiring, poor MPG, fuel smell, hard starting, loss of power.'
+        overview: 'Fresh injectors restore smooth running and we code them to the ECU so everything stays balanced.',
+        includes: [
+          'Test existing injectors to confirm the fault',
+          'Remove and replace the affected injectors',
+          'Code the new injectors to the ECU where required',
+          'Balance idle trims and road-test the vehicle'
+        ],
+        symptoms: [
+          'Rough idle or hard starting, especially when cold',
+          'Misfires under load or poor acceleration',
+          'Fuel smells from the exhaust or engine bay',
+          'Poor MPG or excessive smoke'
+        ]
       },
       {
         id: 'glow_plug',
         title: 'Glow Plug Replacement',
         price: 'From £50',
         applicable: ['Diesel'],
-        desc: 'Essential for cold starts on diesel engines.',
-        symptoms: 'Symptoms: hard starting in cold weather, white smoke on start-up, rough running until warm.'
+        overview: 'Healthy glow plugs are vital for quick diesel starts and a clean burn on cold mornings.',
+        includes: [
+          'Test glow plug resistance and the control module',
+          'Remove tired plugs using specialist tools',
+          'Install quality replacements with anti-seize applied',
+          'Reset any related fault codes or warning lights'
+        ],
+        symptoms: [
+          'Hard starting in cold weather',
+          'White smoke on start-up that clears as the engine warms',
+          'Rough running for the first few seconds',
+          'Glow plug warning light staying on'
+        ]
       },
       {
         id: 'spark_plug',
         title: 'Spark Plug Replacement',
         price: 'From £50',
         applicable: ['Petrol'],
-        desc: 'Healthy spark plugs keep your petrol engine smooth and efficient.',
-        symptoms: 'Symptoms: misfires, poor acceleration, high fuel consumption, trouble starting.'
+        overview: 'Fresh plugs keep petrol engines smooth, efficient and easy to start.',
+        includes: [
+          'Remove old spark plugs and inspect their condition',
+          'Check coil packs and leads for wear while accessible',
+          'Install new correctly gapped spark plugs',
+          'Torque to spec and verify smooth idle'
+        ],
+        symptoms: [
+          'Misfires or rough running, especially under load',
+          'Poor acceleration or sluggish throttle response',
+          'Higher fuel consumption than normal',
+          'Struggling to start or long cranking times'
+        ]
       },
       {
         id: 'ignition',
         title: 'Ignition Coils / Leads Replacement',
         price: 'From £80',
         applicable: ['Petrol', 'Diesel'],
-        desc: 'Faulty coils/leads can cause misfiring and poor engine performance.',
-        symptoms: 'Symptoms: engine misfire, check engine light, jerky acceleration, fuel smell from exhaust.'
+        overview: 'Strong spark and clean signals stop misfires, protect the catalytic converter and keep emissions low.',
+        includes: [
+          'Test coils and leads with diagnostic equipment',
+          'Replace faulty components with high-quality parts',
+          'Inspect wiring harnesses and connectors for damage',
+          'Road-test and monitor live data to confirm the fix'
+        ],
+        symptoms: [
+          'Engine misfire or juddering under acceleration',
+          'Check engine light flashing or stored misfire codes',
+          'Jerky throttle response or uneven idle',
+          'Fuel smells from the exhaust or poor emissions results'
+        ]
       },
       {
         id: 'handbrake',
         title: 'Handbrake Adjustment',
         price: 'From £150',
         applicable: ['Petrol', 'Diesel'],
-        desc: 'Keeps your parking brake working safely and holding the car securely.',
-        symptoms: 'Symptoms: handbrake pulls up too high, car rolls on hills, poor MOT handbrake result.'
+        overview: 'A properly adjusted parking brake keeps the car secure on hills and ready for the MOT.',
+        includes: [
+          'Inspect cables, levers and mechanisms for wear',
+          'Adjust the handbrake to the correct bite point',
+          'Lubricate pivot points to prevent seizing',
+          'Test hold on inclines and set the lever travel'
+        ],
+        symptoms: [
+          'Handbrake pulls up too high before it grips',
+          'Vehicle rolls on slopes even with the brake applied',
+          'Poor MOT handbrake results or advisories',
+          'Rear brakes feel weak or uneven'
+        ]
       }
     ];
 
@@ -638,28 +1056,76 @@
         return;
       }
 
-      const typeText = fuel === 'Both' ? 'your vehicle type' : `${fuel.toLowerCase()} vehicles`;
-      messageBox.textContent = `Showing services for ${typeText}.`;
+      const typeText = fuel === 'Both' ? 'petrol and diesel vehicles' : `${fuel.toLowerCase()} vehicles`;
+      messageBox.textContent = `Tap a service to reveal what's included for ${typeText}.`;
       messageBox.classList.remove('hidden');
 
-      listBox.innerHTML = available.map(service => `
-        <label class="service-item">
-          <header>
-            <div>
-              <h3>${service.title}</h3>
-              <div class="applicable">${service.price} (${service.applicable.length === 2 ? 'Both' : service.applicable.join(', ')})</div>
-            </div>
-            <input type="radio" class="service-radio" name="srv" value="${service.id}" data-title="${service.title}" data-price="${service.price}">
-          </header>
-          <div>${service.desc}</div>
-          <p class="symptoms">${service.symptoms}</p>
-        </label>
-      `).join('');
+      const serviceMarkup = available.map(service => {
+        const suitabilityTag = service.applicable.length === 2 ? '' : `${service.applicable[0]} only`;
+        const suitabilityText = service.suitability || (service.applicable.length === 2
+          ? 'Suitable for petrol and diesel vehicles.'
+          : service.applicable[0] === 'Petrol'
+            ? 'Suitable for petrol vehicles only.'
+            : 'Suitable for diesel vehicles only.'
+        );
+        const includesHtml = service.includes && service.includes.length
+          ? `<div class="service-section"><h4>What's included</h4><ul>${service.includes.map(item => `<li>${item}</li>`).join('')}</ul></div>`
+          : '';
+        const symptomsHtml = service.symptoms && service.symptoms.length
+          ? `<div class="service-section"><h4>When to book</h4><ul>${service.symptoms.map(item => `<li>${item}</li>`).join('')}</ul></div>`
+          : '';
+        const notesHtml = service.notes ? `<p class="service-note">${service.notes}</p>` : '';
 
-      listBox.querySelectorAll('input[name="srv"]').forEach(input => {
-        input.addEventListener('change', () => {
+        return `
+          <label class="service-item" data-service="${service.id}">
+            <div class="service-summary">
+              <div>
+                <h3>${service.title}</h3>
+                <div class="service-meta">
+                  <span class="price">${service.price}</span>
+                  ${suitabilityTag ? `<span class="applicable-tag">${suitabilityTag}</span>` : ''}
+                </div>
+              </div>
+              <div class="service-controls">
+                <span class="chevron" aria-hidden="true">&#9662;</span>
+                <input type="radio" class="service-radio" name="srv" value="${service.id}" data-title="${service.title}" data-price="${service.price}">
+              </div>
+            </div>
+            <div class="service-body">
+              <p class="service-overview">${service.overview}</p>
+              <p class="service-suitability">${suitabilityText}</p>
+              ${includesHtml}
+              ${notesHtml}
+              ${symptomsHtml}
+            </div>
+          </label>
+        `;
+      }).join('');
+
+      listBox.innerHTML = serviceMarkup;
+
+      const serviceItems = Array.from(listBox.querySelectorAll('.service-item'));
+      serviceItems.forEach(item => {
+        const radio = item.querySelector('input[name="srv"]');
+        const expand = () => {
+          serviceItems.forEach(other => other.classList.remove('expanded'));
+          item.classList.add('expanded');
+          radio.checked = true;
           warranty.classList.remove('hidden');
           finish.classList.remove('hidden');
+        };
+
+        item.addEventListener('click', event => {
+          if (event.target.tagName === 'A') {
+            return;
+          }
+          expand();
+        });
+
+        radio.addEventListener('change', () => {
+          if (radio.checked) {
+            expand();
+          }
         });
       });
 

@@ -263,6 +263,68 @@
       margin: 12px 0 0;
       font-weight: 600;
     }
+    .mode-list {
+      display: grid;
+      gap: 16px;
+      margin-top: 16px;
+    }
+    .mode-item {
+      background: rgba(0,0,0,0.35);
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.35);
+      padding: 18px;
+      cursor: pointer;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      position: relative;
+    }
+    .mode-item.expanded {
+      border-color: var(--text);
+      box-shadow: 0 10px 28px rgba(0,0,0,0.4);
+    }
+    .mode-summary {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+    }
+    .mode-summary h4 {
+      margin: 0 0 4px;
+      font-size: 1.2rem;
+    }
+    .mode-tag {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.35);
+      font-size: 0.85rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .mode-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .mode-item input[type="radio"] {
+      width: auto;
+      transform: scale(1.1);
+    }
+    .mode-body {
+      display: none;
+      margin-top: 14px;
+      padding: 16px;
+      border-radius: 12px;
+      background: rgba(0,0,0,0.35);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: rgba(255,255,255,0.9);
+      line-height: 1.5;
+    }
+    .mode-item.expanded .mode-body {
+      display: block;
+    }
     .option {
       display: flex;
       align-items: center;
@@ -294,7 +356,15 @@
         flex-direction: column;
         align-items: flex-start;
       }
+      .mode-summary {
+        flex-direction: column;
+        align-items: flex-start;
+      }
       .service-controls {
+        width: 100%;
+        justify-content: space-between;
+      }
+      .mode-controls {
         width: 100%;
         justify-content: space-between;
       }
@@ -314,6 +384,7 @@
       <div class="coverage">
         <p>We work within a 15 mile radius from Unit 5, Wingate Grange Industrial Estate, TS28 5AH.</p>
         <p>Anything further is £25 for call out.</p>
+        <p>Bookings available between 9am and 5pm.</p>
         <p class="contact">Call or WhatsApp: <a href="tel:07926725369">07926725369</a></p>
         <p>Email: <a href="mailto:support@mitchsautoservices.co.uk">support@mitchsautoservices.co.uk</a></p>
       </div>
@@ -377,6 +448,56 @@
         <label class="option"><input type="radio" name="warr" value="18 months (+£40)"> 1 Year 6 Months for £40</label>
         <label class="option"><input type="radio" name="warr" value="Lifetime (price on request)"> Lifetime warranty (price on request – depends on make & model)</label>
       </div>
+      <div id="fulfilmentSection" class="hidden" style="margin-top:24px;">
+        <h3>How would you like us to carry out the work?</h3>
+        <p class="hint">Choose the style that suits you — appointments run between 9am and 5pm.</p>
+        <div class="mode-list">
+          <label class="mode-item" data-mode="mobile">
+            <div class="mode-summary">
+              <div>
+                <h4>Mobile mechanic</h4>
+                <span class="mode-tag">We come to you</span>
+              </div>
+              <div class="mode-controls">
+                <span class="chevron" aria-hidden="true">&#9662;</span>
+                <input type="radio" name="mode" value="Mobile mechanic visit" data-label="Mobile mechanic visit">
+              </div>
+            </div>
+            <div class="mode-body">
+              <p>With this option you are requesting one of our mechanics to come to your address. Perfect for keeping life easy on servicing, diagnostics, brake work and battery care without needing to travel.</p>
+            </div>
+          </label>
+          <label class="mode-item" data-mode="garage">
+            <div class="mode-summary">
+              <div>
+                <h4>Garage service</h4>
+                <span class="mode-tag">Drop off with us</span>
+              </div>
+              <div class="mode-controls">
+                <span class="chevron" aria-hidden="true">&#9662;</span>
+                <input type="radio" name="mode" value="Garage drop-off" data-label="Garage drop-off service">
+              </div>
+            </div>
+            <div class="mode-body">
+              <p>With this option you choose to bring your vehicle to the garage and drop it off. Ideal when the job needs ramp access, longer workshop time or when it suits you to leave the car with us.</p>
+            </div>
+          </label>
+        </div>
+      </div>
+      <div id="bookingSection" class="hidden" style="margin-top:24px;">
+        <h3>Select a date and time</h3>
+        <p class="hint">Pick a day from today onwards and a slot between 9am and 5pm that works for you.</p>
+        <div class="grid-two">
+          <div>
+            <label for="appointmentDate">Preferred date</label>
+            <input type="date" id="appointmentDate" name="appointmentDate">
+          </div>
+          <div>
+            <label for="appointmentTime">Preferred time</label>
+            <input type="time" id="appointmentTime" name="appointmentTime" min="09:00" max="17:00" step="1800">
+          </div>
+        </div>
+      </div>
       <div style="margin-top:24px;" id="finishContainer" class="hidden">
         <button id="finishBtn" onclick="finishBooking()">Finish</button>
         <p class="footer-note">Tap Finish to send us an email with everything we need at <a href="mailto:support@mitchsautoservices.co.uk">support@mitchsautoservices.co.uk</a>.</p>
@@ -389,6 +510,50 @@
     const DVLA_FALLBACK_URL = 'https://driver-vehicle-licensing.api.gov.uk/vehicle-enquiry/v1/vehicles';
     const DVLA_FALLBACK_KEY = 'ZQHFV22Ym6ao1CfyyqEol2oxzpoWQM2w59rAkPro';
     const VEHICLE_NOT_FOUND_MESSAGE = 'We are unable to find your vehicle, please check you have entered the reg correctly.';
+
+    const FULFILMENT_SECTION = document.getElementById('fulfilmentSection');
+    const BOOKING_SECTION = document.getElementById('bookingSection');
+    const DATE_INPUT = document.getElementById('appointmentDate');
+    const TIME_INPUT = document.getElementById('appointmentTime');
+    const MODE_ITEMS = Array.from(document.querySelectorAll('#fulfilmentSection .mode-item'));
+    const MODE_RADIOS = MODE_ITEMS.map(item => item.querySelector('input[name="mode"]'));
+
+    function refreshDateLimits() {
+      if (!DATE_INPUT) {
+        return;
+      }
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const iso = today.toISOString().split('T')[0];
+      DATE_INPUT.min = iso;
+      if (DATE_INPUT.value && DATE_INPUT.value < iso) {
+        DATE_INPUT.value = iso;
+      }
+    }
+
+    refreshDateLimits();
+
+    MODE_ITEMS.forEach(item => {
+      const radio = item.querySelector('input[name="mode"]');
+      const expand = () => {
+        MODE_ITEMS.forEach(other => other.classList.remove('expanded'));
+        item.classList.add('expanded');
+        radio.checked = true;
+      };
+
+      item.addEventListener('click', event => {
+        if (event.target && event.target.matches('input[type="radio"]')) {
+          return;
+        }
+        expand();
+      });
+
+      radio.addEventListener('change', () => {
+        if (radio.checked) {
+          expand();
+        }
+      });
+    });
 
     function resolveErrorMessage(value) {
       if (!value) {
@@ -1060,12 +1225,34 @@
       const finish = document.getElementById('finishContainer');
 
       listBox.innerHTML = '';
+      refreshDateLimits();
+
+      if (DATE_INPUT) {
+        DATE_INPUT.value = '';
+      }
+      if (TIME_INPUT) {
+        TIME_INPUT.value = '';
+      }
+      MODE_ITEMS.forEach(item => item.classList.remove('expanded'));
+      MODE_RADIOS.forEach(radio => { radio.checked = false; });
+      if (FULFILMENT_SECTION) {
+        FULFILMENT_SECTION.classList.add('hidden');
+      }
+      if (BOOKING_SECTION) {
+        BOOKING_SECTION.classList.add('hidden');
+      }
 
       const fuel = normaliseFuel(data.fuelType);
       if (fuel === 'Electric') {
         messageBox.textContent = 'We do not do electric just yet but we are hoping to expand to them soon. Please check back later!';
         messageBox.classList.remove('hidden');
         warranty.classList.add('hidden');
+        if (FULFILMENT_SECTION) {
+          FULFILMENT_SECTION.classList.add('hidden');
+        }
+        if (BOOKING_SECTION) {
+          BOOKING_SECTION.classList.add('hidden');
+        }
         finish.classList.add('hidden');
         return;
       }
@@ -1085,6 +1272,12 @@
         messageBox.textContent = 'No services available for this vehicle type just yet — please contact us for help.';
         messageBox.classList.remove('hidden');
         warranty.classList.add('hidden');
+        if (FULFILMENT_SECTION) {
+          FULFILMENT_SECTION.classList.add('hidden');
+        }
+        if (BOOKING_SECTION) {
+          BOOKING_SECTION.classList.add('hidden');
+        }
         finish.classList.add('hidden');
         return;
       }
@@ -1145,6 +1338,19 @@
           item.classList.add('expanded');
           radio.checked = true;
           warranty.classList.remove('hidden');
+          if (FULFILMENT_SECTION) {
+            FULFILMENT_SECTION.classList.remove('hidden');
+          }
+          if (BOOKING_SECTION) {
+            BOOKING_SECTION.classList.remove('hidden');
+          }
+          if (DATE_INPUT && !DATE_INPUT.value) {
+            refreshDateLimits();
+            DATE_INPUT.value = DATE_INPUT.min;
+          }
+          if (TIME_INPUT && !TIME_INPUT.value) {
+            TIME_INPUT.value = '09:00';
+          }
           finish.classList.remove('hidden');
         };
 
@@ -1213,6 +1419,41 @@
         return;
       }
 
+      const modeInput = document.querySelector('input[name="mode"]:checked');
+      if (!modeInput) {
+        alert('Please choose whether you would like a mobile mechanic or to drop the vehicle at the garage.');
+        return;
+      }
+
+      refreshDateLimits();
+
+      if (!DATE_INPUT || !DATE_INPUT.value) {
+        alert('Please pick an appointment date from today onwards.');
+        return;
+      }
+
+      if (DATE_INPUT.value < DATE_INPUT.min) {
+        alert('Please choose a date from today onwards.');
+        return;
+      }
+
+      if (!TIME_INPUT || !TIME_INPUT.value) {
+        alert('Please pick a preferred time between 09:00 and 17:00.');
+        return;
+      }
+
+      const [hourStr, minuteStr] = TIME_INPUT.value.split(':');
+      const hour = Number.parseInt(hourStr, 10);
+      const minute = Number.parseInt(minuteStr || '0', 10);
+      if (Number.isNaN(hour) || hour < 9 || hour > 17 || (hour === 17 && minute > 0)) {
+        alert('Please pick a preferred time between 09:00 and 17:00.');
+        return;
+      }
+
+      const dateParts = DATE_INPUT.value.split('-');
+      const formattedDate = dateParts.length === 3 ? `${dateParts[2]}/${dateParts[1]}/${dateParts[0]}` : DATE_INPUT.value;
+      const formattedTime = TIME_INPUT.value ? TIME_INPUT.value.slice(0, 5) : '';
+
       const warrantyInput = document.querySelector('input[name="warr"]:checked');
       const details = [
         `Vehicle: ${document.getElementById('vehTitle').textContent}`,
@@ -1221,7 +1462,9 @@
         `MOT: ${document.getElementById('motStatus').textContent}`,
         `Tax: ${document.getElementById('taxStatus').textContent}`,
         `Service: ${serviceInput.dataset.title} (${serviceInput.dataset.price})`,
-        warrantyInput ? `Warranty: ${warrantyInput.value}` : ''
+        warrantyInput ? `Warranty: ${warrantyInput.value}` : '',
+        `Service mode: ${modeInput.dataset.label || modeInput.value}`,
+        `Preferred appointment: ${formattedDate} at ${formattedTime}`
       ].filter(Boolean).join('\n');
 
       const subject = encodeURIComponent('Service Booking Request');

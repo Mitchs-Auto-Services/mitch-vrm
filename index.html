@@ -450,7 +450,7 @@
       </div>
       <div id="fulfilmentSection" class="hidden" style="margin-top:24px;">
         <h3>How would you like us to carry out the work?</h3>
-        <p class="hint">Choose the style that suits you — appointments run between 9am and 5pm.</p>
+        <p class="hint">Choose the style that suits you — appointments run between 9am and 5pm in 30-minute slots.</p>
         <div class="mode-list">
           <label class="mode-item" data-mode="mobile">
             <div class="mode-summary">
@@ -486,7 +486,7 @@
       </div>
       <div id="bookingSection" class="hidden" style="margin-top:24px;">
         <h3>Select a date and time</h3>
-        <p class="hint">Pick a day from today onwards and choose either a 9am or 5pm slot that works for you.</p>
+        <p class="hint">Pick a day from today onwards and choose a 30-minute slot between 09:00 and 17:00 that works for you.</p>
         <div class="grid-two">
           <div>
             <label for="appointmentDate">Preferred date</label>
@@ -497,6 +497,21 @@
             <select id="appointmentTime" name="appointmentTime">
               <option value="">Select a time</option>
               <option value="09:00">09:00</option>
+              <option value="09:30">09:30</option>
+              <option value="10:00">10:00</option>
+              <option value="10:30">10:30</option>
+              <option value="11:00">11:00</option>
+              <option value="11:30">11:30</option>
+              <option value="12:00">12:00</option>
+              <option value="12:30">12:30</option>
+              <option value="13:00">13:00</option>
+              <option value="13:30">13:30</option>
+              <option value="14:00">14:00</option>
+              <option value="14:30">14:30</option>
+              <option value="15:00">15:00</option>
+              <option value="15:30">15:30</option>
+              <option value="16:00">16:00</option>
+              <option value="16:30">16:30</option>
               <option value="17:00">17:00</option>
             </select>
           </div>
@@ -521,6 +536,23 @@
     const TIME_INPUT = document.getElementById('appointmentTime');
     const MODE_ITEMS = Array.from(document.querySelectorAll('#fulfilmentSection .mode-item'));
     const MODE_RADIOS = MODE_ITEMS.map(item => item.querySelector('input[name="mode"]'));
+    const ALLOWED_TIMES = [
+      '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
+      '12:00', '12:30', '13:00', '13:30', '14:00', '14:30',
+      '15:00', '15:30', '16:00', '16:30', '17:00'
+    ];
+
+    if (TIME_INPUT) {
+      const existingValues = new Set(Array.from(TIME_INPUT.options).map(option => option.value).filter(Boolean));
+      ALLOWED_TIMES.forEach(time => {
+        if (!existingValues.has(time)) {
+          const option = document.createElement('option');
+          option.value = time;
+          option.textContent = time;
+          TIME_INPUT.appendChild(option);
+        }
+      });
+    }
 
     function refreshDateLimits() {
       if (!DATE_INPUT) {
@@ -1441,9 +1473,8 @@
         return;
       }
 
-      const allowedTimes = ['09:00', '17:00'];
-      if (!TIME_INPUT || !TIME_INPUT.value || !allowedTimes.includes(TIME_INPUT.value)) {
-        alert('Please choose either a 09:00 or 17:00 appointment.');
+      if (!TIME_INPUT || !TIME_INPUT.value || !ALLOWED_TIMES.includes(TIME_INPUT.value)) {
+        alert('Please choose an appointment between 09:00 and 17:00 in 30-minute steps.');
         return;
       }
 

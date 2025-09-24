@@ -388,6 +388,32 @@
     const API_URL = '/api/vrm';
     const DVLA_FALLBACK_URL = 'https://driver-vehicle-licensing.api.gov.uk/vehicle-enquiry/v1/vehicles';
     const DVLA_FALLBACK_KEY = 'ZQHFV22Ym6ao1CfyyqEol2oxzpoWQM2w59rAkPro';
+    const VEHICLE_NOT_FOUND_MESSAGE = 'We are unable to find your vehicle, please check you have entered the reg correctly.';
+
+    function resolveErrorMessage(value) {
+      if (!value) {
+        return '';
+      }
+      if (typeof value === 'string') {
+        return value;
+      }
+      if (Array.isArray(value)) {
+        const stringItem = value.find(item => typeof item === 'string');
+        if (stringItem) {
+          return stringItem;
+        }
+      }
+      if (typeof value === 'object') {
+        if (typeof value.message === 'string') {
+          return value.message;
+        }
+        const firstString = Object.values(value).find(entry => typeof entry === 'string');
+        if (firstString) {
+          return firstString;
+        }
+      }
+      return '';
+    }
 
     const SERVICES = [
       {
@@ -934,11 +960,15 @@
 
         if (!response.ok) {
           if (response.status >= 400 && response.status < 500) {
-            throw new Error(data?.error || data?.message || 'Lookup failed');
+            const message = (response.status === 400 || response.status === 404)
+              ? VEHICLE_NOT_FOUND_MESSAGE
+              : resolveErrorMessage(data?.error) || resolveErrorMessage(data?.message);
+            throw new Error(message || 'Lookup failed');
           }
 
           fallbackReason = `API responded with status ${response.status}`;
-          throw new Error(data?.error || data?.message || 'Lookup failed');
+          const message = resolveErrorMessage(data?.error) || resolveErrorMessage(data?.message);
+          throw new Error(message || 'Lookup failed');
         }
 
         return data || {};
@@ -966,7 +996,10 @@
         }
 
         if (!fallbackResponse.ok) {
-          throw new Error(fallbackData?.message || fallbackData?.error || 'Lookup failed');
+          const message = (fallbackResponse.status === 400 || fallbackResponse.status === 404)
+            ? VEHICLE_NOT_FOUND_MESSAGE
+            : resolveErrorMessage(fallbackData?.message) || resolveErrorMessage(fallbackData?.error);
+          throw new Error(message || 'Lookup failed');
         }
 
         return fallbackData || {};
@@ -1154,7 +1187,18 @@
         renderVehicle(data, vrm);
         renderServices(data);
       } catch (err) {
-        errorBox.textContent = err.message || 'Something went wrong while looking up the registration.';
+        let message = '';
+        if (err && typeof err.message === 'string') {
+          message = err.message;
+        } else if (typeof err === 'string') {
+          message = err;
+        }
+
+        if (!message || message === '[object Object]' || message === 'Lookup failed') {
+          message = VEHICLE_NOT_FOUND_MESSAGE;
+        }
+
+        errorBox.textContent = message || 'Something went wrong while looking up the registration.';
         errorBox.classList.remove('hidden');
       } finally {
         button.disabled = false;

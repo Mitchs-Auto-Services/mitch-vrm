@@ -12,6 +12,8 @@ function escapeRegExp(value = '') {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
+const POSTCODE_PATTERN = /^[A-Z]{1,2}\d[A-Z0-9]?\s*\d[A-Z]{2}$/i;
+
 function extractNumberFromDisplay(displayName = '', street = '') {
   if (!displayName) {
     return '';
@@ -22,28 +24,60 @@ function extractNumberFromDisplay(displayName = '', street = '') {
     return '';
   }
 
-  const first = parts[0];
+  const lowerStreet = street ? street.toLowerCase() : '';
+  const candidateParts = [];
 
-  // Most display names begin with the house number (e.g. "12", "12A", "12-14").
-  const directMatch = first.match(/^(\d+[A-Za-z]?|\d+[A-Za-z]?[-\/]\d+[A-Za-z]?)/);
-  if (directMatch) {
-    return directMatch[1];
+  for (let index = 0; index < parts.length && index < 4; index += 1) {
+    candidateParts.push(parts[index]);
   }
 
-  if (!street) {
-    return '';
+  if (street) {
+    parts.forEach(part => {
+      if (part.toLowerCase().includes(lowerStreet)) {
+        candidateParts.push(part);
+      }
+    });
   }
 
-  const streetPattern = new RegExp(`^(\\d+[A-Za-z0-9]*[-\\/\\dA-Za-z]*)\\s+${escapeRegExp(street)}$`, 'i');
-  const streetMatch = parts[0].match(streetPattern);
-  if (streetMatch) {
-    return streetMatch[1];
+  const seen = new Set();
+
+  for (const part of candidateParts) {
+    const trimmed = part.trim();
+    if (!trimmed) {
+      continue;
+    }
+
+    const lower = trimmed.toLowerCase();
+    if (seen.has(lower)) {
+      continue;
+    }
+    seen.add(lower);
+
+    if (POSTCODE_PATTERN.test(trimmed) || !/\d/.test(trimmed)) {
+      continue;
+    }
+
+    if (!street || lower.includes(lowerStreet)) {
+      return trimmed;
+    }
+
+    const descriptorMatch = trimmed.match(/((?:no\.?|number|unit|flat|suite|apartment|block|building|house)\s*\d+[A-Za-z0-9]*(?:[-\/]\d+[A-Za-z0-9]*)?)/i);
+    if (descriptorMatch) {
+      return descriptorMatch[1].trim();
+    }
+
+    const directMatch = trimmed.match(/(\d+[A-Za-z0-9]*(?:[-\/]\d+[A-Za-z0-9]*)?)/);
+    if (directMatch) {
+      return directMatch[1];
+    }
   }
 
-  const inlinePattern = new RegExp(`(\\d+[A-Za-z0-9]*[-\\/\\dA-Za-z]*)\\s+${escapeRegExp(street)}`, 'i');
-  const inlineMatch = displayName.match(inlinePattern);
-  if (inlineMatch) {
-    return inlineMatch[1];
+  if (street) {
+    const inlinePattern = new RegExp(`((?:no\.?|number|unit|flat|suite|apartment|block|building|house)?\s*\d+[A-Za-z0-9]*(?:[-\/]\d+[A-Za-z0-9]*)?)\\s+${escapeRegExp(street)}`, 'i');
+    const inlineMatch = displayName.match(inlinePattern);
+    if (inlineMatch) {
+      return inlineMatch[1].trim();
+    }
   }
 
   return '';
@@ -57,7 +91,21 @@ function buildLine1(address = {}, displayName = '') {
     (address.building && `${address.building}`) ||
     extractNumberFromDisplay(displayName, street);
 
-  return [number, street].filter(Boolean).join(' ').trim();
+  const components = [];
+
+  if (number) {
+    components.push(number.trim());
+  }
+
+  if (street) {
+    const lowerStreet = street.toLowerCase();
+    const hasStreetInNumber = number && number.toLowerCase().includes(lowerStreet);
+    if (!hasStreetInNumber) {
+      components.push(street.trim());
+    }
+  }
+
+  return components.join(' ').trim();
 }
 
 function pickCity(address = {}) {

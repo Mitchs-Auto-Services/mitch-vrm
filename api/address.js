@@ -8,9 +8,55 @@ function normalisePostcode(value = '') {
   return cleaned.replace(/([0-9][A-Z0-9]{2})$/, ' $1');
 }
 
-function buildLine1(address = {}) {
-  const number = address.house_number ? `${address.house_number}` : '';
+function escapeRegExp(value = '') {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function extractNumberFromDisplay(displayName = '', street = '') {
+  if (!displayName) {
+    return '';
+  }
+
+  const parts = displayName.split(',').map(part => part.trim()).filter(Boolean);
+  if (!parts.length) {
+    return '';
+  }
+
+  const first = parts[0];
+
+  // Most display names begin with the house number (e.g. "12", "12A", "12-14").
+  const directMatch = first.match(/^(\d+[A-Za-z]?|\d+[A-Za-z]?[-\/]\d+[A-Za-z]?)/);
+  if (directMatch) {
+    return directMatch[1];
+  }
+
+  if (!street) {
+    return '';
+  }
+
+  const streetPattern = new RegExp(`^(\\d+[A-Za-z0-9]*[-\\/\\dA-Za-z]*)\\s+${escapeRegExp(street)}$`, 'i');
+  const streetMatch = parts[0].match(streetPattern);
+  if (streetMatch) {
+    return streetMatch[1];
+  }
+
+  const inlinePattern = new RegExp(`(\\d+[A-Za-z0-9]*[-\\/\\dA-Za-z]*)\\s+${escapeRegExp(street)}`, 'i');
+  const inlineMatch = displayName.match(inlinePattern);
+  if (inlineMatch) {
+    return inlineMatch[1];
+  }
+
+  return '';
+}
+
+function buildLine1(address = {}, displayName = '') {
   const street = address.road || address.residential || address.neighbourhood || address.suburb || '';
+  const number =
+    (address.house_number && `${address.house_number}`) ||
+    (address.house_name && `${address.house_name}`) ||
+    (address.building && `${address.building}`) ||
+    extractNumberFromDisplay(displayName, street);
+
   return [number, street].filter(Boolean).join(' ').trim();
 }
 
@@ -86,7 +132,8 @@ export default async function handler(req, res) {
     const seen = new Set();
     const addresses = results.map(result => {
       const address = result?.address || {};
-      const line1 = buildLine1(address);
+      const displayName = result?.display_name || '';
+      const line1 = buildLine1(address, displayName);
       const city = pickCity(address);
       const line2 = pickLine2(address, city);
       const postcode = (address.postcode || formattedPostcode).toUpperCase();

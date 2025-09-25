@@ -14,11 +14,13 @@ export default async function handler(req, res) {
     // LIVE DVLA endpoint (use real plates + LIVE key)
     const DVLA_URL = 'https://driver-vehicle-licensing.api.gov.uk/vehicle-enquiry/v1/vehicles';
 
+    const apiKey = process.env.DVLA_API_KEY || 'ZQHFV22Ym6ao1CfyyqEol2oxzpoWQM2w59rAkPro';
+
     const upstream = await fetch(DVLA_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-api-key': process.env.DVLA_API_KEY
+        'x-api-key': apiKey
       },
       body: JSON.stringify({ registrationNumber: reg }),
       cache: 'no-store'

@@ -40,17 +40,56 @@
     .masthead {
       background: linear-gradient(90deg, #000000 0%, #141921 100%);
       border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+      color: #ffffff;
+    }
+    .masthead__inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
       padding: 18px 0;
-      text-align: center;
+    }
+    .masthead__left {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .masthead__title {
+      margin: 0;
       text-transform: uppercase;
       letter-spacing: 0.08em;
       font-weight: 800;
       font-size: 1.75rem;
-      color: #ffffff;
     }
-    .masthead__title {
-      margin: 0 auto;
-      width: min(1180px, calc(100% - 48px));
+    .masthead__tagline {
+      margin: 0;
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: rgba(244, 245, 247, 0.82);
+    }
+    .masthead__location {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 16px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.32);
+      background: rgba(0, 0, 0, 0.45);
+      color: inherit;
+      text-decoration: none;
+      font-weight: 700;
+      flex-shrink: 0;
+      transition: transform 0.2s ease, background 0.2s ease;
+    }
+    .masthead__location:hover,
+    .masthead__location:focus-visible {
+      background: rgba(255, 123, 44, 0.2);
+      transform: translateY(-1px);
+    }
+    .masthead__location-icon {
+      display: inline-flex;
+      width: 18px;
+      height: 18px;
     }
     .hero-shell {
       padding: 60px 0 42px;
@@ -556,6 +595,14 @@
       .container {
         width: calc(100% - 32px);
       }
+      .masthead__inner {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .masthead__location {
+        width: 100%;
+        justify-content: center;
+      }
       .hero-shell {
         padding: 46px 0 32px;
       }
@@ -592,18 +639,32 @@
 </head>
 <body>
   <header class="masthead">
-    <div class="masthead__title">Mitchs Auto Services</div>
+    <div class="container masthead__inner">
+      <div class="masthead__left">
+        <div class="masthead__title">Mitchs Auto Services</div>
+        <p class="masthead__tagline">We get back to your request within the day.</p>
+      </div>
+      <a class="masthead__location" href="https://www.google.com/maps/place/Unit+5,+Wingate+Grange+Industrial+Estate,+TS28+5AH" target="_blank" rel="noopener noreferrer">
+        <span class="masthead__location-icon" aria-hidden="true">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2.75C8.548 2.75 5.75 5.548 5.75 9C5.75 13.524 11.325 20.553 11.561 20.848C11.795 21.142 12.205 21.142 12.439 20.848C12.675 20.553 18.25 13.524 18.25 9C18.25 5.548 15.452 2.75 12 2.75ZM12 11.25C10.481 11.25 9.25 10.019 9.25 8.5C9.25 6.981 10.481 5.75 12 5.75C13.519 5.75 14.75 6.981 14.75 8.5C14.75 10.019 13.519 11.25 12 11.25Z" fill="#ff7b2c"/>
+          </svg>
+        </span>
+        <span>View garage location</span>
+      </a>
+    </div>
   </header>
   <header class="hero-shell">
     <div class="container hero-grid">
       <div class="hero-panel hero-panel--primary">
-        <p class="hero-eyebrow">Precision vehicle care</p>
+        <p class="hero-eyebrow">Welcome to Mitchs Auto Services Booking Page</p>
         <h1>Professional servicing wherever you need us</h1>
-        <p class="hero-lead">Trusted mobile and garage mechanics with a loyalty programme that even gives you a chance to win a free service.</p>
+        <p class="hero-lead">Trusted mobile and garage mechanics with a loyalty programme that even gives you a chance to win a free service. ALL PRICES ARE FROM, please get in contact to get a more accurate price.</p>
         <div class="hero-badges">
           <div class="hero-badge"><span></span>Mobile service to your driveway</div>
           <div class="hero-badge"><span></span>Garage repairs with pit access</div>
           <div class="hero-badge"><span></span>Loyalty rewards & email updates</div>
+          <div class="hero-badge"><span></span>We do full Services, Pre-MOT checks, diagnostic and repairs</div>
         </div>
         <div>
           <p>Welcome to Mitch’s Auto Services booking page. Enter your vehicle registration to get started, then:</p>
@@ -615,7 +676,7 @@
           </ul>
         </div>
         <p class="hero-extra">IF YOU’RE NOT SURE WHAT’S WRONG YOU CAN EITHER BOOK A DIAGNOSTIC, OR CHOOSE THE “I DON’T KNOW” OPTION IN THE SERVICE LIST AND GIVE US AS MUCH DETAIL AS YOU CAN. WE’LL REVIEW IT AND GET BACK TO YOU WITH THE NEXT STEPS AS QUICKLY AS POSSIBLE.</p>
-        <p class="hero-lead">Once submitted, we’ll confirm your booking and send you all the details by email.</p>
+        <p class="hero-lead">Once submitted, we’ll confirm your booking and send you all the details by email. <strong>Scroll down to begin.</strong></p>
       </div>
       <aside class="hero-panel hero-panel--secondary">
         <h2 class="hero-panel__title">Coverage & contact</h2>
@@ -627,7 +688,7 @@
           <li class="hero-panel__item">We have a loyalty programme with a chance to win a free service.</li>
         </ul>
         <div class="hero-contact">
-          <div>Call or WhatsApp: <a href="tel:07926725369">07926725369</a></div>
+          <div>Call: <a href="tel:07926725369">07926725369</a></div>
           <div>Email: <a href="mailto:support@mitchsautoservices.co.uk">support@mitchsautoservices.co.uk</a></div>
         </div>
       </aside>
@@ -638,11 +699,11 @@
     <div class="modes-grid">
       <div class="mode-card">
         <h3>Mobile service</h3>
-        <p>Our fully equipped van brings the workshop to your driveway or workplace, perfect for servicing, diagnostics, battery work and brake repairs without the travel hassle.</p>
+        <p>Our fully equipped van brings the workshop to your driveway or workplace, perfect for servicing, diagnostics, battery work and brake repairs without the travel hassle. This is useful if you are worried about driving your car so you don’t damage it even more.</p>
       </div>
       <div class="mode-card">
         <h3>Garage service</h3>
-        <p>Drop the car with us at Unit 5 for pit access, larger repairs and longer jobs. We keep you updated throughout and get you back on the road quickly.</p>
+        <p>Drop the car with us at Unit 5 for pit access, larger repairs and longer jobs. This is when you want to drop it off with us and let us do our thing with better tools and better equipment. We keep you updated throughout and get you back on the road quickly.</p>
       </div>
     </div>
 
@@ -824,7 +885,7 @@
       </div>
       <div style="margin-top:24px;" id="finishContainer" class="hidden">
         <button id="finishBtn" onclick="finishBooking()">Finish</button>
-        <p class="footer-note">Tap Finish to send us an email with everything we need at <a href="mailto:support@mitchsautoservices.co.uk">support@mitchsautoservices.co.uk</a>.</p>
+        <p class="footer-note">Tap Finish to send us an email with everything we need, we will get back with you same day.</p>
       </div>
     </section>
   </main>
@@ -973,8 +1034,6 @@
           item.classList.toggle('expanded', match);
         } else if (!match) {
           item.classList.remove('expanded');
-        } else if (match) {
-          item.classList.add('expanded');
         }
       });
 
@@ -1021,7 +1080,7 @@
     MODE_ITEMS.forEach(item => {
       const radio = item.querySelector('input[name="mode"]');
       const modeKey = item.dataset.mode;
-      const handleSelect = () => {
+      const openItem = () => {
         if (modeKey) {
           setModeSelection(modeKey, { expand: true });
         }
@@ -1031,13 +1090,21 @@
         if (event.target && event.target.matches('input[type="radio"]')) {
           return;
         }
-        handleSelect();
+        if (!modeKey) {
+          return;
+        }
+        const isExpanded = item.classList.contains('expanded');
+        if (isExpanded) {
+          item.classList.remove('expanded');
+        } else {
+          openItem();
+        }
       });
 
       if (radio) {
         radio.addEventListener('change', () => {
           if (radio.checked) {
-            handleSelect();
+            openItem();
           }
         });
       }
@@ -1412,7 +1479,7 @@
       },
       {
         id: 'pre_mot',
-        title: 'Pre-MOT Diagnosis & Repair',
+        title: 'Pre-MOT Diagnosis & Repair Plan',
         price: '£150',
         applicable: ['Petrol', 'Diesel'],
         overview: 'Beat the test with a full MOT-style inspection and fixes before you book the official slot.',
@@ -1603,10 +1670,10 @@
       },
       {
         id: 'not_sure',
-        title: "I'm not sure",
+        title: "i'm not sure/ Issue not listed",
         price: 'Quote provided',
         applicable: ['Petrol', 'Diesel'],
-        overview: 'Not certain what you need? Tell us what the vehicle is doing and we\'ll guide you towards the right repair or service package.',
+        overview: 'If we don’t have the service provided please let us know what you may think it is and we will have a look at it and see if we can help.',
         includes: [
           'Listen to your concerns and review the vehicle symptoms',
           'Recommend the most suitable service or repair before any work starts',
@@ -1619,7 +1686,7 @@
           'Intermittent faults that are hard to pin down',
           'Any other issue where you just want expert advice first'
         ],
-        notes: 'Use this option if you want us to investigate and advise on the best fix before committing to a service.',
+        notes: 'Use this option to share what you think might be happening and we’ll investigate the issue for you.',
         requiresDetails: true,
         extraField: {
           id: 'notSureDetails',
@@ -1860,44 +1927,71 @@
       listBox.innerHTML = serviceMarkup;
 
       const serviceItems = Array.from(listBox.querySelectorAll('.service-item'));
+      const revealFollowUpSections = () => {
+        warranty.classList.remove('hidden');
+        if (FULFILMENT_SECTION) {
+          FULFILMENT_SECTION.classList.remove('hidden');
+        }
+        if (BOOKING_SECTION) {
+          BOOKING_SECTION.classList.remove('hidden');
+        }
+        if (INFO_SECTION) {
+          INFO_SECTION.classList.remove('hidden');
+        }
+        if (DATE_INPUT && !DATE_INPUT.value) {
+          refreshDateLimits();
+          DATE_INPUT.value = DATE_INPUT.min;
+        }
+        if (TIME_INPUT && !TIME_INPUT.value) {
+          TIME_INPUT.value = '09:00';
+        }
+        finish.classList.remove('hidden');
+      };
+
       serviceItems.forEach(item => {
         const radio = item.querySelector('input[name="srv"]');
-        const expand = () => {
-          serviceItems.forEach(other => other.classList.remove('expanded'));
-          item.classList.add('expanded');
-          radio.checked = true;
-          warranty.classList.remove('hidden');
-          if (FULFILMENT_SECTION) {
-            FULFILMENT_SECTION.classList.remove('hidden');
+
+        const toggle = (forceExpand = null) => {
+          const isExpanded = item.classList.contains('expanded');
+          const shouldExpand = forceExpand !== null ? forceExpand : !isExpanded;
+
+          serviceItems.forEach(other => {
+            if (other !== item) {
+              other.classList.remove('expanded');
+            }
+          });
+
+          if (shouldExpand) {
+            item.classList.add('expanded');
+          } else {
+            item.classList.remove('expanded');
           }
-          if (BOOKING_SECTION) {
-            BOOKING_SECTION.classList.remove('hidden');
+
+          if (radio && !radio.checked) {
+            radio.checked = true;
           }
-          if (INFO_SECTION) {
-            INFO_SECTION.classList.remove('hidden');
-          }
-          if (DATE_INPUT && !DATE_INPUT.value) {
-            refreshDateLimits();
-            DATE_INPUT.value = DATE_INPUT.min;
-          }
-          if (TIME_INPUT && !TIME_INPUT.value) {
-            TIME_INPUT.value = '09:00';
-          }
-          finish.classList.remove('hidden');
+
+          revealFollowUpSections();
         };
 
         item.addEventListener('click', event => {
-          if (event.target.tagName === 'A') {
+          if (event.target && event.target.closest('a')) {
             return;
           }
-          expand();
+          if (event.target && event.target.matches('input[type="radio"]')) {
+            toggle(true);
+            return;
+          }
+          toggle();
         });
 
-        radio.addEventListener('change', () => {
-          if (radio.checked) {
-            expand();
-          }
-        });
+        if (radio) {
+          radio.addEventListener('change', () => {
+            if (radio.checked) {
+              toggle(true);
+            }
+          });
+        }
       });
 
       document.getElementById('servicesCard').classList.remove('hidden');

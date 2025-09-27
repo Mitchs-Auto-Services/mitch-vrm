@@ -361,10 +361,54 @@
     .full-width {
       grid-column: 1 / -1;
     }
+    .service-search {
+      margin-top: 18px;
+      position: relative;
+    }
+    .service-search input[type="search"] {
+      width: 100%;
+      padding: 14px 48px 14px 18px;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: rgba(0, 0, 0, 0.6);
+      color: var(--text);
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .service-search input[type="search"]:focus {
+      border-color: var(--orange);
+      box-shadow: 0 0 0 3px rgba(255, 123, 44, 0.25);
+    }
+    .service-search__icon {
+      position: absolute;
+      top: 50%;
+      right: 18px;
+      transform: translateY(-50%);
+      pointer-events: none;
+      font-size: 1.1rem;
+      color: rgba(244, 245, 247, 0.7);
+    }
+    .visually-hidden {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      border: 0;
+    }
     .service-list {
       display: grid;
       gap: 18px;
       margin-top: 20px;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    }
+    @media (min-width: 1024px) {
+      .service-list {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
     }
     .service-item {
       background: linear-gradient(165deg, rgba(255, 255, 255, 0.08), rgba(8, 11, 16, 0.92));
@@ -470,6 +514,15 @@
     .service-note {
       margin: 14px 0 0;
       font-weight: 700;
+    }
+    .service-empty {
+      padding: 32px;
+      border-radius: 18px;
+      background: rgba(0, 0, 0, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      text-align: center;
+      font-weight: 600;
+      color: rgba(244, 245, 247, 0.78);
     }
     .mode-select-wrapper {
       display: none;
@@ -745,6 +798,11 @@
       <p>Once we've confirmed your vehicle, tap a service to open the full description, see what's included and check the typical symptoms.</p>
       <p class="hint">We carry out both mobile and garage work depending on what suits you best.</p>
       <div id="servicesMessage" class="alert warn hidden"></div>
+      <div id="serviceSearchWrapper" class="service-search hidden">
+        <label class="visually-hidden" for="serviceSearch">Search services</label>
+        <input type="search" id="serviceSearch" name="serviceSearch" placeholder="Search for a service…" autocomplete="off">
+        <span class="service-search__icon" aria-hidden="true">&#128269;</span>
+      </div>
       <div id="serviceList" class="service-list"></div>
       <div id="warrantySection" class="hidden" style="margin-top:24px;">
         <h3>Warranty options</h3>
@@ -897,10 +955,17 @@
     const VEHICLE_NOT_FOUND_MESSAGE = 'We are unable to find your vehicle, please check you have entered the reg correctly.';
     const GARAGE_ADDRESS_TEXT = 'Unit 5, Wingate Grange Industrial Estate, TS28 5AH';
 
+    const SERVICES_CARD = document.getElementById('servicesCard');
+    const SERVICES_MESSAGE = document.getElementById('servicesMessage');
+    const SERVICE_SEARCH_WRAPPER = document.getElementById('serviceSearchWrapper');
+    const SERVICE_SEARCH_INPUT = document.getElementById('serviceSearch');
+    const SERVICE_LIST = document.getElementById('serviceList');
+    const WARRANTY_SECTION = document.getElementById('warrantySection');
     const FULFILMENT_SECTION = document.getElementById('fulfilmentSection');
     const BOOKING_SECTION = document.getElementById('bookingSection');
     const DATE_INPUT = document.getElementById('appointmentDate');
     const TIME_INPUT = document.getElementById('appointmentTime');
+    const FINISH_CONTAINER = document.getElementById('finishContainer');
     const MODE_ITEMS = Array.from(document.querySelectorAll('#fulfilmentSection .mode-item'));
     const MODE_SELECT = document.getElementById('modeSelect');
     const MODE_SELECT_DESCRIPTION = document.getElementById('modeSelectDescription');
@@ -925,6 +990,10 @@
     const MOBILE_ADDRESS_GROUP = document.getElementById('mobileAddressGroup');
     const GARAGE_ADDRESS_NOTICE = document.getElementById('garageAddressNotice');
     const EXTRA_COMMENTS_INPUT = document.getElementById('extraComments');
+
+    const serviceNotesCache = new Map();
+    let currentServiceData = [];
+    let selectedServiceId = '';
 
     function handleModeChange(modeKey) {
       const addressInputs = [
@@ -1018,6 +1087,62 @@
       }
     }
 
+    function hideFollowUpSections() {
+      if (WARRANTY_SECTION) {
+        WARRANTY_SECTION.classList.add('hidden');
+      }
+      if (FULFILMENT_SECTION) {
+        FULFILMENT_SECTION.classList.add('hidden');
+      }
+      if (BOOKING_SECTION) {
+        BOOKING_SECTION.classList.add('hidden');
+      }
+      if (INFO_SECTION) {
+        INFO_SECTION.classList.add('hidden');
+      }
+      if (FINISH_CONTAINER) {
+        FINISH_CONTAINER.classList.add('hidden');
+      }
+    }
+
+    function revealFollowUpSections() {
+      if (WARRANTY_SECTION) {
+        WARRANTY_SECTION.classList.remove('hidden');
+      }
+      if (FULFILMENT_SECTION) {
+        FULFILMENT_SECTION.classList.remove('hidden');
+      }
+      if (BOOKING_SECTION) {
+        BOOKING_SECTION.classList.remove('hidden');
+      }
+      if (INFO_SECTION) {
+        INFO_SECTION.classList.remove('hidden');
+      }
+      if (DATE_INPUT && !DATE_INPUT.value) {
+        refreshDateLimits();
+        DATE_INPUT.value = DATE_INPUT.min;
+      }
+      if (TIME_INPUT && !TIME_INPUT.value) {
+        TIME_INPUT.value = '09:00';
+      }
+      if (FINISH_CONTAINER) {
+        FINISH_CONTAINER.classList.remove('hidden');
+      }
+    }
+
+    function cacheExtraFieldValues() {
+      if (!SERVICE_LIST) {
+        return;
+      }
+      const fields = SERVICE_LIST.querySelectorAll('textarea[data-service-extra]');
+      fields.forEach(field => {
+        const key = field.dataset.serviceExtra;
+        if (key) {
+          serviceNotesCache.set(key, field.value);
+        }
+      });
+    }
+
     handleModeChange('');
 
     function setModeSelection(modeKey, options = {}) {
@@ -1076,6 +1201,187 @@
     }
 
     refreshDateLimits();
+
+    function renderServiceList(services) {
+      if (!SERVICE_LIST) {
+        return;
+      }
+
+      cacheExtraFieldValues();
+
+      if (!Array.isArray(services) || services.length === 0) {
+        SERVICE_LIST.innerHTML = '<div class="service-empty">No services match your search. Please try another term.</div>';
+        selectedServiceId = '';
+        hideFollowUpSections();
+        return;
+      }
+
+      const markup = services.map(service => {
+        const suitabilityTag = service.applicable.length === 2 ? '' : `${service.applicable[0]} only`;
+        const suitabilityText = service.suitability || (service.applicable.length === 2
+          ? 'Suitable for petrol and diesel vehicles.'
+          : service.applicable[0] === 'Petrol'
+            ? 'Suitable for petrol vehicles only.'
+            : 'Suitable for diesel vehicles only.'
+        );
+        const includesHtml = service.includes && service.includes.length
+          ? `<div class="service-section"><h4>What's included</h4><ul>${service.includes.map(item => `<li>${item}</li>`).join('')}</ul></div>`
+          : '';
+        const symptomsHtml = service.symptoms && service.symptoms.length
+          ? `<div class="service-section"><h4>When to book</h4><ul>${service.symptoms.map(item => `<li>${item}</li>`).join('')}</ul></div>`
+          : '';
+        const notesHtml = service.notes ? `<p class="service-note">${service.notes}</p>` : '';
+        const extraHtml = service.extraField
+          ? `<div class="service-section"><h4>${service.extraField.label}</h4><textarea id="${service.extraField.id}" name="${service.extraField.id}" rows="4" placeholder="${service.extraField.placeholder}" data-service-extra="${service.id}"></textarea></div>`
+          : '';
+
+        return `
+          <label class="service-item" data-service="${service.id}">
+            <div class="service-summary">
+              <div>
+                <h3>${service.title}</h3>
+                <div class="service-meta">
+                  <span class="price">${service.price}</span>
+                  ${suitabilityTag ? `<span class="applicable-tag">${suitabilityTag}</span>` : ''}
+                </div>
+              </div>
+              <div class="service-controls">
+                <span class="chevron" aria-hidden="true">&#9662;</span>
+                <input type="radio" class="service-radio" name="srv" value="${service.id}" data-title="${service.title}" data-price="${service.price}" data-require-details="${service.requiresDetails ? 'true' : 'false'}" data-extra-field-id="${service.extraField ? service.extraField.id : ''}">
+              </div>
+            </div>
+            <div class="service-body">
+              <p class="service-overview">${service.overview}</p>
+              <p class="service-suitability">${suitabilityText}</p>
+              ${includesHtml}
+              ${notesHtml}
+              ${symptomsHtml}
+              ${extraHtml}
+            </div>
+          </label>
+        `;
+      }).join('');
+
+      SERVICE_LIST.innerHTML = markup;
+
+      const serviceItems = Array.from(SERVICE_LIST.querySelectorAll('.service-item'));
+      const hasSelectedService = services.some(service => service.id === selectedServiceId);
+
+      if (!hasSelectedService) {
+        selectedServiceId = '';
+        hideFollowUpSections();
+      }
+
+      serviceItems.forEach(item => {
+        const radio = item.querySelector('input[name="srv"]');
+        const serviceId = item.dataset.service;
+        const extraField = item.querySelector('textarea[data-service-extra]');
+
+        if (extraField && serviceId) {
+          const cachedValue = serviceNotesCache.get(serviceId);
+          if (typeof cachedValue === 'string') {
+            extraField.value = cachedValue;
+          }
+          extraField.addEventListener('input', () => {
+            serviceNotesCache.set(serviceId, extraField.value);
+          });
+        }
+
+        const toggle = (forceExpand = null) => {
+          const isExpanded = item.classList.contains('expanded');
+          const shouldExpand = forceExpand !== null ? forceExpand : !isExpanded;
+
+          serviceItems.forEach(other => {
+            if (other !== item) {
+              other.classList.remove('expanded');
+            }
+          });
+
+          if (shouldExpand) {
+            item.classList.add('expanded');
+          } else {
+            item.classList.remove('expanded');
+          }
+
+          if (radio && !radio.checked) {
+            radio.checked = true;
+          }
+
+          if (radio && radio.checked) {
+            selectedServiceId = radio.value;
+            revealFollowUpSections();
+          }
+        };
+
+        item.addEventListener('click', event => {
+          if (event.target && (event.target.matches('input[type="radio"]') || event.target.closest('a') || event.target.tagName === 'TEXTAREA')) {
+            return;
+          }
+          toggle();
+        });
+
+        if (radio) {
+          radio.addEventListener('change', () => {
+            if (radio.checked) {
+              serviceItems.forEach(other => {
+                if (other !== item) {
+                  other.classList.remove('expanded');
+                }
+              });
+              item.classList.add('expanded');
+              selectedServiceId = radio.value;
+              revealFollowUpSections();
+            }
+          });
+        }
+      });
+
+      if (hasSelectedService && selectedServiceId) {
+        const selectedItem = serviceItems.find(item => item.dataset.service === selectedServiceId);
+        if (selectedItem) {
+          selectedItem.classList.add('expanded');
+          const selectedRadio = selectedItem.querySelector('input[name="srv"]');
+          if (selectedRadio) {
+            selectedRadio.checked = true;
+            revealFollowUpSections();
+          }
+        }
+      }
+    }
+
+    function applyServiceFilter(query) {
+      if (!Array.isArray(currentServiceData) || currentServiceData.length === 0) {
+        renderServiceList([]);
+        return;
+      }
+
+      const term = (query || '').trim().toLowerCase();
+      if (!term) {
+        renderServiceList(currentServiceData);
+        return;
+      }
+
+      const filtered = currentServiceData.filter(service => {
+        const fields = [
+          service.title,
+          service.overview,
+          service.price,
+          service.notes,
+          ...(service.applicable || []),
+          ...((service.includes || [])),
+          ...((service.symptoms || []))
+        ].filter(Boolean);
+        return fields.some(field => field.toLowerCase().includes(term));
+      });
+
+      renderServiceList(filtered);
+    }
+
+    if (SERVICE_SEARCH_INPUT) {
+      SERVICE_SEARCH_INPUT.addEventListener('input', event => {
+        applyServiceFilter(event.target.value);
+      });
+    }
 
     MODE_ITEMS.forEach(item => {
       const radio = item.querySelector('input[name="mode"]');
@@ -1811,14 +2117,18 @@
     }
 
     function renderServices(data) {
-      const messageBox = document.getElementById('servicesMessage');
-      const listBox = document.getElementById('serviceList');
-      const warranty = document.getElementById('warrantySection');
-      const finish = document.getElementById('finishContainer');
+      if (!SERVICES_MESSAGE || !SERVICE_LIST) {
+        return;
+      }
 
-      listBox.innerHTML = '';
+      SERVICE_LIST.innerHTML = '';
       resetCustomerForm();
       refreshDateLimits();
+      hideFollowUpSections();
+
+      serviceNotesCache.clear();
+      currentServiceData = [];
+      selectedServiceId = '';
 
       if (DATE_INPUT) {
         DATE_INPUT.value = '';
@@ -1826,175 +2136,58 @@
       if (TIME_INPUT) {
         TIME_INPUT.value = '';
       }
+      if (SERVICE_SEARCH_INPUT) {
+        SERVICE_SEARCH_INPUT.value = '';
+      }
+      if (SERVICE_SEARCH_WRAPPER) {
+        SERVICE_SEARCH_WRAPPER.classList.add('hidden');
+      }
+
       setModeSelection('', { expand: false });
-      if (FULFILMENT_SECTION) {
-        FULFILMENT_SECTION.classList.add('hidden');
-      }
-      if (BOOKING_SECTION) {
-        BOOKING_SECTION.classList.add('hidden');
-      }
 
       const fuel = normaliseFuel(data.fuelType);
       if (fuel === 'Electric') {
-        messageBox.textContent = 'We do not do electric just yet but we are hoping to expand to them soon. Please check back later!';
-        messageBox.classList.remove('hidden');
-        warranty.classList.add('hidden');
-        if (FULFILMENT_SECTION) {
-          FULFILMENT_SECTION.classList.add('hidden');
+        SERVICES_MESSAGE.textContent = 'We do not do electric just yet but we are hoping to expand to them soon. Please check back later!';
+        SERVICES_MESSAGE.classList.remove('hidden');
+        if (SERVICES_CARD) {
+          SERVICES_CARD.classList.remove('hidden');
         }
-        if (BOOKING_SECTION) {
-          BOOKING_SECTION.classList.add('hidden');
-        }
-        finish.classList.add('hidden');
         return;
       }
 
-      warranty.querySelectorAll('input[name="warr"]').forEach((input, index) => {
+      const warrantyInputs = WARRANTY_SECTION ? Array.from(WARRANTY_SECTION.querySelectorAll('input[name="warr"]')) : [];
+      warrantyInputs.forEach((input, index) => {
         input.checked = index === 0;
       });
-
-      warranty.classList.add('hidden');
-      finish.classList.add('hidden');
 
       const available = SERVICES.filter(service =>
         fuel === 'Both' || service.applicable.length === 2 || service.applicable.includes(fuel)
       );
 
       if (available.length === 0) {
-        messageBox.textContent = 'No services available for this vehicle type just yet — please contact us for help.';
-        messageBox.classList.remove('hidden');
-        warranty.classList.add('hidden');
-        if (FULFILMENT_SECTION) {
-          FULFILMENT_SECTION.classList.add('hidden');
+        SERVICES_MESSAGE.textContent = 'No services available for this vehicle type just yet — please contact us for help.';
+        SERVICES_MESSAGE.classList.remove('hidden');
+        if (SERVICES_CARD) {
+          SERVICES_CARD.classList.remove('hidden');
         }
-        if (BOOKING_SECTION) {
-          BOOKING_SECTION.classList.add('hidden');
-        }
-        finish.classList.add('hidden');
         return;
       }
 
       const typeText = fuel === 'Both' ? 'petrol and diesel vehicles' : `${fuel.toLowerCase()} vehicles`;
-      messageBox.textContent = `Tap a service to reveal what's included for ${typeText}.`;
-      messageBox.classList.remove('hidden');
+      SERVICES_MESSAGE.textContent = `Tap a service to reveal what's included for ${typeText}.`;
+      SERVICES_MESSAGE.classList.remove('hidden');
 
-      const serviceMarkup = available.map(service => {
-        const suitabilityTag = service.applicable.length === 2 ? '' : `${service.applicable[0]} only`;
-        const suitabilityText = service.suitability || (service.applicable.length === 2
-          ? 'Suitable for petrol and diesel vehicles.'
-          : service.applicable[0] === 'Petrol'
-            ? 'Suitable for petrol vehicles only.'
-            : 'Suitable for diesel vehicles only.'
-        );
-        const includesHtml = service.includes && service.includes.length
-          ? `<div class="service-section"><h4>What's included</h4><ul>${service.includes.map(item => `<li>${item}</li>`).join('')}</ul></div>`
-          : '';
-        const symptomsHtml = service.symptoms && service.symptoms.length
-          ? `<div class="service-section"><h4>When to book</h4><ul>${service.symptoms.map(item => `<li>${item}</li>`).join('')}</ul></div>`
-          : '';
-        const notesHtml = service.notes ? `<p class="service-note">${service.notes}</p>` : '';
-        const extraHtml = service.extraField
-          ? `<div class="service-section"><h4>${service.extraField.label}</h4><textarea id="${service.extraField.id}" name="${service.extraField.id}" rows="4" placeholder="${service.extraField.placeholder}" data-service-extra="${service.id}"></textarea></div>`
-          : '';
+      currentServiceData = available;
 
-        return `
-          <label class="service-item" data-service="${service.id}">
-            <div class="service-summary">
-              <div>
-                <h3>${service.title}</h3>
-                <div class="service-meta">
-                  <span class="price">${service.price}</span>
-                  ${suitabilityTag ? `<span class="applicable-tag">${suitabilityTag}</span>` : ''}
-                </div>
-              </div>
-              <div class="service-controls">
-                <span class="chevron" aria-hidden="true">&#9662;</span>
-                <input type="radio" class="service-radio" name="srv" value="${service.id}" data-title="${service.title}" data-price="${service.price}" data-require-details="${service.requiresDetails ? 'true' : 'false'}" data-extra-field-id="${service.extraField ? service.extraField.id : ''}">
-              </div>
-            </div>
-            <div class="service-body">
-              <p class="service-overview">${service.overview}</p>
-              <p class="service-suitability">${suitabilityText}</p>
-              ${includesHtml}
-              ${notesHtml}
-              ${symptomsHtml}
-              ${extraHtml}
-            </div>
-          </label>
-        `;
-      }).join('');
+      if (SERVICE_SEARCH_WRAPPER) {
+        SERVICE_SEARCH_WRAPPER.classList.remove('hidden');
+      }
 
-      listBox.innerHTML = serviceMarkup;
+      renderServiceList(available);
 
-      const serviceItems = Array.from(listBox.querySelectorAll('.service-item'));
-      const revealFollowUpSections = () => {
-        warranty.classList.remove('hidden');
-        if (FULFILMENT_SECTION) {
-          FULFILMENT_SECTION.classList.remove('hidden');
-        }
-        if (BOOKING_SECTION) {
-          BOOKING_SECTION.classList.remove('hidden');
-        }
-        if (INFO_SECTION) {
-          INFO_SECTION.classList.remove('hidden');
-        }
-        if (DATE_INPUT && !DATE_INPUT.value) {
-          refreshDateLimits();
-          DATE_INPUT.value = DATE_INPUT.min;
-        }
-        if (TIME_INPUT && !TIME_INPUT.value) {
-          TIME_INPUT.value = '09:00';
-        }
-        finish.classList.remove('hidden');
-      };
-
-      serviceItems.forEach(item => {
-        const radio = item.querySelector('input[name="srv"]');
-
-        const toggle = (forceExpand = null) => {
-          const isExpanded = item.classList.contains('expanded');
-          const shouldExpand = forceExpand !== null ? forceExpand : !isExpanded;
-
-          serviceItems.forEach(other => {
-            if (other !== item) {
-              other.classList.remove('expanded');
-            }
-          });
-
-          if (shouldExpand) {
-            item.classList.add('expanded');
-          } else {
-            item.classList.remove('expanded');
-          }
-
-          if (radio && !radio.checked) {
-            radio.checked = true;
-          }
-
-          revealFollowUpSections();
-        };
-
-        item.addEventListener('click', event => {
-          if (event.target && event.target.closest('a')) {
-            return;
-          }
-          if (event.target && event.target.matches('input[type="radio"]')) {
-            toggle(true);
-            return;
-          }
-          toggle();
-        });
-
-        if (radio) {
-          radio.addEventListener('change', () => {
-            if (radio.checked) {
-              toggle(true);
-            }
-          });
-        }
-      });
-
-      document.getElementById('servicesCard').classList.remove('hidden');
+      if (SERVICES_CARD) {
+        SERVICES_CARD.classList.remove('hidden');
+      }
     }
 
     async function lookupVRM() {

@@ -14,6 +14,25 @@ function escapeRegExp(value = '') {
 
 const POSTCODE_PATTERN = /^[A-Z]{1,2}\d[A-Z0-9]?\s*\d[A-Z]{2}$/i;
 
+function isEnglandResult(result = {}) {
+  const address = result?.address || {};
+  const regionHints = [
+    address.state,
+    address.state_district,
+    address.region,
+    address.country,
+    result?.display_name
+  ];
+
+  const hasEnglandRegion = regionHints.some(part =>
+    typeof part === 'string' && part.toLowerCase().includes('england')
+  );
+
+  const isGreatBritain = (address.country_code || '').toLowerCase() === 'gb';
+
+  return isGreatBritain && hasEnglandRegion;
+}
+
 function extractNumberFromDisplay(displayName = '', street = '') {
   if (!displayName) {
     return '';
@@ -83,8 +102,19 @@ function extractNumberFromDisplay(displayName = '', street = '') {
   return '';
 }
 
+function pickStreet(address = {}) {
+  return (
+    address.road ||
+    address.residential ||
+    address.pedestrian ||
+    address.neighbourhood ||
+    address.suburb ||
+    ''
+  );
+}
+
 function buildLine1(address = {}, displayName = '') {
-  const street = address.road || address.residential || address.neighbourhood || address.suburb || '';
+  const street = pickStreet(address);
   const number =
     (address.house_number && `${address.house_number}`) ||
     (address.house_name && `${address.house_name}`) ||
@@ -105,7 +135,11 @@ function buildLine1(address = {}, displayName = '') {
     }
   }
 
-  return components.join(' ').trim();
+  return {
+    line1: components.join(' ').trim(),
+    houseNumber: number ? number.trim() : '',
+    street: street ? street.trim() : ''
+  };
 }
 
 function pickCity(address = {}) {
@@ -178,35 +212,57 @@ export default async function handler(req, res) {
     }
 
     const seen = new Set();
-    const addresses = results.map(result => {
-      const address = result?.address || {};
-      const displayName = result?.display_name || '';
-      const line1 = buildLine1(address, displayName);
-      const city = pickCity(address);
-      const line2 = pickLine2(address, city);
-      const postcode = (address.postcode || formattedPostcode).toUpperCase();
-      const displayParts = [line1, line2 && line2 !== city ? line2 : '', city, postcode]
-        .filter(part => part && part.length)
-        .map(part => part.trim());
+    const addresses = results
+      .filter(isEnglandResult)
+      .map(result => {
+        const address = result?.address || {};
+        const displayName = result?.display_name || '';
+        const { line1, houseNumber, street } = buildLine1(address, displayName);
+        const city = pickCity(address);
+        const line2 = pickLine2(address, city);
+        const postcode = (address.postcode || formattedPostcode).toUpperCase();
+        const displayParts = [line1, line2 && line2 !== city ? line2 : '', city, postcode]
+          .filter(part => part && part.length)
+          .map(part => part.trim());
 
-      const display = displayParts.length ? displayParts.join(', ') : result.display_name || postcode;
+        const display = displayParts.length ? displayParts.join(', ') : result.display_name || postcode;
 
-      return {
-        id: String(result.place_id || `${line1}-${postcode}`),
-        line1,
-        line2,
-        city,
-        postcode,
-        display
-      };
-    }).filter(entry => {
-      const key = `${entry.display}`.toLowerCase();
-      if (seen.has(key)) {
-        return false;
-      }
-      seen.add(key);
-      return true;
-    });
+        return {
+          id: String(result.place_id || `${line1}-${postcode}`),
+          line1,
+          line2,
+          city,
+          postcode,
+          houseNumber,
+          street,
+          locality: line2,
+          display
+        };
+      })
+      .filter(entry => {
+        const key = `${entry.display}`.toLowerCase();
+        if (seen.has(key)) {
+          return false;
+        }
+        seen.add(key);
+        return Boolean(entry.display);
+      })
+      .sort((a, b) => {
+        const parseNumber = value => {
+          if (!value) return Number.POSITIVE_INFINITY;
+          const match = `${value}`.match(/\d+/);
+          return match ? parseInt(match[0], 10) : Number.POSITIVE_INFINITY;
+        };
+
+        const aNum = parseNumber(a.houseNumber);
+        const bNum = parseNumber(b.houseNumber);
+
+        if (Number.isFinite(aNum) && Number.isFinite(bNum) && aNum !== bNum) {
+          return aNum - bNum;
+        }
+
+        return a.display.localeCompare(b.display, 'en-GB', { numeric: true, sensitivity: 'base' });
+      });
 
     return res.status(200).json({ addresses });
   } catch (error) {

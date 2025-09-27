@@ -155,14 +155,24 @@ function pickCity(address = {}) {
   );
 }
 
-function pickLine2(address = {}, city = '') {
+function pickLocality(address = {}, city = '') {
   const candidates = [
     address.neighbourhood,
     address.suburb,
     address.hamlet,
     address.village,
-    address.town,
-    address.county
+    address.town
+  ].filter(Boolean);
+
+  const unique = candidates.find(entry => entry && entry !== city);
+  return unique || '';
+}
+
+function pickCounty(address = {}, city = '') {
+  const candidates = [
+    address.county,
+    address.state_district,
+    address.state
   ].filter(Boolean);
 
   const unique = candidates.find(entry => entry && entry !== city);
@@ -219,23 +229,37 @@ export default async function handler(req, res) {
         const displayName = result?.display_name || '';
         const { line1, houseNumber, street } = buildLine1(address, displayName);
         const city = pickCity(address);
-        const line2 = pickLine2(address, city);
+        const locality = pickLocality(address, city);
+        const county = pickCounty(address, city);
         const postcode = (address.postcode || formattedPostcode).toUpperCase();
-        const displayParts = [line1, line2 && line2 !== city ? line2 : '', city, postcode]
+        const displayParts = [line1, city, county, postcode]
           .filter(part => part && part.length)
           .map(part => part.trim());
 
-        const display = displayParts.length ? displayParts.join(', ') : result.display_name || postcode;
+        const seenParts = new Set();
+        const orderedParts = displayParts.filter(part => {
+          const key = part.toLowerCase();
+          if (seenParts.has(key)) {
+            return false;
+          }
+          seenParts.add(key);
+          return true;
+        });
+
+        const display = orderedParts.length
+          ? orderedParts.join(', ')
+          : result.display_name || postcode;
 
         return {
           id: String(result.place_id || `${line1}-${postcode}`),
           line1,
-          line2,
+          line2: locality,
           city,
           postcode,
           houseNumber,
           street,
-          locality: line2,
+          locality,
+          county,
           display
         };
       })

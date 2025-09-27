@@ -1017,6 +1017,9 @@
                   <input id="serviceCity" name="serviceCity" autocomplete="address-level2" placeholder="City">
                 </div>
                 <div>
+                  <input id="serviceCounty" name="serviceCounty" autocomplete="address-level1" placeholder="County">
+                </div>
+                <div>
                   <input id="servicePostcode" name="servicePostcode" autocomplete="postal-code" placeholder="Postcode">
                 </div>
               </div>
@@ -1079,6 +1082,7 @@
     const SERVICE_STREET_ADDRESS_INPUT = document.getElementById('serviceStreetAddress');
     const SERVICE_TOWN_INPUT = document.getElementById('serviceTown');
     const SERVICE_CITY_INPUT = document.getElementById('serviceCity');
+    const SERVICE_COUNTY_INPUT = document.getElementById('serviceCounty');
     const SERVICE_POSTCODE_INPUT = document.getElementById('servicePostcode');
     const MOBILE_ADDRESS_GROUP = document.getElementById('mobileAddressGroup');
     const GARAGE_ADDRESS_NOTICE = document.getElementById('garageAddressNotice');
@@ -1097,6 +1101,7 @@
       SERVICE_STREET_ADDRESS_INPUT,
       SERVICE_TOWN_INPUT,
       SERVICE_CITY_INPUT,
+      SERVICE_COUNTY_INPUT,
       SERVICE_POSTCODE_INPUT
     ].filter(Boolean);
 
@@ -1105,6 +1110,15 @@
     let selectedServiceId = '';
     let manualAddressVisible = false;
     let addressOptions = [];
+    const POSTCODE_REGEX = /^[A-Z]{1,2}\d[A-Z0-9]?\d[A-Z]{2}$/;
+
+    function normalisePostcode(value) {
+      const cleaned = (value || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+      if (!cleaned || !POSTCODE_REGEX.test(cleaned)) {
+        return '';
+      }
+      return cleaned.replace(/([0-9][A-Z0-9]{2})$/, ' $1');
+    }
 
     function setAddressStatus(message, variant = '') {
       if (!ADDRESS_STATUS) {
@@ -1146,7 +1160,9 @@
         const button = document.createElement('button');
         button.type = 'button';
         button.dataset.index = String(index);
-        button.textContent = entry.display || entry.line1 || entry.postcode || 'Select address';
+        const label = entry.display || entry.line1 || entry.postcode || 'Select address';
+        button.textContent = label;
+        button.title = label;
         listItem.appendChild(button);
         fragment.appendChild(listItem);
       });
@@ -1195,15 +1211,26 @@
         }
       }
       if (SERVICE_TOWN_INPUT) {
-        const locality = address.locality || address.city || '';
-        SERVICE_TOWN_INPUT.value = locality ? locality.trim() : '';
+        const locality = address.locality || '';
+        const county = address.county || '';
+        const city = address.city || '';
+        const townValue = locality || city || county || '';
+        SERVICE_TOWN_INPUT.value = townValue ? townValue.trim() : '';
       }
       if (SERVICE_CITY_INPUT) {
-        const city = address.city || address.locality || '';
-        SERVICE_CITY_INPUT.value = city ? city.trim() : '';
+        const city = address.city || '';
+        const county = address.county || '';
+        const locality = address.locality || '';
+        const cityValue = city || locality || county || '';
+        SERVICE_CITY_INPUT.value = cityValue ? cityValue.trim() : '';
+      }
+      if (SERVICE_COUNTY_INPUT) {
+        const county = address.county || '';
+        SERVICE_COUNTY_INPUT.value = county ? county.trim() : '';
       }
       if (SERVICE_POSTCODE_INPUT) {
-        SERVICE_POSTCODE_INPUT.value = address.postcode ? address.postcode.toUpperCase() : '';
+        const formattedPostcode = normalisePostcode(address.postcode || '');
+        SERVICE_POSTCODE_INPUT.value = formattedPostcode;
       }
     }
 
@@ -1242,7 +1269,13 @@
         return;
       }
 
-      const postcode = rawPostcode.toUpperCase();
+      const postcode = normalisePostcode(rawPostcode);
+      if (!postcode) {
+        setAddressStatus('Please enter a valid UK postcode.', 'error');
+        ADDRESS_POSTCODE_INPUT.focus();
+        return;
+      }
+
       ADDRESS_POSTCODE_INPUT.value = postcode;
       setAddressStatus('Looking up addresses…');
       clearAddressResults();
@@ -1255,7 +1288,8 @@
       }
 
       try {
-        const response = await fetch(`${ADDRESS_API_URL}?postcode=${encodeURIComponent(postcode)}`);
+        const lookupPostcode = postcode.replace(/\s+/g, '');
+        const response = await fetch(`${ADDRESS_API_URL}?postcode=${encodeURIComponent(lookupPostcode)}`);
         const payload = await response.json();
 
         if (!response.ok) {
@@ -2643,8 +2677,9 @@
         const streetAddress = SERVICE_STREET_ADDRESS_INPUT ? SERVICE_STREET_ADDRESS_INPUT.value.trim() : '';
         const town = SERVICE_TOWN_INPUT ? SERVICE_TOWN_INPUT.value.trim() : '';
         const city = SERVICE_CITY_INPUT ? SERVICE_CITY_INPUT.value.trim() : '';
+        const county = SERVICE_COUNTY_INPUT ? SERVICE_COUNTY_INPUT.value.trim() : '';
         const postcodeRaw = SERVICE_POSTCODE_INPUT ? SERVICE_POSTCODE_INPUT.value.trim() : '';
-        const postcode = postcodeRaw ? postcodeRaw.toUpperCase() : '';
+        const postcode = normalisePostcode(postcodeRaw);
 
         if (!houseNumber) {
           alert('Please enter the house number for the mobile booking.');
@@ -2662,6 +2697,10 @@
           alert('Please enter the city for the mobile booking.');
           return;
         }
+        if (!county) {
+          alert('Please enter the county for the mobile booking.');
+          return;
+        }
         if (!postcode) {
           alert('Please enter the postcode for the mobile booking.');
           return;
@@ -2671,11 +2710,23 @@
         if (SERVICE_STREET_ADDRESS_INPUT) SERVICE_STREET_ADDRESS_INPUT.value = streetAddress;
         if (SERVICE_TOWN_INPUT) SERVICE_TOWN_INPUT.value = town;
         if (SERVICE_CITY_INPUT) SERVICE_CITY_INPUT.value = city;
+        if (SERVICE_COUNTY_INPUT) SERVICE_COUNTY_INPUT.value = county;
         if (SERVICE_POSTCODE_INPUT) SERVICE_POSTCODE_INPUT.value = postcode;
 
         const streetLine = [houseNumber, streetAddress].filter(Boolean).join(' ').replace(/\s+/g, ' ').trim();
-        const localityLine = [town, city].filter(Boolean).join(', ').trim();
-        serviceAddress = [streetLine, localityLine, postcode].filter(Boolean).join(', ');
+        const locationParts = [town, city, county].filter(Boolean);
+        const uniqueLocationParts = [];
+        const seenLocations = new Set();
+        locationParts.forEach(part => {
+          const key = part.toLowerCase();
+          if (seenLocations.has(key)) {
+            return;
+          }
+          seenLocations.add(key);
+          uniqueLocationParts.push(part);
+        });
+        const serviceAddressParts = [streetLine, ...uniqueLocationParts, postcode].filter(Boolean);
+        serviceAddress = serviceAddressParts.join(', ');
       }
 
       const extraComments = EXTRA_COMMENTS_INPUT ? EXTRA_COMMENTS_INPUT.value.trim() : '';

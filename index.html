@@ -2023,10 +2023,16 @@
         details.modelDescription
       ];
 
+      let fallback = '';
+
       for (const candidate of candidates) {
         const value = cleanVehicleName(candidate);
         if (!value) {
           continue;
+        }
+
+        if (!fallback) {
+          fallback = value;
         }
 
         if (make) {
@@ -2047,7 +2053,7 @@
         return value;
       }
 
-      return '';
+      return fallback;
     }
 
     function formatEngineCapacity(value) {
@@ -2228,7 +2234,10 @@
       vehicleDetails = data || {};
       lastLookedUpVrm = vrm || '';
       const make = titleCaseVehicleName(vehicleDetails.make);
-      const model = titleCaseVehicleName(resolveVehicleModel(vehicleDetails));
+      let model = titleCaseVehicleName(resolveVehicleModel(vehicleDetails));
+      if (model && make && model.toLowerCase() === make.toLowerCase()) {
+        model = '';
+      }
       const year = vehicleDetails.yearOfManufacture || vehicleDetails.yearOfRegistration || '';
       const colour = vehicleDetails.colour || vehicleDetails.primaryColour || '';
       const fuelDisplay = formatFuelDisplay(vehicleDetails.fuelType);

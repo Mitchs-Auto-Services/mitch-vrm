@@ -1456,6 +1456,27 @@
 
     const SERVICES = [
       {
+        id: 'diagnostic',
+        title: "Diagnostic/ I Don't Know",
+        price: '£50',
+        applicable: ['Petrol', 'Diesel'],
+        overview:
+          'With this option you receive a full diagnostic sheet sent straight to your email so you can see the problem for yourself.',
+        includes: [
+          'Plug in professional diagnostics and read live and stored fault codes from every control unit',
+          'Monitor live data to trace intermittent or sensor-related issues that might be causing the concern',
+          'Carry out targeted electrical and mechanical tests based on the scan results',
+          'Send you a detailed diagnostic report with our findings, recommended fixes, and next steps'
+        ],
+        symptoms: [
+          'Dashboard warning lights or messages without an obvious cause',
+          'Misfires, non-starting, strange noises, or running issues',
+          'Electrical gremlins or intermittent faults that keep coming back',
+          'Any time you are not sure what is wrong and want us to investigate properly'
+        ],
+        notes: 'If you are not sure what is wrong, book this and we will get to the bottom of the issue with you.'
+      },
+      {
         id: 'air_filter',
         title: 'Air Filter Replacement',
         price: 'From £80',
@@ -1571,25 +1592,6 @@
           'Low voltage readings or dim interior lights',
           'Doing short trips that never fully recharge the battery',
           'Battery warning appearing even after long drives'
-        ]
-      },
-      {
-        id: 'diagnostic',
-        title: 'Car Diagnostic Check',
-        price: 'From £50',
-        applicable: ['Petrol', 'Diesel'],
-        overview: 'If you are not sure what is wrong, this in-depth scan points you in the right direction with a full written report.',
-        includes: [
-          'Plug in professional diagnostics and read fault codes from all modules',
-          'Live-data monitoring to spot intermittent or sensor-related issues',
-          'Targeted electrical and mechanical checks based on findings',
-          'Email you a transparent report with next-step recommendations'
-        ],
-        symptoms: [
-          'Engine light or other dashboard warnings',
-          'Misfires, cutting out or refusing to start',
-          'Unusual noises, vibrations or smells',
-          'Mystery electrical gremlins that appear and disappear'
         ]
       },
       {
@@ -1975,32 +1977,6 @@
           'Poor MOT handbrake results or advisories',
           'Rear brakes feel weak or uneven'
         ]
-      },
-      {
-        id: 'not_sure',
-        title: "i'm not sure/ Issue not listed",
-        price: 'Quote provided',
-        applicable: ['Petrol', 'Diesel'],
-        overview: 'If we don’t have the service provided please let us know what you may think it is and we will have a look at it and see if we can help.',
-        includes: [
-          'Listen to your concerns and review the vehicle symptoms',
-          'Recommend the most suitable service or repair before any work starts',
-          'Provide an estimate for parts and labour once the issue is identified',
-          'Keep you updated with transparent findings and next steps'
-        ],
-        symptoms: [
-          'Warning lights or messages without a clear cause',
-          'New noises, vibrations or handling changes',
-          'Intermittent faults that are hard to pin down',
-          'Any other issue where you just want expert advice first'
-        ],
-        notes: 'Use this option to share what you think might be happening and we’ll investigate the issue for you.',
-        requiresDetails: true,
-        extraField: {
-          id: 'notSureDetails',
-          label: 'Tell us what is happening',
-          placeholder: 'Please explain the issue you are experiencing.'
-        }
       }
     ];
 

@@ -358,87 +358,6 @@
       gap: 14px;
       margin-top: 10px;
     }
-    .address-lookup {
-      margin-top: 12px;
-      display: grid;
-      gap: 12px;
-    }
-    .address-search-row {
-      display: grid;
-      gap: 10px;
-      grid-template-columns: minmax(0, 1fr) auto;
-      align-items: stretch;
-    }
-    .address-search-row input {
-      border-radius: 14px;
-      padding: 14px 18px;
-      font-size: 1rem;
-    }
-    .address-search-row button {
-      padding: 14px 20px;
-      border-radius: 14px;
-      white-space: nowrap;
-    }
-    .address-status {
-      font-size: 0.9rem;
-      color: var(--muted);
-    }
-    .address-status.error {
-      color: #ffb8a1;
-    }
-    .address-status.success {
-      color: #a7f3c6;
-    }
-    .address-results {
-      border-radius: 16px;
-      border: 1px solid rgba(255, 255, 255, 0.16);
-      background: rgba(0, 0, 0, 0.62);
-      max-height: 240px;
-      overflow-y: auto;
-    }
-    .address-results ul {
-      list-style: none;
-      margin: 0;
-      padding: 0;
-    }
-    .address-results li + li {
-      border-top: 1px solid rgba(255, 255, 255, 0.08);
-    }
-    .address-results button {
-      width: 100%;
-      text-align: left;
-      background: transparent;
-      border: none;
-      color: var(--text);
-      padding: 14px 18px;
-      font-size: 0.95rem;
-      font-weight: 600;
-      letter-spacing: normal;
-      text-transform: none;
-      box-shadow: none;
-    }
-    .address-results button:hover {
-      background: rgba(255, 123, 44, 0.18);
-      transform: none;
-    }
-    .address-results button.active {
-      background: rgba(255, 123, 44, 0.28);
-    }
-    .button-secondary {
-      background: rgba(0, 0, 0, 0.6);
-      border: 1px solid rgba(255, 255, 255, 0.24);
-      border-radius: 14px;
-      padding: 14px 18px;
-      text-transform: none;
-      letter-spacing: normal;
-      font-weight: 600;
-      box-shadow: none;
-    }
-    .button-secondary:hover:not(:disabled) {
-      background: rgba(255, 123, 44, 0.22);
-      transform: none;
-      box-shadow: none;
-    }
     .full-width {
       grid-column: 1 / -1;
     }
@@ -992,18 +911,7 @@
             </div>
             <div id="mobileAddressGroup" class="full-width hidden">
               <label>Service address</label>
-              <div class="address-lookup" id="addressLookupContainer">
-                <div class="address-search-row">
-                  <input id="addressLookupPostcode" name="addressLookupPostcode" placeholder="Please type postcode" autocomplete="postal-code" inputmode="text">
-                  <button type="button" id="addressSearchBtn">Find address</button>
-                </div>
-                <div id="addressLookupStatus" class="address-status" aria-live="polite"></div>
-                <div id="addressResultsContainer" class="address-results hidden">
-                  <ul id="addressResultsList"></ul>
-                </div>
-                <button type="button" id="addressManualBtn" class="button-secondary">Or type your address manually</button>
-              </div>
-              <div class="address-grid hidden" id="manualAddressContainer">
+              <div class="address-grid" id="manualAddressContainer">
                 <div>
                   <input id="serviceHouseNumber" name="serviceHouseNumber" autocomplete="address-line1" placeholder="House number">
                 </div>
@@ -1049,8 +957,6 @@
     const DVLA_FALLBACK_KEY = 'ZQHFV22Ym6ao1CfyyqEol2oxzpoWQM2w59rAkPro';
     const VEHICLE_NOT_FOUND_MESSAGE = 'We are unable to find your vehicle, please check you have entered the reg correctly.';
     const GARAGE_ADDRESS_TEXT = 'Unit 5, Wingate Grange Industrial Estate, TS28 5AH';
-    const ADDRESS_API_URL = '/api/address';
-
     const SERVICES_CARD = document.getElementById('servicesCard');
     const SERVICES_MESSAGE = document.getElementById('servicesMessage');
     const SERVICE_SEARCH_WRAPPER = document.getElementById('serviceSearchWrapper');
@@ -1087,15 +993,6 @@
     const MOBILE_ADDRESS_GROUP = document.getElementById('mobileAddressGroup');
     const GARAGE_ADDRESS_NOTICE = document.getElementById('garageAddressNotice');
     const EXTRA_COMMENTS_INPUT = document.getElementById('extraComments');
-    const ADDRESS_LOOKUP_CONTAINER = document.getElementById('addressLookupContainer');
-    const ADDRESS_POSTCODE_INPUT = document.getElementById('addressLookupPostcode');
-    const ADDRESS_SEARCH_BUTTON = document.getElementById('addressSearchBtn');
-    const ADDRESS_STATUS = document.getElementById('addressLookupStatus');
-    const ADDRESS_RESULTS_CONTAINER = document.getElementById('addressResultsContainer');
-    const ADDRESS_RESULTS_LIST = document.getElementById('addressResultsList');
-    const ADDRESS_MANUAL_BUTTON = document.getElementById('addressManualBtn');
-    const MANUAL_ADDRESS_CONTAINER = document.getElementById('manualAddressContainer');
-
     const ADDRESS_INPUTS = [
       SERVICE_HOUSE_NUMBER_INPUT,
       SERVICE_STREET_ADDRESS_INPUT,
@@ -1108,8 +1005,6 @@
     const serviceNotesCache = new Map();
     let currentServiceData = [];
     let selectedServiceId = '';
-    let manualAddressVisible = false;
-    let addressOptions = [];
     const POSTCODE_REGEX = /^[A-Z]{1,2}\d[A-Z0-9]?\d[A-Z]{2}$/;
 
     function normalisePostcode(value) {
@@ -1120,247 +1015,15 @@
       return cleaned.replace(/([0-9][A-Z0-9]{2})$/, ' $1');
     }
 
-    function setAddressStatus(message, variant = '') {
-      if (!ADDRESS_STATUS) {
-        return;
-      }
-      ADDRESS_STATUS.textContent = message || '';
-      ADDRESS_STATUS.classList.remove('error', 'success');
-      if (!message) {
-        return;
-      }
-      if (variant === 'error') {
-        ADDRESS_STATUS.classList.add('error');
-      } else if (variant === 'success') {
-        ADDRESS_STATUS.classList.add('success');
-      }
-    }
-
-    function clearAddressResults() {
-      addressOptions = [];
-      if (ADDRESS_RESULTS_LIST) {
-        ADDRESS_RESULTS_LIST.innerHTML = '';
-      }
-      if (ADDRESS_RESULTS_CONTAINER) {
-        ADDRESS_RESULTS_CONTAINER.classList.add('hidden');
-      }
-    }
-
-    function renderAddressResults(addresses = []) {
-      clearAddressResults();
-      if (!ADDRESS_RESULTS_LIST || !Array.isArray(addresses) || addresses.length === 0) {
-        return;
-      }
-
-      addressOptions = addresses;
-      const fragment = document.createDocumentFragment();
-
-      addresses.forEach((entry, index) => {
-        const listItem = document.createElement('li');
-        const button = document.createElement('button');
-        button.type = 'button';
-        button.dataset.index = String(index);
-        const label = entry.display || entry.line1 || entry.postcode || 'Select address';
-        button.textContent = label;
-        button.title = label;
-        listItem.appendChild(button);
-        fragment.appendChild(listItem);
-      });
-
-      ADDRESS_RESULTS_LIST.appendChild(fragment);
-      if (ADDRESS_RESULTS_CONTAINER) {
-        ADDRESS_RESULTS_CONTAINER.classList.remove('hidden');
-      }
-    }
-
-    function setManualAddressVisibility(visible) {
-      manualAddressVisible = Boolean(visible);
-      if (MANUAL_ADDRESS_CONTAINER) {
-        MANUAL_ADDRESS_CONTAINER.classList.toggle('hidden', !manualAddressVisible);
-      }
-      ADDRESS_INPUTS.forEach(input => {
-        input.required = manualAddressVisible;
-      });
-      if (ADDRESS_MANUAL_BUTTON) {
-        ADDRESS_MANUAL_BUTTON.classList.toggle('hidden', manualAddressVisible);
-      }
-    }
-
     function clearManualAddressInputs() {
       ADDRESS_INPUTS.forEach(input => {
         input.value = '';
       });
     }
 
-    function fillManualAddress(address = {}) {
-      if (SERVICE_HOUSE_NUMBER_INPUT) {
-        const house = address.houseNumber || address.line1 || '';
-        SERVICE_HOUSE_NUMBER_INPUT.value = house ? house.trim() : '';
-      }
-      if (SERVICE_STREET_ADDRESS_INPUT) {
-        const streetValue = (address.street || '').trim();
-        if (streetValue) {
-          SERVICE_STREET_ADDRESS_INPUT.value = streetValue;
-        } else if (address.line1) {
-          const withoutHouse = address.houseNumber
-            ? address.line1.replace(address.houseNumber, '').trim()
-            : address.line1;
-          SERVICE_STREET_ADDRESS_INPUT.value = withoutHouse ? withoutHouse.trim() : '';
-        } else {
-          SERVICE_STREET_ADDRESS_INPUT.value = '';
-        }
-      }
-      if (SERVICE_TOWN_INPUT) {
-        const locality = address.locality || '';
-        const county = address.county || '';
-        const city = address.city || '';
-        const townValue = locality || city || county || '';
-        SERVICE_TOWN_INPUT.value = townValue ? townValue.trim() : '';
-      }
-      if (SERVICE_CITY_INPUT) {
-        const city = address.city || '';
-        const county = address.county || '';
-        const locality = address.locality || '';
-        const cityValue = city || locality || county || '';
-        SERVICE_CITY_INPUT.value = cityValue ? cityValue.trim() : '';
-      }
-      if (SERVICE_COUNTY_INPUT) {
-        const county = address.county || '';
-        SERVICE_COUNTY_INPUT.value = county ? county.trim() : '';
-      }
-      if (SERVICE_POSTCODE_INPUT) {
-        const formattedPostcode = normalisePostcode(address.postcode || '');
-        SERVICE_POSTCODE_INPUT.value = formattedPostcode;
-      }
-    }
-
-    function resetAddressLookup(options = {}) {
-      const {
-        clearFields = true,
-        clearPostcode = false,
-        hideManual = true,
-        clearStatus = true
-      } = options;
-
-      clearAddressResults();
-      if (clearStatus) {
-        setAddressStatus('');
-      }
-      if (clearPostcode && ADDRESS_POSTCODE_INPUT) {
-        ADDRESS_POSTCODE_INPUT.value = '';
-      }
-      if (clearFields) {
-        clearManualAddressInputs();
-      }
-      if (hideManual) {
-        setManualAddressVisibility(false);
-      }
-    }
-
-    async function performAddressSearch() {
-      if (!ADDRESS_POSTCODE_INPUT) {
-        return;
-      }
-
-      const rawPostcode = ADDRESS_POSTCODE_INPUT.value.trim();
-      if (!rawPostcode) {
-        setAddressStatus('Please enter a postcode to search for your address.', 'error');
-        ADDRESS_POSTCODE_INPUT.focus();
-        return;
-      }
-
-      const postcode = normalisePostcode(rawPostcode);
-      if (!postcode) {
-        setAddressStatus('Please enter a valid UK postcode.', 'error');
-        ADDRESS_POSTCODE_INPUT.focus();
-        return;
-      }
-
-      ADDRESS_POSTCODE_INPUT.value = postcode;
-      setAddressStatus('Looking up addresses…');
-      clearAddressResults();
-
-      let originalButtonText = '';
-      if (ADDRESS_SEARCH_BUTTON) {
-        originalButtonText = ADDRESS_SEARCH_BUTTON.textContent;
-        ADDRESS_SEARCH_BUTTON.disabled = true;
-        ADDRESS_SEARCH_BUTTON.textContent = 'Searching…';
-      }
-
-      try {
-        const lookupPostcode = postcode.replace(/\s+/g, '');
-        const response = await fetch(`${ADDRESS_API_URL}?postcode=${encodeURIComponent(lookupPostcode)}`);
-        const payload = await response.json();
-
-        if (!response.ok) {
-          throw new Error(payload?.error || 'Address lookup failed.');
-        }
-
-        const addresses = Array.isArray(payload.addresses) ? payload.addresses : [];
-        if (!addresses.length) {
-          setAddressStatus('We couldn’t find any addresses for that postcode. Please check it or enter your address manually.', 'error');
-          return;
-        }
-
-        renderAddressResults(addresses);
-        setAddressStatus('Select your address from the list below.');
-      } catch (error) {
-        setAddressStatus(error.message || 'We could not find addresses for that postcode. Please check the postcode or enter your address manually.', 'error');
-      } finally {
-        if (ADDRESS_SEARCH_BUTTON) {
-          ADDRESS_SEARCH_BUTTON.disabled = false;
-          ADDRESS_SEARCH_BUTTON.textContent = originalButtonText || 'Find address';
-        }
-      }
-    }
-
-    function handleAddressSelection(event) {
-      const button = event.target.closest('button[data-index]');
-      if (!button) {
-        return;
-      }
-      const index = Number(button.dataset.index);
-      if (Number.isNaN(index) || !addressOptions[index]) {
-        return;
-      }
-
-      const selection = addressOptions[index];
-      fillManualAddress(selection);
-      setManualAddressVisibility(true);
-      setAddressStatus('Address loaded below. Please confirm or make any changes.', 'success');
-
-      if (ADDRESS_RESULTS_LIST) {
-        ADDRESS_RESULTS_LIST.querySelectorAll('button[data-index]').forEach(item => {
-          item.classList.toggle('active', item === button);
-        });
-      }
-    }
-
-    if (ADDRESS_SEARCH_BUTTON) {
-      ADDRESS_SEARCH_BUTTON.addEventListener('click', performAddressSearch);
-    }
-
-    if (ADDRESS_POSTCODE_INPUT) {
-      ADDRESS_POSTCODE_INPUT.addEventListener('keydown', event => {
-        if (event.key === 'Enter') {
-          event.preventDefault();
-          performAddressSearch();
-        }
-      });
-    }
-
-    if (ADDRESS_RESULTS_LIST) {
-      ADDRESS_RESULTS_LIST.addEventListener('click', handleAddressSelection);
-    }
-
-    if (ADDRESS_MANUAL_BUTTON) {
-      ADDRESS_MANUAL_BUTTON.addEventListener('click', () => {
-        clearAddressResults();
-        setManualAddressVisibility(true);
-        setAddressStatus('Please type your address details below.', 'success');
-        if (SERVICE_HOUSE_NUMBER_INPUT) {
-          SERVICE_HOUSE_NUMBER_INPUT.focus();
-        }
+    function setMobileAddressRequired(isRequired) {
+      ADDRESS_INPUTS.forEach(input => {
+        input.required = Boolean(isRequired);
       });
     }
 
@@ -1369,14 +1032,7 @@
         if (MOBILE_ADDRESS_GROUP) {
           MOBILE_ADDRESS_GROUP.classList.remove('hidden');
         }
-        if (ADDRESS_LOOKUP_CONTAINER) {
-          ADDRESS_LOOKUP_CONTAINER.classList.remove('hidden');
-        }
-        if (manualAddressVisible) {
-          setManualAddressVisibility(true);
-        } else {
-          setManualAddressVisibility(false);
-        }
+        setMobileAddressRequired(true);
         if (GARAGE_ADDRESS_NOTICE) {
           GARAGE_ADDRESS_NOTICE.classList.add('hidden');
         }
@@ -1384,7 +1040,8 @@
         if (MOBILE_ADDRESS_GROUP) {
           MOBILE_ADDRESS_GROUP.classList.add('hidden');
         }
-        resetAddressLookup({ clearFields: true, clearPostcode: true, hideManual: true });
+        clearManualAddressInputs();
+        setMobileAddressRequired(false);
         if (GARAGE_ADDRESS_NOTICE) {
           GARAGE_ADDRESS_NOTICE.classList.remove('hidden');
         }
@@ -1392,7 +1049,8 @@
         if (MOBILE_ADDRESS_GROUP) {
           MOBILE_ADDRESS_GROUP.classList.add('hidden');
         }
-        resetAddressLookup({ clearFields: true, clearPostcode: true, hideManual: true });
+        clearManualAddressInputs();
+        setMobileAddressRequired(false);
         if (GARAGE_ADDRESS_NOTICE) {
           GARAGE_ADDRESS_NOTICE.classList.add('hidden');
         }
@@ -1418,7 +1076,8 @@
       if (EMAIL_INPUT) EMAIL_INPUT.value = '';
       if (PHONE_INPUT) PHONE_INPUT.value = '';
       if (EXTRA_COMMENTS_INPUT) EXTRA_COMMENTS_INPUT.value = '';
-      resetAddressLookup({ clearFields: true, clearPostcode: true, hideManual: true });
+      clearManualAddressInputs();
+      setMobileAddressRequired(false);
       if (MOBILE_ADDRESS_GROUP) {
         MOBILE_ADDRESS_GROUP.classList.add('hidden');
       }

@@ -1981,6 +1981,105 @@
     ];
 
     let vehicleDetails = null;
+    let lastLookedUpVrm = '';
+
+    function formatEngineCapacity(value) {
+      if (value === null || value === undefined || value === '') {
+        return '';
+      }
+      const numeric = Number(value);
+      if (!Number.isFinite(numeric) || numeric <= 0) {
+        return `${value}`;
+      }
+      const litres = Math.round((numeric / 1000) * 10) / 10;
+      if (litres > 0) {
+        const text = litres.toFixed(1);
+        return `${text}L`;
+      }
+      return `${numeric}cc`;
+    }
+
+    function formatDateDisplay(value) {
+      if (!value) {
+        return '';
+      }
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) {
+        return `${value}`;
+      }
+      return date.toLocaleDateString('en-GB');
+    }
+
+    function formatRelativeDays(value) {
+      if (!value) {
+        return '';
+      }
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) {
+        return '';
+      }
+      const target = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const diff = Math.round((target.getTime() - today.getTime()) / 86400000);
+      if (diff > 0) {
+        return ` (${diff} day${diff === 1 ? '' : 's'} left)`;
+      }
+      if (diff === 0) {
+        return ' (today)';
+      }
+      const overdue = Math.abs(diff);
+      return ` (${overdue} day${overdue === 1 ? '' : 's'} overdue)`;
+    }
+
+    function formatFuelDisplay(value) {
+      const normalised = normaliseFuel(value);
+      if (normalised === 'Both') {
+        return value || 'Unknown';
+      }
+      return normalised;
+    }
+
+    function formatMotSummary(data) {
+      if (!data) {
+        return '';
+      }
+      const status = (data.motStatus || '').trim();
+      const expiryRaw = data.motExpiryDate || data.motDueDate || data.motDate || '';
+      const expiry = formatDateDisplay(expiryRaw);
+      const relative = formatRelativeDays(expiryRaw);
+      if (expiry) {
+        const lowerStatus = status.toLowerCase();
+        if (status && !lowerStatus.includes('no details')) {
+          return `${status} – expires on ${expiry}${relative}`;
+        }
+        return `Expires on ${expiry}${relative}`;
+      }
+      if (status) {
+        return status;
+      }
+      return 'No MOT information available';
+    }
+
+    function formatTaxSummary(data) {
+      if (!data) {
+        return '';
+      }
+      const status = (data.taxStatus || '').trim();
+      const dueRaw = data.taxDueDate || data.taxDue || '';
+      const due = formatDateDisplay(dueRaw);
+      const relative = formatRelativeDays(dueRaw);
+      if (due) {
+        if (status) {
+          return `${status} – due on ${due}${relative}`;
+        }
+        return `Due on ${due}${relative}`;
+      }
+      if (status) {
+        return status;
+      }
+      return 'No tax information available';
+    }
 
     async function fetchVehicleDetails(vrm) {
       let fallbackReason = null;
@@ -2059,31 +2158,37 @@
     }
 
     function renderVehicle(data, vrm) {
-      vehicleDetails = data;
-      const title = [data.make, data.model].filter(Boolean).join(' ');
-      document.getElementById('vehTitle').textContent = title || 'Vehicle details';
-      const engine = data.engineCapacity ? `${(data.engineCapacity/1000).toFixed(1)}L` : '';
-      const metaBits = [data.fuelType, engine, data.colour].filter(Boolean).join(' • ');
-      document.getElementById('vehMeta').textContent = metaBits;
-      document.getElementById('vehReg').textContent = `Reg: ${vrm}`;
+      vehicleDetails = data || {};
+      lastLookedUpVrm = vrm || '';
+      const make = vehicleDetails.make || '';
+      const model = vehicleDetails.model || '';
+      const year = vehicleDetails.yearOfManufacture || vehicleDetails.yearOfRegistration || '';
+      const colour = vehicleDetails.colour || vehicleDetails.primaryColour || '';
+      const fuelDisplay = formatFuelDisplay(vehicleDetails.fuelType);
+      const engineDisplay = formatEngineCapacity(vehicleDetails.engineCapacity || vehicleDetails.engineSize);
 
-      // MOT
+      const baseTitle = [make, model].filter(Boolean).join(' ');
+      const titleWithYear = year
+        ? (baseTitle ? `${baseTitle} (${year})` : `Vehicle details (${year})`)
+        : baseTitle;
+      document.getElementById('vehTitle').textContent = titleWithYear || 'Vehicle details';
+
+      const metaBits = [
+        fuelDisplay ? `Fuel: ${fuelDisplay}` : '',
+        engineDisplay ? `Engine: ${engineDisplay}` : '',
+        colour ? `Colour: ${colour}` : ''
+      ].filter(Boolean);
+      document.getElementById('vehMeta').textContent = metaBits.join(' • ');
+      document.getElementById('vehReg').textContent = `Registration: ${vrm}`;
+
       const motStatus = document.getElementById('motStatus');
-      if (data.motExpiryDate) {
-        const motDate = new Date(data.motExpiryDate);
-        const days = Math.round((motDate - new Date()) / 86400000);
-        const dayText = isNaN(days) ? '' : ` (${days} days left)`;
-        motStatus.textContent = `${motDate.toLocaleDateString('en-GB')}${dayText}`;
-      } else {
-        motStatus.textContent = 'Unknown';
-      }
+      motStatus.textContent = formatMotSummary(vehicleDetails);
 
-      // Tax
       const taxStatus = document.getElementById('taxStatus');
-      taxStatus.textContent = (data.taxStatus || 'Unknown');
+      taxStatus.textContent = formatTaxSummary(vehicleDetails);
 
       const evNotice = document.getElementById('evNotice');
-      if (normaliseFuel(data.fuelType) === 'Electric') {
+      if (normaliseFuel(vehicleDetails.fuelType) === 'Electric') {
         evNotice.textContent = 'We do not do electric just yet but we are hoping to expand to them soon.';
         evNotice.classList.remove('hidden');
       } else {
@@ -2213,6 +2318,11 @@
       const serviceInput = document.querySelector('input[name="srv"]:checked');
       if (!serviceInput) {
         alert('Please pick a service.');
+        return;
+      }
+
+      if (!vehicleDetails || !lastLookedUpVrm) {
+        alert('Please look up your vehicle before finishing the booking.');
         return;
       }
 
@@ -2367,29 +2477,64 @@
       const extraComments = EXTRA_COMMENTS_INPUT ? EXTRA_COMMENTS_INPUT.value.trim() : '';
       const warrantyInput = document.querySelector('input[name="warr"]:checked');
 
-      const customerDetails = [
-        `Customer name: ${firstName} ${lastName}`,
-        `Customer email: ${email}`,
-        `Customer phone: ${phone}`,
-        modeKey === 'mobile' ? `Service address: ${serviceAddress}` : '',
-        modeKey === 'garage' ? `Drop-off location: ${GARAGE_ADDRESS_TEXT}` : '',
-        extraComments ? `Extra comments: ${extraComments}` : ''
-      ].filter(Boolean).join('\\n');
+      const registration = (lastLookedUpVrm || vehicleDetails.registrationNumber || '').toUpperCase();
+      const make = vehicleDetails.make || '';
+      const model = vehicleDetails.model || '';
+      const year = vehicleDetails.yearOfManufacture || vehicleDetails.yearOfRegistration || '';
+      const fuelDisplay = formatFuelDisplay(vehicleDetails.fuelType);
+      const engineDisplay = formatEngineCapacity(vehicleDetails.engineCapacity || vehicleDetails.engineSize);
+      const colour = vehicleDetails.colour || vehicleDetails.primaryColour || '';
+      const motSummary = formatMotSummary(vehicleDetails);
+      const taxSummary = formatTaxSummary(vehicleDetails);
+      const serviceTitle = serviceInput.dataset.title || serviceInput.value || 'Selected service';
+      const servicePrice = serviceInput.dataset.price || 'Price on request';
+      const warrantyChoice = warrantyInput ? warrantyInput.value : '';
 
-      const bookingDetails = [
-        `Vehicle: ${document.getElementById('vehTitle').textContent}`,
-        document.getElementById('vehMeta').textContent ? `Details: ${document.getElementById('vehMeta').textContent}` : '',
-        document.getElementById('vehReg').textContent,
-        `MOT: ${document.getElementById('motStatus').textContent}`,
-        `Tax: ${document.getElementById('taxStatus').textContent}`,
-        `Service: ${serviceInput.dataset.title} (${serviceInput.dataset.price})`,
+      const customerLines = [
+        `Name: ${firstName} ${lastName}`,
+        `Email: ${email}`,
+        `Phone: ${phone}`,
+        modeKey === 'mobile' ? `Service address: ${serviceAddress}` : '',
+        modeKey === 'garage' ? `Garage drop-off location: ${GARAGE_ADDRESS_TEXT}` : '',
+        extraComments ? `Extra comments: ${extraComments}` : ''
+      ].filter(Boolean);
+
+      const vehicleLines = [
+        registration ? `Registration: ${registration}` : '',
+        make ? `Make: ${make}` : '',
+        model ? `Model: ${model}` : '',
+        year ? `Year: ${year}` : '',
+        fuelDisplay ? `Fuel type: ${fuelDisplay}` : '',
+        engineDisplay ? `Engine size: ${engineDisplay}` : '',
+        colour ? `Colour: ${colour}` : '',
+        motSummary ? `MOT: ${motSummary}` : '',
+        taxSummary ? `Tax: ${taxSummary}` : ''
+      ].filter(Boolean);
+
+      const bookingLines = [
+        `Service selected: ${serviceTitle}`,
+        `From price listed: ${servicePrice}`,
         serviceDetails ? `Service notes: ${serviceDetails}` : '',
-        warrantyInput ? `Warranty: ${warrantyInput.value}` : '',
+        warrantyChoice ? `Warranty: ${warrantyChoice}` : '',
         `Service mode: ${modeLabel}`,
         `Preferred appointment: ${formattedDate} at ${formattedTime}`
-      ].filter(Boolean).join('\\n');
+      ].filter(Boolean);
 
-      const details = [customerDetails, bookingDetails].filter(Boolean).join('\\n\\n');
+      const formatSection = (title, lines) => {
+        if (!lines.length) {
+          return '';
+        }
+        const body = lines.map(line => `- ${line}`).join('\\n');
+        return `${title}:\\n${body}`;
+      };
+
+      const sections = [
+        formatSection('Customer details', customerLines),
+        formatSection('Vehicle details', vehicleLines),
+        formatSection('Booking selection', bookingLines)
+      ].filter(Boolean);
+
+      const details = sections.join('\\n\\n');
 
       const subject = encodeURIComponent('Service Booking Request');
       const body = encodeURIComponent(`${details}\\n\\nPlease contact me to confirm availability.`);

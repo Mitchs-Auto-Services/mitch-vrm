@@ -246,6 +246,19 @@
       padding: 24px 26px;
       box-shadow: 0 24px 46px rgba(0, 0, 0, 0.32);
     }
+    .mode-card--disabled {
+      opacity: 0.55;
+      filter: grayscale(35%);
+      position: relative;
+    }
+    .mode-card--disabled::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 22px;
+      background: linear-gradient(160deg, rgba(239, 68, 68, 0.12), rgba(0, 0, 0, 0));
+      pointer-events: none;
+    }
     .mode-card h3 {
       margin: 0 0 10px;
       font-size: 1.35rem;
@@ -253,6 +266,29 @@
     .mode-card p {
       margin: 0;
       color: rgba(244, 245, 247, 0.82);
+    }
+    .mode-card--disabled p {
+      color: rgba(244, 245, 247, 0.68);
+    }
+    .mode-card__status {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(239, 68, 68, 0.5);
+      background: rgba(239, 68, 68, 0.18);
+      color: #ffc6c6;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-weight: 800;
+      margin-top: 14px;
+    }
+    .mode-card__note {
+      margin-top: 12px;
+      color: rgba(255, 204, 204, 0.86);
+      font-weight: 600;
     }
     .card {
       background: linear-gradient(160deg, rgba(255, 255, 255, 0.08), rgba(8, 11, 16, 0.92));
@@ -336,6 +372,20 @@
       background: rgba(255, 123, 44, 0.18);
       border-color: rgba(255, 123, 44, 0.4);
       color: #ffeadf;
+    }
+    .alert.outage {
+      background: rgba(239, 68, 68, 0.16);
+      border-color: rgba(239, 68, 68, 0.55);
+      color: #ffd7d7;
+      box-shadow: 0 18px 34px rgba(239, 68, 68, 0.25);
+    }
+    .status-banner {
+      padding: 26px 0;
+      background: linear-gradient(135deg, rgba(239, 68, 68, 0.18), rgba(15, 19, 25, 0.9));
+      border-bottom: 1px solid rgba(239, 68, 68, 0.35);
+    }
+    .status-banner .alert {
+      margin-top: 0;
     }
     .result {
       margin-top: 22px;
@@ -554,6 +604,15 @@
     .mode-item:hover {
       transform: translateY(-2px);
     }
+    .mode-item.is-disabled {
+      cursor: not-allowed;
+      opacity: 0.55;
+      filter: grayscale(35%);
+      transform: none;
+    }
+    .mode-item.is-disabled:hover {
+      transform: none;
+    }
     .mode-item.expanded {
       border-color: var(--orange);
       box-shadow: 0 26px 48px rgba(0, 0, 0, 0.38);
@@ -582,6 +641,11 @@
       letter-spacing: 0.04em;
       background: rgba(0, 0, 0, 0.45);
     }
+    .mode-tag--unavailable {
+      background: rgba(239, 68, 68, 0.22);
+      border-color: rgba(239, 68, 68, 0.55);
+      color: #ffc6c6;
+    }
     .mode-controls {
       display: flex;
       align-items: center;
@@ -603,6 +667,17 @@
     }
     .mode-item.expanded .mode-body {
       display: block;
+    }
+    .mode-item.is-disabled .mode-body {
+      display: block;
+      border-color: rgba(239, 68, 68, 0.45);
+      background: rgba(239, 68, 68, 0.12);
+      color: #ffd7d7;
+    }
+    .mode-unavailable-note {
+      font-weight: 700;
+      color: #ffcccc;
+      margin: 0 0 12px;
     }
     .option {
       display: flex;
@@ -712,9 +787,9 @@
       <div class="hero-panel hero-panel--primary">
         <p class="hero-eyebrow">Welcome to Mitchs Auto Services Booking Page</p>
         <h1>Professional servicing wherever you need us</h1>
-        <p class="hero-lead">Trusted mobile and garage mechanics with a loyalty programme that even gives you a chance to win a free service. ALL PRICES ARE FROM, please get in contact to get a more accurate price.</p>
+        <p class="hero-lead">Trusted mobile and garage mechanics with a loyalty programme that even gives you a chance to win a free service. ALL PRICES ARE FROM, please get in contact to get a more accurate price. Mobile visits are temporarily paused while our van is repaired.</p>
         <div class="hero-badges">
-          <div class="hero-badge"><span></span>Mobile service to your driveway</div>
+          <div class="hero-badge"><span></span>Mobile service returning soon (temporarily paused)</div>
           <div class="hero-badge"><span></span>Garage repairs with pit access</div>
           <div class="hero-badge"><span></span>Loyalty rewards & email updates</div>
           <div class="hero-badge"><span></span>We do full Services, Pre-MOT checks, diagnostic and repairs</div>
@@ -737,7 +812,7 @@
           <li class="hero-panel__item">We work within a 15 mile radius from Unit 5, Wingate Grange Industrial Estate, TS28 5AH.</li>
           <li class="hero-panel__item">Anything further is £25 for call out.</li>
           <li class="hero-panel__item">Bookings available between 9am and 5pm.</li>
-          <li class="hero-panel__item">We carry out both mobile visits and garage drop-offs.</li>
+          <li class="hero-panel__item">Garage drop-offs available (mobile visits temporarily paused while the van is repaired).</li>
           <li class="hero-panel__item">We have a loyalty programme with a chance to win a free service.</li>
         </ul>
         <div class="hero-contact">
@@ -748,11 +823,21 @@
     </div>
   </header>
 
+  <section class="status-banner">
+    <div class="container">
+      <div class="alert outage">
+        <strong>Mobile service temporarily unavailable.</strong> Our van is currently off the road so all bookings are garage drop-off only. We'll be back with mobile visits as soon as possible.
+      </div>
+    </div>
+  </section>
+
   <main class="container main-content">
     <div class="modes-grid">
-      <div class="mode-card">
+      <div class="mode-card mode-card--disabled" aria-disabled="true">
         <h3>Mobile service</h3>
-        <p>Our fully equipped van brings the workshop to your driveway or workplace, perfect for servicing, diagnostics, battery work and brake repairs without the travel hassle. This is useful if you are worried about driving your car so you don’t damage it even more.</p>
+        <p>Our fully equipped van brings the workshop to your driveway or workplace for servicing, diagnostics, battery work and brake repairs without the travel hassle. This is useful if you are worried about driving your car so you don’t damage it even more.</p>
+        <span class="mode-card__status">Currently unavailable</span>
+        <p class="mode-card__note">Our van is off the road for repairs so mobile visits are paused until further notice. Book a garage appointment below and we’ll let you know as soon as mobile service returns.</p>
       </div>
       <div class="mode-card">
         <h3>Garage service</h3>
@@ -796,7 +881,7 @@
     <section id="servicesCard" class="card hidden">
       <h2>Select a service</h2>
       <p>Once we've confirmed your vehicle, tap a service to open the full description, see what's included and check the typical symptoms.</p>
-      <p class="hint">We carry out both mobile and garage work depending on what suits you best.</p>
+      <p class="hint">Garage appointments are available right now while the mobile service is paused for repairs — we’ll let you know as soon as home visits return.</p>
       <div id="servicesMessage" class="alert warn hidden"></div>
       <div id="serviceSearchWrapper" class="service-search hidden">
         <label class="visually-hidden" for="serviceSearch">Search services</label>
@@ -814,30 +899,31 @@
       </div>
       <div id="fulfilmentSection" class="hidden" style="margin-top:24px;">
         <h3>How would you like us to carry out the work?</h3>
-        <p class="hint">Choose the style that suits you — appointments run between 9am and 5pm in 30-minute slots.</p>
+        <p class="hint">Mobile visits are temporarily unavailable while our van is repaired, so please choose the garage drop-off service. Appointments run between 9am and 5pm in 30-minute slots.</p>
         <div class="mode-select-wrapper">
           <label for="modeSelect">Choose your service style</label>
           <select id="modeSelect" name="modeSelect">
             <option value="">Select service style</option>
-            <option value="mobile" data-value="Mobile mechanic visit" data-label="Mobile mechanic visit">Mobile mechanic — we come to you</option>
+            <option value="mobile" data-value="Mobile mechanic visit" data-label="Mobile mechanic visit" data-disabled="true" disabled>Mobile mechanic — currently unavailable</option>
             <option value="garage" data-value="Garage drop-off" data-label="Garage drop-off service">Garage service — drop off with us</option>
           </select>
           <div id="modeSelectDescription" class="mode-select-description hidden"></div>
         </div>
         <div class="mode-list">
-          <label class="mode-item" data-mode="mobile">
+          <label class="mode-item is-disabled" data-mode="mobile" data-disabled="true" aria-disabled="true">
             <div class="mode-summary">
               <div>
                 <h4>Mobile mechanic</h4>
-                <span class="mode-tag">We come to you</span>
+                <span class="mode-tag mode-tag--unavailable">Currently unavailable</span>
               </div>
               <div class="mode-controls">
                 <span class="chevron" aria-hidden="true">&#9662;</span>
-                <input type="radio" name="mode" value="Mobile mechanic visit" data-label="Mobile mechanic visit">
+                <input type="radio" name="mode" value="Mobile mechanic visit" data-label="Mobile mechanic visit" disabled>
               </div>
             </div>
             <div class="mode-body">
-              <p>With this option you are requesting one of our mechanics to come to your address. Perfect for keeping life easy on servicing, diagnostics, brake work and battery care without needing to travel.</p>
+              <p class="mode-unavailable-note">Temporarily unavailable while our van is repaired — mobile visits will return as soon as possible.</p>
+              <p>Normally we come to your address for servicing, diagnostics, brake work and battery care when you’d prefer not to drive the vehicle.</p>
             </div>
           </label>
           <label class="mode-item" data-mode="garage">
@@ -979,6 +1065,14 @@
       }
       return map;
     }, {});
+    const DISABLED_MODES = new Set(['mobile']);
+
+    function isModeDisabled(modeKey = '') {
+      if (!modeKey) {
+        return false;
+      }
+      return DISABLED_MODES.has(modeKey);
+    }
     const INFO_SECTION = document.getElementById('infoSection');
     const FIRST_NAME_INPUT = document.getElementById('firstName');
     const LAST_NAME_INPUT = document.getElementById('lastName');
@@ -1028,6 +1122,9 @@
     }
 
     function handleModeChange(modeKey) {
+      if (isModeDisabled(modeKey)) {
+        modeKey = '';
+      }
       if (modeKey === 'mobile') {
         if (MOBILE_ADDRESS_GROUP) {
           MOBILE_ADDRESS_GROUP.classList.remove('hidden');
@@ -1058,6 +1155,9 @@
     }
 
     function updateModeDescription(modeKey) {
+      if (isModeDisabled(modeKey)) {
+        modeKey = '';
+      }
       if (!MODE_SELECT_DESCRIPTION) {
         return;
       }
@@ -1127,6 +1227,11 @@
       if (TIME_INPUT && !TIME_INPUT.value) {
         TIME_INPUT.value = '09:00';
       }
+      const checkedMode = document.querySelector('#fulfilmentSection input[name="mode"]:checked');
+      const checkedModeKey = checkedMode ? checkedMode.closest('.mode-item')?.dataset.mode || '' : (MODE_SELECT ? MODE_SELECT.value : '');
+      if (!checkedModeKey || isModeDisabled(checkedModeKey)) {
+        setModeSelection('garage', { expand: true });
+      }
       if (FINISH_CONTAINER) {
         FINISH_CONTAINER.classList.remove('hidden');
       }
@@ -1149,12 +1254,22 @@
 
     function setModeSelection(modeKey, options = {}) {
       const { expand = true } = options;
-      const value = modeKey || '';
+      let value = modeKey || '';
+      if (isModeDisabled(value)) {
+        value = '';
+      }
 
       MODE_ITEMS.forEach(item => {
-        const match = Boolean(value) && item.dataset.mode === value;
+        const itemMode = item.dataset.mode || '';
+        const itemDisabled = isModeDisabled(itemMode) || item.dataset.disabled === 'true';
+        const match = Boolean(value) && itemMode === value && !itemDisabled;
         const radio = item.querySelector('input[name="mode"]');
+        if (itemDisabled) {
+          item.classList.add('is-disabled');
+          item.setAttribute('aria-disabled', 'true');
+        }
         if (radio) {
+          radio.disabled = itemDisabled;
           radio.checked = match;
         }
         if (expand) {
@@ -1164,8 +1279,15 @@
         }
       });
 
-      if (MODE_SELECT && MODE_SELECT.value !== value) {
-        MODE_SELECT.value = value;
+      if (MODE_SELECT) {
+        const selectValue = MODE_SELECT.value;
+        if (value) {
+          if (selectValue !== value) {
+            MODE_SELECT.value = value;
+          }
+        } else if (selectValue) {
+          MODE_SELECT.value = '';
+        }
       }
 
       updateModeDescription(value);
@@ -1388,13 +1510,28 @@
     MODE_ITEMS.forEach(item => {
       const radio = item.querySelector('input[name="mode"]');
       const modeKey = item.dataset.mode;
+      const itemDisabled = isModeDisabled(modeKey) || item.dataset.disabled === 'true';
+
+      if (itemDisabled) {
+        item.classList.add('is-disabled');
+        item.setAttribute('aria-disabled', 'true');
+        if (radio) {
+          radio.disabled = true;
+          radio.checked = false;
+        }
+      }
+
       const openItem = () => {
-        if (modeKey) {
+        if (modeKey && !isModeDisabled(modeKey)) {
           setModeSelection(modeKey, { expand: true });
         }
       };
 
       item.addEventListener('click', event => {
+        if (itemDisabled) {
+          event.preventDefault();
+          return;
+        }
         if (event.target && event.target.matches('input[type="radio"]')) {
           return;
         }
@@ -1409,7 +1546,7 @@
         }
       });
 
-      if (radio) {
+      if (radio && !itemDisabled) {
         radio.addEventListener('change', () => {
           if (radio.checked) {
             openItem();
@@ -1421,8 +1558,10 @@
     if (MODE_SELECT) {
       MODE_SELECT.addEventListener('change', () => {
         const value = MODE_SELECT.value;
-        if (value) {
+        if (value && !isModeDisabled(value)) {
           setModeSelection(value, { expand: true });
+        } else if (value && isModeDisabled(value)) {
+          setModeSelection('', { expand: false });
         } else {
           setModeSelection('', { expand: false });
         }
@@ -2433,13 +2572,23 @@
         }
       }
 
-      if (!modeLabel) {
-        alert('Please choose whether you would like a mobile mechanic or to drop the vehicle at the garage.');
+      if (!modeKey) {
+        modeKey = MODE_SELECT?.value || '';
+        if (modeKey && !modeLabel) {
+          const selectedOption = MODE_SELECT?.selectedOptions?.[0];
+          if (selectedOption) {
+            modeLabel = selectedOption.dataset.label || selectedOption.textContent?.trim() || modeKey;
+          }
+        }
+      }
+
+      if (!modeKey || isModeDisabled(modeKey)) {
+        alert('Our mobile service is temporarily unavailable. Please select the garage drop-off option.');
         return;
       }
 
-      if (!modeKey) {
-        modeKey = MODE_SELECT?.value || '';
+      if (!modeLabel) {
+        modeLabel = modeKey === 'garage' ? 'Garage drop-off service' : modeKey;
       }
 
       refreshDateLimits();

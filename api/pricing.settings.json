@@ -1,0 +1,31 @@
+{
+  "scrapRatePerTonneGBP": 160,
+  "bodyTypeRateAdjustments": {
+    "van": 1,
+    "estate": 1,
+    "suv": 1,
+    "mpv": 1,
+    "4x4": 1,
+    "saloon": 1,
+    "hatchback": 1,
+    "other": 1
+  },
+  "partsBufferTableGBP": {
+    "low": 50,
+    "medium": 100,
+    "high": 150
+  },
+  "defaultPartsPopularity": "medium",
+  "collectionFeeGBP": 0,
+  "processingReserveGBP": 30,
+  "roundingStepGBP": 25,
+  "minimumMarginGBP": 75,
+  "conditionFactor": 0.95,
+  "expectedMilesPerYear": 12000,
+  "resaleRetailTypicalGBP": {
+    "car": 12000,
+    "van": 10000
+  },
+  "applyCatalystUplift": false,
+  "catalystUpliftGBP": 0
+}

@@ -234,6 +234,183 @@
       flex-direction: column;
       gap: 40px;
     }
+    .quote-section {
+      display: flex;
+      flex-direction: column;
+      gap: 26px;
+    }
+    .quote-card {
+      padding: 30px 32px;
+      border-radius: 28px;
+      background: linear-gradient(155deg, rgba(255, 255, 255, 0.08), rgba(8, 12, 18, 0.92));
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      box-shadow: 0 32px 62px rgba(0, 0, 0, 0.32);
+    }
+    .quote-card__title {
+      margin: 0 0 12px;
+      font-size: 2.15rem;
+      letter-spacing: 0.015em;
+    }
+    .quote-card__lead {
+      margin: 0 0 24px;
+      color: rgba(244, 245, 247, 0.86);
+    }
+    .quote-form {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 18px;
+      align-items: end;
+    }
+    .quote-form .form-field {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .quote-form button[type="submit"] {
+      justify-self: flex-start;
+      min-width: 180px;
+    }
+    .quote-message {
+      margin-top: 14px;
+      font-weight: 600;
+      color: #ffb9b9;
+    }
+    .quote-tiles {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 22px;
+    }
+    .quote-tile {
+      position: relative;
+      border-radius: 26px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: linear-gradient(160deg, rgba(0, 0, 0, 0.65), rgba(11, 14, 20, 0.92));
+      padding: 26px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      box-shadow: 0 28px 58px rgba(0, 0, 0, 0.3);
+    }
+    .quote-tile__header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 20px;
+    }
+    .quote-tile__header h3 {
+      margin: 0;
+      font-size: 1.55rem;
+    }
+    .quote-tile__caption {
+      margin: 4px 0 0;
+      color: rgba(244, 245, 247, 0.7);
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+    .quote-price {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 6px;
+    }
+    .quote-price strong {
+      font-size: 2rem;
+      letter-spacing: 0.01em;
+    }
+    .quote-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-weight: 800;
+      background: var(--orange-soft);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.22);
+    }
+    .quote-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .quote-cta {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px 18px;
+      border-radius: 14px;
+      background: var(--orange);
+      color: #fff;
+      font-weight: 700;
+      text-decoration: none;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .quote-cta:hover,
+    .quote-cta:focus-visible {
+      transform: translateY(-1px);
+      box-shadow: 0 18px 34px rgba(255, 123, 44, 0.24);
+    }
+    .quote-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      background: rgba(0, 0, 0, 0.5);
+      color: rgba(244, 245, 247, 0.9);
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .quote-toggle:hover,
+    .quote-toggle:focus-visible {
+      border-color: var(--orange);
+      color: #fff;
+    }
+    .quote-breakdown {
+      border-top: 1px solid rgba(255, 255, 255, 0.12);
+      padding-top: 18px;
+    }
+    .quote-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      gap: 12px;
+    }
+    .quote-list li {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: flex-start;
+      color: rgba(244, 245, 247, 0.82);
+    }
+    .quote-list span {
+      font-weight: 600;
+    }
+    .quote-note {
+      margin: 14px 0 0;
+      font-size: 0.9rem;
+      color: rgba(244, 245, 247, 0.72);
+    }
+    .quote-empty {
+      margin: 0;
+      color: rgba(244, 245, 247, 0.7);
+      font-weight: 600;
+    }
+    .quote-section.is-loading .quote-cta,
+    .quote-section.is-loading .quote-toggle {
+      pointer-events: none;
+      opacity: 0.7;
+    }
+    .quote-section.is-loading .quote-toggle::after {
+      content: '…';
+    }
     .modes-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -740,6 +917,21 @@
       .card {
         padding: 26px;
       }
+      .quote-card {
+        padding: 26px;
+      }
+      .quote-form {
+        grid-template-columns: 1fr;
+      }
+      .quote-form button[type="submit"] {
+        width: 100%;
+      }
+      .quote-tiles {
+        grid-template-columns: 1fr;
+      }
+      .quote-price strong {
+        font-size: 1.7rem;
+      }
       .service-item,
       .mode-item {
         padding: 20px;
@@ -832,6 +1024,84 @@
   </section>
 
   <main class="container main-content">
+    <section class="quote-section" aria-labelledby="quoteHeading">
+      <div class="quote-card">
+        <h2 id="quoteHeading" class="quote-card__title">Get indicative scrap &amp; trade offers</h2>
+        <p class="quote-card__lead">Use your registration and mileage to see today&#8217;s guide prices. Quotes update instantly based on our latest yard rates and parts demand.</p>
+        <form id="quoteForm" class="quote-form" novalidate>
+          <div class="form-field">
+            <label for="quoteReg">Registration</label>
+            <input id="quoteReg" name="reg" placeholder="e.g. NU10 HXC" maxlength="9" autocomplete="off" required>
+          </div>
+          <div class="form-field">
+            <label for="quoteMileage">Mileage</label>
+            <input id="quoteMileage" name="mileage" type="number" min="0" step="100" placeholder="Current mileage" required>
+          </div>
+          <button id="quoteSubmit" type="submit" disabled>Get quote</button>
+        </form>
+        <p id="quoteMessage" class="quote-message hidden"></p>
+      </div>
+      <div class="quote-tiles" role="list">
+        <article class="quote-tile" data-kind="scrap" role="listitem">
+          <div class="quote-tile__header">
+            <div>
+              <h3>Scrap my car</h3>
+              <p class="quote-tile__caption">Best for end-of-life vehicles</p>
+            </div>
+            <div class="quote-price">
+              <strong id="scrapPriceValue">£—</strong>
+              <span class="quote-badge">Indicative offer</span>
+            </div>
+          </div>
+          <p class="quote-empty" id="scrapPlaceholder">Enter your reg and mileage to see today&#8217;s guide price.</p>
+          <div class="quote-actions">
+            <a id="scrapCta" class="quote-cta" href="/enquire?type=scrap" aria-disabled="true" tabindex="-1">Start scrap enquiry</a>
+            <button type="button" class="quote-toggle" id="scrapToggle" aria-expanded="false" aria-controls="scrapBreakdown">View breakdown</button>
+          </div>
+          <div id="scrapBreakdown" class="quote-breakdown" hidden>
+            <ul class="quote-list">
+              <li><span>Estimated weight</span><strong id="scrapWeight">–</strong></li>
+              <li><span>Rate applied</span><strong id="scrapRate">–</strong></li>
+              <li><span>Parts buffer</span><strong id="scrapParts">–</strong></li>
+              <li id="scrapCatalystRow"><span>Catalyst uplift</span><strong id="scrapCatalyst">–</strong></li>
+              <li id="scrapCollectionRow"><span>Collection fee</span><strong id="scrapCollection">–</strong></li>
+              <li id="scrapProcessingRow"><span>Processing reserve</span><strong id="scrapProcessing">–</strong></li>
+            </ul>
+            <p class="quote-note" id="scrapPopularityNote"></p>
+          </div>
+        </article>
+        <article class="quote-tile" data-kind="retail" role="listitem">
+          <div class="quote-tile__header">
+            <div>
+              <h3>Sell my car</h3>
+              <p class="quote-tile__caption">Retail-ready trade-in offer</p>
+            </div>
+            <div class="quote-price">
+              <strong id="retailPriceValue">£—</strong>
+              <span class="quote-badge">Indicative offer</span>
+            </div>
+          </div>
+          <p class="quote-empty" id="retailPlaceholder">Get an estimate that keeps margin for prep and parts.</p>
+          <div class="quote-actions">
+            <a id="retailCta" class="quote-cta" href="/enquire?type=retail" aria-disabled="true" tabindex="-1">Start retail enquiry</a>
+            <button type="button" class="quote-toggle" id="retailToggle" aria-expanded="false" aria-controls="retailBreakdown">View breakdown</button>
+          </div>
+          <div id="retailBreakdown" class="quote-breakdown" hidden>
+            <ul class="quote-list">
+              <li><span>Estimated weight</span><strong id="retailWeight">–</strong></li>
+              <li><span>Rate reference</span><strong id="retailRate">–</strong></li>
+              <li><span>Vehicle age</span><strong id="retailAge">–</strong></li>
+              <li><span>Expected mileage</span><strong id="retailExpected">–</strong></li>
+              <li><span>Mileage penalty</span><strong id="retailPenalty">–</strong></li>
+              <li><span>Condition factor</span><strong id="retailCondition">–</strong></li>
+              <li><span>Margin over scrap</span><strong id="retailMargin">–</strong></li>
+            </ul>
+            <p class="quote-note" id="retailConfidenceNote"></p>
+          </div>
+        </article>
+      </div>
+    </section>
+
     <div class="modes-grid">
       <div class="mode-card mode-card--disabled" aria-disabled="true">
         <h3>Mobile service</h3>
@@ -1043,6 +1313,46 @@
     const DVLA_FALLBACK_KEY = 'ZQHFV22Ym6ao1CfyyqEol2oxzpoWQM2w59rAkPro';
     const VEHICLE_NOT_FOUND_MESSAGE = 'We are unable to find your vehicle, please check you have entered the reg correctly.';
     const GARAGE_ADDRESS_TEXT = 'Unit 5, Wingate Grange Industrial Estate, TS28 5AH';
+    const QUOTE_API_URL = '/api/quote';
+    const QUOTE_SECTION = document.querySelector('.quote-section');
+    const QUOTE_FORM = document.getElementById('quoteForm');
+    const QUOTE_REG_INPUT = document.getElementById('quoteReg');
+    const QUOTE_MILEAGE_INPUT = document.getElementById('quoteMileage');
+    const QUOTE_SUBMIT = document.getElementById('quoteSubmit');
+    const QUOTE_MESSAGE = document.getElementById('quoteMessage');
+    const SCRAP_ELEMENTS = {
+      price: document.getElementById('scrapPriceValue'),
+      placeholder: document.getElementById('scrapPlaceholder'),
+      cta: document.getElementById('scrapCta'),
+      breakdown: document.getElementById('scrapBreakdown'),
+      weight: document.getElementById('scrapWeight'),
+      rate: document.getElementById('scrapRate'),
+      parts: document.getElementById('scrapParts'),
+      catalystRow: document.getElementById('scrapCatalystRow'),
+      catalyst: document.getElementById('scrapCatalyst'),
+      collectionRow: document.getElementById('scrapCollectionRow'),
+      collection: document.getElementById('scrapCollection'),
+      processingRow: document.getElementById('scrapProcessingRow'),
+      processing: document.getElementById('scrapProcessing'),
+      popularityNote: document.getElementById('scrapPopularityNote')
+    };
+    const RETAIL_ELEMENTS = {
+      price: document.getElementById('retailPriceValue'),
+      placeholder: document.getElementById('retailPlaceholder'),
+      cta: document.getElementById('retailCta'),
+      breakdown: document.getElementById('retailBreakdown'),
+      weight: document.getElementById('retailWeight'),
+      rate: document.getElementById('retailRate'),
+      age: document.getElementById('retailAge'),
+      expected: document.getElementById('retailExpected'),
+      penalty: document.getElementById('retailPenalty'),
+      condition: document.getElementById('retailCondition'),
+      margin: document.getElementById('retailMargin'),
+      confidenceNote: document.getElementById('retailConfidenceNote')
+    };
+    const QUOTE_TOGGLES = Array.from(document.querySelectorAll('.quote-toggle'));
+    let lastQuoteResult = null;
+    let quoteIsLoading = false;
     const SERVICES_CARD = document.getElementById('servicesCard');
     const SERVICES_MESSAGE = document.getElementById('servicesMessage');
     const SERVICE_SEARCH_WRAPPER = document.getElementById('serviceSearchWrapper');
@@ -1066,6 +1376,370 @@
       return map;
     }, {});
     const DISABLED_MODES = new Set(['mobile']);
+
+    function normaliseQuoteReg(value = '') {
+      return (value || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+    }
+
+    function isQuoteRegValid(value) {
+      return normaliseQuoteReg(value).length >= 5;
+    }
+
+    function isMileageValid(value) {
+      const numeric = Number(value);
+      return Number.isFinite(numeric) && numeric >= 0;
+    }
+
+    function formatCurrencyGBP(value) {
+      const numeric = Number(value);
+      if (!Number.isFinite(numeric)) return '£—';
+      return `£${Math.round(numeric).toLocaleString('en-GB')}`;
+    }
+
+    function formatRatePerTonne(value) {
+      const numeric = Number(value);
+      if (!Number.isFinite(numeric)) return '£— per tonne';
+      return `${formatCurrencyGBP(numeric)} per tonne`;
+    }
+
+    function formatKg(value) {
+      const numeric = Number(value);
+      if (!Number.isFinite(numeric)) return '–';
+      return `${Math.round(numeric).toLocaleString('en-GB')} kg`;
+    }
+
+    function formatMiles(value) {
+      const numeric = Number(value);
+      if (!Number.isFinite(numeric)) return '–';
+      return `${Math.round(numeric).toLocaleString('en-GB')} miles`;
+    }
+
+    function formatPenalty(value) {
+      const numeric = Number(value);
+      if (!Number.isFinite(numeric) || numeric <= 0) return '0%';
+      return `${Math.round(numeric * 100)}%`;
+    }
+
+    function formatCondition(value) {
+      const numeric = Number(value);
+      if (!Number.isFinite(numeric)) return '—';
+      return numeric.toFixed(2);
+    }
+
+    const BUCKET_LABELS = {
+      van: 'Van',
+      estate: 'Estate',
+      suv: 'SUV',
+      mpv: 'MPV',
+      '4x4': '4x4',
+      saloon: 'Saloon',
+      hatchback: 'Hatchback',
+      other: 'Other vehicle'
+    };
+
+    const POPULARITY_LABELS = {
+      low: 'Low',
+      medium: 'Medium',
+      high: 'High'
+    };
+
+    function describeBucket(bucket) {
+      if (!bucket) return 'Vehicle';
+      return BUCKET_LABELS[bucket] || (bucket.charAt(0).toUpperCase() + bucket.slice(1));
+    }
+
+    function describePopularity(tier) {
+      if (!tier) return 'Standard';
+      return POPULARITY_LABELS[tier] || (tier.charAt(0).toUpperCase() + tier.slice(1));
+    }
+
+    function setQuoteMessage(message) {
+      if (!QUOTE_MESSAGE) return;
+      if (!message) {
+        QUOTE_MESSAGE.textContent = '';
+        QUOTE_MESSAGE.classList.add('hidden');
+      } else {
+        QUOTE_MESSAGE.textContent = message;
+        QUOTE_MESSAGE.classList.remove('hidden');
+      }
+    }
+
+    function isQuoteFormValid() {
+      if (!QUOTE_REG_INPUT || !QUOTE_MILEAGE_INPUT) return false;
+      return isQuoteRegValid(QUOTE_REG_INPUT.value) && isMileageValid(QUOTE_MILEAGE_INPUT.value);
+    }
+
+    function updateQuoteSubmitState() {
+      if (!QUOTE_SUBMIT) return;
+      QUOTE_SUBMIT.disabled = quoteIsLoading || !isQuoteFormValid();
+    }
+
+    function setQuoteLoadingState(isLoading) {
+      quoteIsLoading = Boolean(isLoading);
+      if (QUOTE_SECTION) {
+        QUOTE_SECTION.classList.toggle('is-loading', quoteIsLoading);
+      }
+      if (QUOTE_SUBMIT) {
+        QUOTE_SUBMIT.textContent = quoteIsLoading ? 'Calculating…' : 'Get quote';
+      }
+      updateQuoteSubmitState();
+    }
+
+    function collapseQuotePanels() {
+      QUOTE_TOGGLES.forEach(button => {
+        if (!button) return;
+        button.setAttribute('aria-expanded', 'false');
+        const target = document.getElementById(button.getAttribute('aria-controls'));
+        if (target) {
+          target.hidden = true;
+        }
+      });
+    }
+
+    function ensureCtaPrepared(anchor) {
+      if (!anchor) return;
+      if (!anchor.dataset.baseHref) {
+        anchor.dataset.baseHref = anchor.getAttribute('href') || '#';
+      }
+      anchor.addEventListener('click', event => {
+        if (anchor.getAttribute('aria-disabled') === 'true') {
+          event.preventDefault();
+        }
+      });
+    }
+
+    function setCtaState(anchor, enabled, href) {
+      if (!anchor) return;
+      anchor.setAttribute('aria-disabled', enabled ? 'false' : 'true');
+      anchor.tabIndex = enabled ? 0 : -1;
+      if (enabled && href) {
+        anchor.href = href;
+      } else if (anchor.dataset.baseHref) {
+        anchor.href = anchor.dataset.baseHref;
+      }
+    }
+
+    function buildCtaHref(baseHref, params) {
+      if (!baseHref) return '#';
+      try {
+        const url = new URL(baseHref, window.location.origin);
+        Object.entries(params || {}).forEach(([key, value]) => {
+          if (value !== undefined && value !== null && value !== '') {
+            url.searchParams.set(key, value);
+          }
+        });
+        return `${url.pathname}${url.search}`;
+      } catch (error) {
+        return baseHref;
+      }
+    }
+
+    function setRowValue(rowEl, valueEl, rawValue, formatter = formatCurrencyGBP) {
+      if (!rowEl || !valueEl) return;
+      const numeric = Number(rawValue);
+      if (Number.isFinite(numeric) && numeric > 0) {
+        rowEl.hidden = false;
+        valueEl.textContent = formatter(numeric);
+      } else {
+        rowEl.hidden = true;
+        valueEl.textContent = formatter(0);
+      }
+    }
+
+    function resetQuoteTiles() {
+      lastQuoteResult = null;
+      if (SCRAP_ELEMENTS.price) SCRAP_ELEMENTS.price.textContent = '£—';
+      if (SCRAP_ELEMENTS.placeholder) SCRAP_ELEMENTS.placeholder.classList.remove('hidden');
+      if (SCRAP_ELEMENTS.weight) SCRAP_ELEMENTS.weight.textContent = '–';
+      if (SCRAP_ELEMENTS.rate) SCRAP_ELEMENTS.rate.textContent = '–';
+      if (SCRAP_ELEMENTS.parts) SCRAP_ELEMENTS.parts.textContent = '–';
+      if (SCRAP_ELEMENTS.catalystRow) SCRAP_ELEMENTS.catalystRow.hidden = true;
+      if (SCRAP_ELEMENTS.collectionRow) SCRAP_ELEMENTS.collectionRow.hidden = true;
+      if (SCRAP_ELEMENTS.processingRow) SCRAP_ELEMENTS.processingRow.hidden = true;
+      if (SCRAP_ELEMENTS.popularityNote) SCRAP_ELEMENTS.popularityNote.textContent = '';
+
+      if (RETAIL_ELEMENTS.price) RETAIL_ELEMENTS.price.textContent = '£—';
+      if (RETAIL_ELEMENTS.placeholder) RETAIL_ELEMENTS.placeholder.classList.remove('hidden');
+      if (RETAIL_ELEMENTS.weight) RETAIL_ELEMENTS.weight.textContent = '–';
+      if (RETAIL_ELEMENTS.rate) RETAIL_ELEMENTS.rate.textContent = '–';
+      if (RETAIL_ELEMENTS.age) RETAIL_ELEMENTS.age.textContent = '–';
+      if (RETAIL_ELEMENTS.expected) RETAIL_ELEMENTS.expected.textContent = '–';
+      if (RETAIL_ELEMENTS.penalty) RETAIL_ELEMENTS.penalty.textContent = '0%';
+      if (RETAIL_ELEMENTS.condition) RETAIL_ELEMENTS.condition.textContent = '—';
+      if (RETAIL_ELEMENTS.margin) RETAIL_ELEMENTS.margin.textContent = '£—';
+      if (RETAIL_ELEMENTS.confidenceNote) RETAIL_ELEMENTS.confidenceNote.textContent = '';
+
+      setCtaState(SCRAP_ELEMENTS.cta, false);
+      setCtaState(RETAIL_ELEMENTS.cta, false);
+      collapseQuotePanels();
+    }
+
+    function updateScrapTile(result) {
+      const breakdown = result.breakdown || {};
+      if (SCRAP_ELEMENTS.price) SCRAP_ELEMENTS.price.textContent = formatCurrencyGBP(result.scrapPriceGBP);
+      if (SCRAP_ELEMENTS.placeholder) SCRAP_ELEMENTS.placeholder.classList.add('hidden');
+      if (SCRAP_ELEMENTS.weight) SCRAP_ELEMENTS.weight.textContent = formatKg(breakdown.estimatedWeightKg);
+      if (SCRAP_ELEMENTS.rate) SCRAP_ELEMENTS.rate.textContent = formatRatePerTonne(breakdown.ratePerTonneApplied);
+      if (SCRAP_ELEMENTS.parts) SCRAP_ELEMENTS.parts.textContent = formatCurrencyGBP(breakdown.partsBufferApplied);
+      setRowValue(SCRAP_ELEMENTS.catalystRow, SCRAP_ELEMENTS.catalyst, breakdown.catalystAppliedGBP);
+      setRowValue(SCRAP_ELEMENTS.collectionRow, SCRAP_ELEMENTS.collection, breakdown.collectionFeeGBP);
+      setRowValue(SCRAP_ELEMENTS.processingRow, SCRAP_ELEMENTS.processing, breakdown.processingReserveGBP);
+      if (SCRAP_ELEMENTS.popularityNote) {
+        const bucketLabel = describeBucket(breakdown.bodyTypeBucket);
+        const tierLabel = describePopularity(breakdown.popularityTier);
+        const buffer = formatCurrencyGBP(breakdown.partsBufferApplied);
+        SCRAP_ELEMENTS.popularityNote.textContent = `Body type bucket: ${bucketLabel}. Parts demand tier: ${tierLabel} (buffer ${buffer}).`;
+      }
+    }
+
+    function updateRetailTile(result) {
+      const breakdown = result.breakdown || {};
+      if (RETAIL_ELEMENTS.price) RETAIL_ELEMENTS.price.textContent = formatCurrencyGBP(result.resalePriceGBP);
+      if (RETAIL_ELEMENTS.placeholder) RETAIL_ELEMENTS.placeholder.classList.add('hidden');
+      if (RETAIL_ELEMENTS.weight) RETAIL_ELEMENTS.weight.textContent = formatKg(breakdown.estimatedWeightKg);
+      if (RETAIL_ELEMENTS.rate) RETAIL_ELEMENTS.rate.textContent = formatRatePerTonne(breakdown.ratePerTonneApplied);
+      if (RETAIL_ELEMENTS.age) {
+        const age = Math.max(0, Math.round(Number(breakdown.ageYears || 0)));
+        RETAIL_ELEMENTS.age.textContent = `${age} year${age === 1 ? '' : 's'}`;
+      }
+      if (RETAIL_ELEMENTS.expected) RETAIL_ELEMENTS.expected.textContent = formatMiles(breakdown.expectedMileageForAge);
+      if (RETAIL_ELEMENTS.penalty) RETAIL_ELEMENTS.penalty.textContent = formatPenalty(breakdown.mileagePenaltyApplied);
+      if (RETAIL_ELEMENTS.condition) RETAIL_ELEMENTS.condition.textContent = formatCondition(breakdown.conditionFactorApplied);
+      if (RETAIL_ELEMENTS.margin) {
+        const margin = Number(result.resalePriceGBP) - Number(result.scrapPriceGBP);
+        RETAIL_ELEMENTS.margin.textContent = formatCurrencyGBP(margin);
+      }
+      if (RETAIL_ELEMENTS.confidenceNote) {
+        const minMargin = formatCurrencyGBP(breakdown.minimumMarginGBP);
+        RETAIL_ELEMENTS.confidenceNote.textContent = `Ensures at least ${minMargin} over scrap after rounding. Confidence: medium.`;
+      }
+    }
+
+    function applyQuoteResult(result) {
+      if (!result || !result.breakdown) return;
+      lastQuoteResult = result;
+      updateScrapTile(result);
+      updateRetailTile(result);
+      const reg = result.reg ? normaliseQuoteReg(result.reg) : '';
+      const mileage = Math.max(0, Math.round(Number(result.mileage || 0)));
+      if (SCRAP_ELEMENTS.cta) {
+        const href = buildCtaHref(SCRAP_ELEMENTS.cta.dataset.baseHref || '/enquire?type=scrap', {
+          type: 'scrap',
+          reg,
+          mileage
+        });
+        setCtaState(SCRAP_ELEMENTS.cta, true, href);
+      }
+      if (RETAIL_ELEMENTS.cta) {
+        const href = buildCtaHref(RETAIL_ELEMENTS.cta.dataset.baseHref || '/enquire?type=retail', {
+          type: 'retail',
+          reg,
+          mileage
+        });
+        setCtaState(RETAIL_ELEMENTS.cta, true, href);
+      }
+    }
+
+    function getQuoteFormValues() {
+      const reg = QUOTE_REG_INPUT ? normaliseQuoteReg(QUOTE_REG_INPUT.value) : '';
+      const mileage = QUOTE_MILEAGE_INPUT ? Number(QUOTE_MILEAGE_INPUT.value) : NaN;
+      return { reg, mileage };
+    }
+
+    function toggleQuotePanel(button) {
+      const targetId = button.getAttribute('aria-controls');
+      const target = document.getElementById(targetId);
+      if (!target) return;
+      const expanded = button.getAttribute('aria-expanded') === 'true';
+      button.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+      target.hidden = expanded;
+    }
+
+    async function submitQuoteRequest(event) {
+      event.preventDefault();
+      if (quoteIsLoading) return;
+      if (!QUOTE_FORM) return;
+
+      const { reg, mileage } = getQuoteFormValues();
+
+      if (!reg || reg.length < 5) {
+        setQuoteMessage('Please enter a valid registration (at least 5 characters).');
+        return;
+      }
+
+      if (!Number.isFinite(mileage) || mileage < 0) {
+        setQuoteMessage('Mileage must be a non-negative number.');
+        return;
+      }
+
+      setQuoteMessage('');
+      setQuoteLoadingState(true);
+
+      try {
+        const response = await fetch(QUOTE_API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ reg, mileage }),
+          cache: 'no-store'
+        });
+
+        let data = null;
+        try {
+          data = await response.json();
+        } catch (parseError) {
+          data = null;
+        }
+
+        if (!response.ok) {
+          const message = (data && data.error) || 'Unable to calculate a quote right now.';
+          const error = new Error(message);
+          error.status = response.status;
+          throw error;
+        }
+
+        applyQuoteResult(data);
+        setQuoteMessage('');
+      } catch (error) {
+        resetQuoteTiles();
+        if (error && (error.status === 400 || error.status === 404)) {
+          setQuoteMessage(error.message || 'Please check the details and try again.');
+        } else {
+          setQuoteMessage('We couldn’t calculate a quote just now. Please try again shortly.');
+        }
+      } finally {
+        setQuoteLoadingState(false);
+      }
+    }
+
+    ensureCtaPrepared(SCRAP_ELEMENTS.cta);
+    ensureCtaPrepared(RETAIL_ELEMENTS.cta);
+    resetQuoteTiles();
+
+    if (QUOTE_FORM) {
+      QUOTE_FORM.addEventListener('submit', submitQuoteRequest);
+    }
+
+    if (QUOTE_REG_INPUT) {
+      QUOTE_REG_INPUT.addEventListener('input', () => {
+        QUOTE_REG_INPUT.value = QUOTE_REG_INPUT.value.toUpperCase();
+        setQuoteMessage('');
+        updateQuoteSubmitState();
+      });
+    }
+
+    if (QUOTE_MILEAGE_INPUT) {
+      QUOTE_MILEAGE_INPUT.addEventListener('input', () => {
+        setQuoteMessage('');
+        updateQuoteSubmitState();
+      });
+    }
+
+    QUOTE_TOGGLES.forEach(button => {
+      if (!button) return;
+      button.addEventListener('click', () => toggleQuotePanel(button));
+    });
+
+    updateQuoteSubmitState();
 
     function isModeDisabled(modeKey = '') {
       if (!modeKey) {

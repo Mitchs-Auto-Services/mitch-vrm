@@ -1,0 +1,636 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Mitch’s Auto Services – Pricing Admin</title>
+  <style>
+    :root {
+      color-scheme: dark;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+      background: radial-gradient(circle at top, #1e242d 0%, #0b0f14 45%, #050608 100%);
+      color: #f5f6f8;
+      min-height: 100vh;
+    }
+    a { color: inherit; }
+    .container {
+      width: min(1040px, calc(100% - 48px));
+      margin: 0 auto;
+      padding: 48px 0 64px;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+    header h1 {
+      margin: 0 0 6px;
+      font-size: 2.1rem;
+      letter-spacing: 0.02em;
+    }
+    header p {
+      margin: 0;
+      color: rgba(245, 246, 248, 0.78);
+      line-height: 1.6;
+    }
+    .card {
+      background: linear-gradient(155deg, rgba(255, 255, 255, 0.08), rgba(9, 13, 18, 0.92));
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 24px;
+      padding: 26px 28px;
+      box-shadow: 0 28px 64px rgba(0, 0, 0, 0.32);
+      display: grid;
+      gap: 20px;
+    }
+    .card h2 {
+      margin: 0;
+      font-size: 1.6rem;
+    }
+    .field-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 18px;
+    }
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    label {
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+    input, select {
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      background: rgba(8, 12, 17, 0.85);
+      color: #f5f6f8;
+      font-size: 1rem;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    }
+    input:focus, select:focus {
+      outline: none;
+      border-color: #ff7b2c;
+      box-shadow: 0 0 0 3px rgba(255, 123, 44, 0.28);
+    }
+    .hint {
+      font-size: 0.9rem;
+      color: rgba(245, 246, 248, 0.68);
+    }
+    .status {
+      padding: 14px 16px;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      font-weight: 600;
+    }
+    .status.hidden {
+      display: none;
+    }
+    .status--error {
+      background: rgba(239, 68, 68, 0.18);
+      border-color: rgba(239, 68, 68, 0.55);
+      color: #ffd7d7;
+    }
+    .status--success {
+      background: rgba(46, 204, 113, 0.18);
+      border-color: rgba(46, 204, 113, 0.48);
+      color: #d4ffdf;
+    }
+    .button-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    button {
+      padding: 12px 18px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      background: #ff7b2c;
+      color: #fff;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    button.secondary {
+      background: rgba(0, 0, 0, 0.5);
+    }
+    button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 16px 32px rgba(255, 123, 44, 0.25);
+    }
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+    .section-note {
+      font-weight: 600;
+      color: rgba(245, 246, 248, 0.8);
+    }
+    .body-type-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 14px;
+    }
+    .body-type-grid .field label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .toggle-row input[type="checkbox"] {
+      width: auto;
+      height: auto;
+      transform: scale(1.2);
+    }
+    @media (max-width: 720px) {
+      .container {
+        width: calc(100% - 32px);
+        padding: 36px 0 48px;
+      }
+      .card {
+        padding: 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="container">
+    <header>
+      <h1>Pricing controls</h1>
+      <p>Adjust the weekly scrap and retail offer inputs so quotes reflect current UK yard rates and your parts margins.</p>
+      <p class="hint">Suggested review: once per week.</p>
+      <p class="hint" id="lastUpdatedValue">Last updated: —</p>
+    </header>
+
+    <div id="statusMessage" class="status hidden"></div>
+
+    <form id="pricingForm">
+      <section class="card">
+        <h2>Scrap fundamentals</h2>
+        <div class="field-grid">
+          <div class="field">
+            <label for="scrapRatePerTonne">Scrap rate per tonne (GBP)</label>
+            <input id="scrapRatePerTonne" type="number" step="5" min="0" required>
+            <p class="hint">Base offer before body-type multipliers.</p>
+          </div>
+          <div class="field">
+            <label for="collectionFee">Collection fee (GBP)</label>
+            <input id="collectionFee" type="number" step="5" min="0">
+            <p class="hint">Deducted for long-distance collections.</p>
+          </div>
+          <div class="field">
+            <label for="processingReserve">Processing reserve (GBP)</label>
+            <input id="processingReserve" type="number" step="5" min="0">
+            <p class="hint">Covers fluids, tyres and admin.</p>
+          </div>
+          <div class="field">
+            <label for="roundingStep">Rounding step (GBP)</label>
+            <input id="roundingStep" type="number" step="5" min="1">
+            <p class="hint">Quotes round to this nearest value.</p>
+          </div>
+        </div>
+        <div class="field-grid">
+          <div class="field">
+            <label for="minimumMargin">Minimum retail margin (GBP)</label>
+            <input id="minimumMargin" type="number" step="5" min="0">
+            <p class="hint">Retail offers stay at least this much above scrap.</p>
+          </div>
+          <div class="field">
+            <label for="conditionFactor">Condition factor</label>
+            <input id="conditionFactor" type="number" step="0.01" min="0.8" max="1.05">
+            <p class="hint">Applied to retail offers to allow for prep.</p>
+          </div>
+          <div class="field">
+            <label for="expectedMiles">Expected miles per year</label>
+            <input id="expectedMiles" type="number" step="500" min="1000">
+            <p class="hint">Used to calculate mileage penalties.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Body-type multipliers</h2>
+        <p class="section-note">Keep between 0.8 and 1.2 to stay close to market reality.</p>
+        <div class="body-type-grid">
+          <div class="field"><label for="multVan">Van <input id="multVan" type="number" step="0.01" min="0.5" max="1.5"></label></div>
+          <div class="field"><label for="multEstate">Estate <input id="multEstate" type="number" step="0.01" min="0.5" max="1.5"></label></div>
+          <div class="field"><label for="multSUV">SUV <input id="multSUV" type="number" step="0.01" min="0.5" max="1.5"></label></div>
+          <div class="field"><label for="multMPV">MPV <input id="multMPV" type="number" step="0.01" min="0.5" max="1.5"></label></div>
+          <div class="field"><label for="mult4x4">4x4 <input id="mult4x4" type="number" step="0.01" min="0.5" max="1.5"></label></div>
+          <div class="field"><label for="multSaloon">Saloon <input id="multSaloon" type="number" step="0.01" min="0.5" max="1.5"></label></div>
+          <div class="field"><label for="multHatch">Hatchback <input id="multHatch" type="number" step="0.01" min="0.5" max="1.5"></label></div>
+          <div class="field"><label for="multOther">Other <input id="multOther" type="number" step="0.01" min="0.5" max="1.5"></label></div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Parts buffers & popularity</h2>
+        <div class="field-grid">
+          <div class="field">
+            <label for="bufferLow">Low demand buffer (GBP)</label>
+            <input id="bufferLow" type="number" step="5" min="0">
+          </div>
+          <div class="field">
+            <label for="bufferMedium">Medium demand buffer (GBP)</label>
+            <input id="bufferMedium" type="number" step="5" min="0">
+          </div>
+          <div class="field">
+            <label for="bufferHigh">High demand buffer (GBP)</label>
+            <input id="bufferHigh" type="number" step="5" min="0">
+          </div>
+          <div class="field">
+            <label for="defaultPopularity">Default parts popularity</label>
+            <select id="defaultPopularity">
+              <option value="low">Low</option>
+              <option value="medium">Medium</option>
+              <option value="high">High</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>Retail reference values</h2>
+        <div class="field-grid">
+          <div class="field">
+            <label for="retailCar">Typical retail (car)</label>
+            <input id="retailCar" type="number" step="100" min="0">
+          </div>
+          <div class="field">
+            <label for="retailVan">Typical retail (van)</label>
+            <input id="retailVan" type="number" step="100" min="0">
+          </div>
+        </div>
+        <div class="toggle-row">
+          <input id="applyCatalyst" type="checkbox">
+          <label for="applyCatalyst">Apply catalyst uplift for post-2001 petrol vehicles</label>
+        </div>
+        <div class="field" style="max-width:280px;">
+          <label for="catalystUplift">Catalyst uplift (GBP)</label>
+          <input id="catalystUplift" type="number" step="5" min="0">
+        </div>
+      </section>
+
+      <div class="button-row">
+        <button type="submit">Save settings</button>
+        <button type="button" class="secondary" id="resetDefaults">Reset to defaults</button>
+      </div>
+    </form>
+
+    <section class="card">
+      <h2>Export logs</h2>
+      <p>Download CSV logs for quotes and realised revenue to compare buy-in versus scrap returns.</p>
+      <div class="button-row">
+        <button type="button" class="secondary" id="downloadQuotes">Download quotes CSV</button>
+        <button type="button" class="secondary" id="downloadRealisations">Download realisations CSV</button>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const DEFAULT_SETTINGS = {
+      scrapRatePerTonneGBP: 160,
+      bodyTypeRateAdjustments: {
+        van: 1,
+        estate: 1,
+        suv: 1,
+        mpv: 1,
+        '4x4': 1,
+        saloon: 1,
+        hatchback: 1,
+        other: 1
+      },
+      partsBufferTableGBP: {
+        low: 50,
+        medium: 100,
+        high: 150
+      },
+      defaultPartsPopularity: 'medium',
+      collectionFeeGBP: 0,
+      processingReserveGBP: 30,
+      roundingStepGBP: 25,
+      minimumMarginGBP: 75,
+      conditionFactor: 0.95,
+      expectedMilesPerYear: 12000,
+      resaleRetailTypicalGBP: {
+        car: 12000,
+        van: 10000
+      },
+      applyCatalystUplift: false,
+      catalystUpliftGBP: 0
+    };
+
+    const LAST_UPDATED = document.getElementById('lastUpdatedValue');
+    const STATUS_BOX = document.getElementById('statusMessage');
+    const FORM = document.getElementById('pricingForm');
+    const RESET_BUTTON = document.getElementById('resetDefaults');
+    const DOWNLOAD_QUOTES = document.getElementById('downloadQuotes');
+    const DOWNLOAD_REALISATIONS = document.getElementById('downloadRealisations');
+
+    let authHeader = null;
+
+    function setStatus(message, isError = false, autoHide = false) {
+      if (!STATUS_BOX) return;
+      if (!message) {
+        STATUS_BOX.textContent = '';
+        STATUS_BOX.classList.add('hidden');
+        STATUS_BOX.classList.remove('status--error', 'status--success');
+        return;
+      }
+      STATUS_BOX.textContent = message;
+      STATUS_BOX.classList.remove('hidden');
+      STATUS_BOX.classList.toggle('status--error', isError);
+      STATUS_BOX.classList.toggle('status--success', !isError);
+      if (autoHide) {
+        setTimeout(() => {
+          STATUS_BOX.classList.add('hidden');
+        }, 3200);
+      }
+    }
+
+    function updateLastUpdated(value) {
+      if (!LAST_UPDATED) return;
+      if (!value) {
+        LAST_UPDATED.textContent = 'Last updated: —';
+        return;
+      }
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) {
+        LAST_UPDATED.textContent = 'Last updated: —';
+        return;
+      }
+      LAST_UPDATED.textContent = `Last updated: ${date.toLocaleString('en-GB', { hour12: false })}`;
+    }
+
+    async function ensureAuthHeader(message) {
+      while (!authHeader) {
+        const password = prompt(message || 'Enter admin password');
+        if (password === null) {
+          const err = new Error('cancelled');
+          err.code = 'cancelled';
+          throw err;
+        }
+        authHeader = 'Basic ' + btoa(`admin:${password}`);
+      }
+    }
+
+    async function authorisedRequest(path, options = {}) {
+      try {
+        await ensureAuthHeader();
+      } catch (err) {
+        throw err;
+      }
+
+      const config = { ...options };
+      config.headers = Object.assign({}, options.headers || {}, { Authorization: authHeader });
+      if (config.body && !(config.body instanceof FormData) && typeof config.body === 'object') {
+        config.headers['Content-Type'] = 'application/json';
+        config.body = JSON.stringify(config.body);
+      }
+
+      const response = await fetch(path, config);
+      if (response.status === 401) {
+        authHeader = null;
+        const err = new Error('unauthorised');
+        err.code = 401;
+        throw err;
+      }
+      if (response.status === 503) {
+        throw new Error('Admin password not configured on the server.');
+      }
+
+      let data = null;
+      try {
+        data = await response.json();
+      } catch (error) {
+        data = null;
+      }
+
+      if (!response.ok) {
+        const err = new Error((data && data.error) || 'Request failed.');
+        err.code = response.status;
+        throw err;
+      }
+
+      return data;
+    }
+
+    function setNumber(id, value) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      if (value === undefined || value === null || Number.isNaN(Number(value))) {
+        el.value = '';
+      } else {
+        el.value = Number(value);
+      }
+    }
+
+    function setBoolean(id, value) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.checked = Boolean(value);
+    }
+
+    function setSelect(id, value) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.value = value || el.options[0]?.value || '';
+    }
+
+    function populateForm(settings) {
+      const config = settings || DEFAULT_SETTINGS;
+      setNumber('scrapRatePerTonne', config.scrapRatePerTonneGBP);
+      setNumber('collectionFee', config.collectionFeeGBP);
+      setNumber('processingReserve', config.processingReserveGBP);
+      setNumber('roundingStep', config.roundingStepGBP);
+      setNumber('minimumMargin', config.minimumMarginGBP);
+      setNumber('conditionFactor', config.conditionFactor);
+      setNumber('expectedMiles', config.expectedMilesPerYear);
+
+      const multipliers = config.bodyTypeRateAdjustments || {};
+      setNumber('multVan', multipliers.van);
+      setNumber('multEstate', multipliers.estate);
+      setNumber('multSUV', multipliers.suv);
+      setNumber('multMPV', multipliers.mpv);
+      setNumber('mult4x4', multipliers['4x4']);
+      setNumber('multSaloon', multipliers.saloon);
+      setNumber('multHatch', multipliers.hatchback);
+      setNumber('multOther', multipliers.other);
+
+      const buffers = config.partsBufferTableGBP || {};
+      setNumber('bufferLow', buffers.low);
+      setNumber('bufferMedium', buffers.medium);
+      setNumber('bufferHigh', buffers.high);
+      setSelect('defaultPopularity', config.defaultPartsPopularity || 'medium');
+
+      const retail = config.resaleRetailTypicalGBP || {};
+      setNumber('retailCar', retail.car);
+      setNumber('retailVan', retail.van);
+
+      setBoolean('applyCatalyst', config.applyCatalystUplift);
+      setNumber('catalystUplift', config.catalystUpliftGBP);
+    }
+
+    function readNumber(id) {
+      const el = document.getElementById(id);
+      if (!el) return undefined;
+      const numeric = Number(el.value);
+      return Number.isFinite(numeric) ? numeric : undefined;
+    }
+
+    function gatherSettingsFromForm() {
+      return {
+        scrapRatePerTonneGBP: readNumber('scrapRatePerTonne'),
+        collectionFeeGBP: readNumber('collectionFee'),
+        processingReserveGBP: readNumber('processingReserve'),
+        roundingStepGBP: readNumber('roundingStep'),
+        minimumMarginGBP: readNumber('minimumMargin'),
+        conditionFactor: readNumber('conditionFactor'),
+        expectedMilesPerYear: readNumber('expectedMiles'),
+        bodyTypeRateAdjustments: {
+          van: readNumber('multVan'),
+          estate: readNumber('multEstate'),
+          suv: readNumber('multSUV'),
+          mpv: readNumber('multMPV'),
+          '4x4': readNumber('mult4x4'),
+          saloon: readNumber('multSaloon'),
+          hatchback: readNumber('multHatch'),
+          other: readNumber('multOther')
+        },
+        partsBufferTableGBP: {
+          low: readNumber('bufferLow'),
+          medium: readNumber('bufferMedium'),
+          high: readNumber('bufferHigh')
+        },
+        defaultPartsPopularity: document.getElementById('defaultPopularity')?.value || 'medium',
+        resaleRetailTypicalGBP: {
+          car: readNumber('retailCar'),
+          van: readNumber('retailVan')
+        },
+        applyCatalystUplift: document.getElementById('applyCatalyst')?.checked || false,
+        catalystUpliftGBP: readNumber('catalystUplift')
+      };
+    }
+
+    async function loadSettings() {
+      while (true) {
+        try {
+          const data = await authorisedRequest('/api/admin/pricing', { method: 'GET' });
+          if (data && data.settings) {
+            populateForm(data.settings);
+            updateLastUpdated(data.updatedAt);
+            setStatus('Settings loaded.', false, true);
+          }
+          return;
+        } catch (error) {
+          if (error.code === 401) {
+            alert('Password incorrect. Please try again.');
+            continue;
+          }
+          if (error.code === 'cancelled') {
+            setStatus('Authentication cancelled. Reload this page to try again.', true);
+            return;
+          }
+          setStatus(error.message || 'Unable to load settings.', true);
+          return;
+        }
+      }
+    }
+
+    async function saveSettings(event) {
+      event.preventDefault();
+      const payload = gatherSettingsFromForm();
+      while (true) {
+        try {
+          const data = await authorisedRequest('/api/admin/pricing', {
+            method: 'POST',
+            body: payload
+          });
+          if (data && data.settings) {
+            populateForm(data.settings);
+            updateLastUpdated(data.updatedAt);
+          }
+          setStatus('Settings saved.', false, true);
+          return;
+        } catch (error) {
+          if (error.code === 401) {
+            alert('Password incorrect. Please try again.');
+            continue;
+          }
+          if (error.code === 'cancelled') {
+            setStatus('Save cancelled.', true);
+            return;
+          }
+          setStatus(error.message || 'Unable to save settings.', true);
+          return;
+        }
+      }
+    }
+
+    async function handleExport(type) {
+      while (true) {
+        try {
+          await ensureAuthHeader();
+        } catch (error) {
+          if (error.code === 'cancelled') {
+            setStatus('Export cancelled.', true);
+            return;
+          }
+          throw error;
+        }
+
+        try {
+          const response = await fetch(`/api/admin/export?type=${encodeURIComponent(type)}`, {
+            headers: { Authorization: authHeader }
+          });
+          if (response.status === 401) {
+            authHeader = null;
+            alert('Password incorrect. Please try again.');
+            continue;
+          }
+          if (!response.ok) {
+            const text = await response.text();
+            throw new Error(text || 'Export failed.');
+          }
+          const blob = await response.blob();
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = type === 'quotes' ? 'quotes.csv' : 'realisations.csv';
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          URL.revokeObjectURL(url);
+          setStatus('Export ready.', false, true);
+          return;
+        } catch (error) {
+          setStatus(error.message || 'Export failed.', true);
+          return;
+        }
+      }
+    }
+
+    FORM?.addEventListener('submit', saveSettings);
+    RESET_BUTTON?.addEventListener('click', () => {
+      populateForm(DEFAULT_SETTINGS);
+      setStatus('Defaults restored in the form. Remember to save.', false);
+    });
+    DOWNLOAD_QUOTES?.addEventListener('click', () => handleExport('quotes'));
+    DOWNLOAD_REALISATIONS?.addEventListener('click', () => handleExport('realisations'));
+
+    populateForm(DEFAULT_SETTINGS);
+    loadSettings();
+  </script>
+</body>
+</html>

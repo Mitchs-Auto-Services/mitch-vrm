@@ -346,14 +346,32 @@
       background: var(--orange);
       color: #fff;
       font-weight: 700;
-      text-decoration: none;
       border: 1px solid rgba(255, 255, 255, 0.16);
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+      cursor: pointer;
     }
     .quote-cta:hover,
     .quote-cta:focus-visible {
       transform: translateY(-1px);
       box-shadow: 0 18px 34px rgba(255, 123, 44, 0.24);
+    }
+    .quote-cta--secondary {
+      background: rgba(0, 0, 0, 0.55);
+      color: rgba(244, 245, 247, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.26);
+    }
+    .quote-cta--secondary:hover,
+    .quote-cta--secondary:focus-visible {
+      color: #fff;
+      border-color: var(--orange);
+      box-shadow: none;
+    }
+    .quote-cta:disabled,
+    .quote-cta.is-disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
     }
     .quote-toggle {
       display: inline-flex;
@@ -1055,7 +1073,8 @@
           </div>
           <p class="quote-empty" id="scrapPlaceholder">Enter your reg and mileage to see today&#8217;s guide price.</p>
           <div class="quote-actions">
-            <a id="scrapCta" class="quote-cta" href="/enquire?type=scrap" aria-disabled="true" tabindex="-1">Start scrap enquiry</a>
+            <button type="button" class="quote-cta" id="scrapEmailPrimary" disabled>Scrap my car</button>
+            <button type="button" class="quote-cta quote-cta--secondary" id="scrapEmailSecondary" disabled>Sell my car</button>
             <button type="button" class="quote-toggle" id="scrapToggle" aria-expanded="false" aria-controls="scrapBreakdown">View breakdown</button>
           </div>
           <div id="scrapBreakdown" class="quote-breakdown" hidden>
@@ -1083,7 +1102,8 @@
           </div>
           <p class="quote-empty" id="retailPlaceholder">Get an estimate that keeps margin for prep and parts.</p>
           <div class="quote-actions">
-            <a id="retailCta" class="quote-cta" href="/enquire?type=retail" aria-disabled="true" tabindex="-1">Start retail enquiry</a>
+            <button type="button" class="quote-cta" id="retailEmailPrimary" disabled>Sell my car</button>
+            <button type="button" class="quote-cta quote-cta--secondary" id="retailEmailSecondary" disabled>Scrap my car</button>
             <button type="button" class="quote-toggle" id="retailToggle" aria-expanded="false" aria-controls="retailBreakdown">View breakdown</button>
           </div>
           <div id="retailBreakdown" class="quote-breakdown" hidden>
@@ -1122,6 +1142,10 @@
           <label for="vrm">Vehicle Registration (Reg)</label>
           <input id="vrm" name="vrm" placeholder="Enter your registration" maxlength="8" autocomplete="off" required>
           <div class="hint">We don’t do electric cars right now.</div>
+        </div>
+        <div>
+          <label for="vrmMileage">Vehicle mileage</label>
+          <input id="vrmMileage" name="vrmMileage" type="number" min="0" step="100" inputmode="numeric" placeholder="Current mileage">
         </div>
         <div style="align-self: end;">
           <button id="lookupBtn" type="submit">Look up</button>
@@ -1318,12 +1342,14 @@
     const QUOTE_FORM = document.getElementById('quoteForm');
     const QUOTE_REG_INPUT = document.getElementById('quoteReg');
     const QUOTE_MILEAGE_INPUT = document.getElementById('quoteMileage');
+    const VRM_MILEAGE_INPUT = document.getElementById('vrmMileage');
     const QUOTE_SUBMIT = document.getElementById('quoteSubmit');
     const QUOTE_MESSAGE = document.getElementById('quoteMessage');
     const SCRAP_ELEMENTS = {
       price: document.getElementById('scrapPriceValue'),
       placeholder: document.getElementById('scrapPlaceholder'),
-      cta: document.getElementById('scrapCta'),
+      scrapButton: document.getElementById('scrapEmailPrimary'),
+      sellButton: document.getElementById('scrapEmailSecondary'),
       breakdown: document.getElementById('scrapBreakdown'),
       weight: document.getElementById('scrapWeight'),
       rate: document.getElementById('scrapRate'),
@@ -1339,7 +1365,8 @@
     const RETAIL_ELEMENTS = {
       price: document.getElementById('retailPriceValue'),
       placeholder: document.getElementById('retailPlaceholder'),
-      cta: document.getElementById('retailCta'),
+      sellButton: document.getElementById('retailEmailPrimary'),
+      scrapButton: document.getElementById('retailEmailSecondary'),
       breakdown: document.getElementById('retailBreakdown'),
       weight: document.getElementById('retailWeight'),
       rate: document.getElementById('retailRate'),
@@ -1472,6 +1499,7 @@
     function updateQuoteSubmitState() {
       if (!QUOTE_SUBMIT) return;
       QUOTE_SUBMIT.disabled = quoteIsLoading || !isQuoteFormValid();
+      refreshQuoteActionState();
     }
 
     function setQuoteLoadingState(isLoading) {
@@ -1496,42 +1524,41 @@
       });
     }
 
-    function ensureCtaPrepared(anchor) {
-      if (!anchor) return;
-      if (!anchor.dataset.baseHref) {
-        anchor.dataset.baseHref = anchor.getAttribute('href') || '#';
-      }
-      anchor.addEventListener('click', event => {
-        if (anchor.getAttribute('aria-disabled') === 'true') {
-          event.preventDefault();
-        }
-      });
-    }
-
-    function setCtaState(anchor, enabled, href) {
-      if (!anchor) return;
-      anchor.setAttribute('aria-disabled', enabled ? 'false' : 'true');
-      anchor.tabIndex = enabled ? 0 : -1;
-      if (enabled && href) {
-        anchor.href = href;
-      } else if (anchor.dataset.baseHref) {
-        anchor.href = anchor.dataset.baseHref;
+    function setQuoteButtonState(button, enabled) {
+      if (!button) return;
+      button.disabled = !enabled;
+      if (!enabled) {
+        button.classList.add('is-disabled');
+      } else {
+        button.classList.remove('is-disabled');
       }
     }
 
-    function buildCtaHref(baseHref, params) {
-      if (!baseHref) return '#';
-      try {
-        const url = new URL(baseHref, window.location.origin);
-        Object.entries(params || {}).forEach(([key, value]) => {
-          if (value !== undefined && value !== null && value !== '') {
-            url.searchParams.set(key, value);
-          }
-        });
-        return `${url.pathname}${url.search}`;
-      } catch (error) {
-        return baseHref;
+    function refreshQuoteActionState() {
+      if (quoteIsLoading || !lastQuoteResult) {
+        setQuoteButtonState(SCRAP_ELEMENTS.scrapButton, false);
+        setQuoteButtonState(SCRAP_ELEMENTS.sellButton, false);
+        setQuoteButtonState(RETAIL_ELEMENTS.sellButton, false);
+        setQuoteButtonState(RETAIL_ELEMENTS.scrapButton, false);
+        return;
       }
+
+      const { reg, mileage } = getQuoteFormValues();
+      const normalisedMileage = Math.max(0, Math.round(Number(mileage || 0)));
+      const matches =
+        normaliseQuoteReg(reg) === (lastQuoteResult.reg || '') &&
+        normalisedMileage === Math.max(0, Math.round(Number(lastQuoteResult.mileage || 0)));
+
+      const scrapValid =
+        matches && Number.isFinite(Number(lastQuoteResult.scrapPriceGBP)) && Number(lastQuoteResult.scrapPriceGBP) > 0;
+      const retailValid =
+        matches && Number.isFinite(Number(lastQuoteResult.resalePriceGBP)) && Number(lastQuoteResult.resalePriceGBP) > 0;
+
+      setQuoteButtonState(SCRAP_ELEMENTS.scrapButton, scrapValid);
+      setQuoteButtonState(RETAIL_ELEMENTS.scrapButton, scrapValid);
+      setQuoteButtonState(SCRAP_ELEMENTS.sellButton, retailValid);
+      setQuoteButtonState(RETAIL_ELEMENTS.sellButton, retailValid);
+      refreshQuoteActionState();
     }
 
     function setRowValue(rowEl, valueEl, rawValue, formatter = formatCurrencyGBP) {
@@ -1569,8 +1596,10 @@
       if (RETAIL_ELEMENTS.margin) RETAIL_ELEMENTS.margin.textContent = '£—';
       if (RETAIL_ELEMENTS.confidenceNote) RETAIL_ELEMENTS.confidenceNote.textContent = '';
 
-      setCtaState(SCRAP_ELEMENTS.cta, false);
-      setCtaState(RETAIL_ELEMENTS.cta, false);
+      setQuoteButtonState(SCRAP_ELEMENTS.scrapButton, false);
+      setQuoteButtonState(SCRAP_ELEMENTS.sellButton, false);
+      setQuoteButtonState(RETAIL_ELEMENTS.sellButton, false);
+      setQuoteButtonState(RETAIL_ELEMENTS.scrapButton, false);
       collapseQuotePanels();
     }
 
@@ -1617,27 +1646,131 @@
 
     function applyQuoteResult(result) {
       if (!result || !result.breakdown) return;
-      lastQuoteResult = result;
-      updateScrapTile(result);
-      updateRetailTile(result);
       const reg = result.reg ? normaliseQuoteReg(result.reg) : '';
       const mileage = Math.max(0, Math.round(Number(result.mileage || 0)));
-      if (SCRAP_ELEMENTS.cta) {
-        const href = buildCtaHref(SCRAP_ELEMENTS.cta.dataset.baseHref || '/enquire?type=scrap', {
-          type: 'scrap',
-          reg,
-          mileage
-        });
-        setCtaState(SCRAP_ELEMENTS.cta, true, href);
+      const enriched = { ...result, reg, mileage };
+      lastQuoteResult = enriched;
+      updateScrapTile(enriched);
+      updateRetailTile(enriched);
+
+      const scrapValid = Number.isFinite(Number(enriched.scrapPriceGBP)) && Number(enriched.scrapPriceGBP) > 0;
+      const retailValid = Number.isFinite(Number(enriched.resalePriceGBP)) && Number(enriched.resalePriceGBP) > 0;
+
+      setQuoteButtonState(SCRAP_ELEMENTS.scrapButton, scrapValid);
+      setQuoteButtonState(RETAIL_ELEMENTS.scrapButton, scrapValid);
+      setQuoteButtonState(SCRAP_ELEMENTS.sellButton, retailValid);
+      setQuoteButtonState(RETAIL_ELEMENTS.sellButton, retailValid);
+      refreshQuoteActionState();
+    }
+
+    function sendQuoteEmail(action, source) {
+      if (!lastQuoteResult) {
+        alert('Please get an up-to-date quote first.');
+        return;
       }
-      if (RETAIL_ELEMENTS.cta) {
-        const href = buildCtaHref(RETAIL_ELEMENTS.cta.dataset.baseHref || '/enquire?type=retail', {
-          type: 'retail',
-          reg,
-          mileage
-        });
-        setCtaState(RETAIL_ELEMENTS.cta, true, href);
+
+      const isScrap = action === 'scrap';
+      const amount = isScrap ? Number(lastQuoteResult.scrapPriceGBP) : Number(lastQuoteResult.resalePriceGBP);
+      if (!Number.isFinite(amount) || amount <= 0) {
+        alert('We need a fresh quote before we can send the offer details.');
+        return;
       }
+
+      const reg = (lastQuoteResult.reg || '').toUpperCase();
+      const mileageValue = Math.max(0, Math.round(Number(lastQuoteResult.mileage || 0)));
+      const mileageLine = mileageValue > 0 ? `Mileage provided: ${formatMiles(mileageValue)}` : '';
+
+      const vehicleDetails = lastQuoteResult.vehicleDetails || {};
+      const make = titleCaseVehicleName(vehicleDetails.make);
+      let model = titleCaseVehicleName(resolveVehicleModel(vehicleDetails));
+      if (make && model && model.toLowerCase() === make.toLowerCase()) {
+        model = '';
+      }
+      const year = vehicleDetails.yearOfManufacture || vehicleDetails.yearOfRegistration || '';
+      const bodyType = vehicleDetails.bodyType || vehicleDetails.bodyTypeDescription || '';
+      const fuelDisplay = formatFuelDisplay(vehicleDetails.fuelType);
+      const engineDisplay = formatEngineCapacity(vehicleDetails.engineCapacity || vehicleDetails.engineSize);
+
+      const breakdown = lastQuoteResult.breakdown || {};
+      const weightValue = Number(breakdown.estimatedWeightKg);
+      const rateValue = Number(breakdown.ratePerTonneApplied);
+      const partsBufferValue = Number(breakdown.partsBufferApplied);
+      const catalystValue = Number(breakdown.catalystAppliedGBP);
+      const collectionValue = Number(breakdown.collectionFeeGBP);
+      const processingValue = Number(breakdown.processingReserveGBP);
+      const penaltyValue = Number(breakdown.mileagePenaltyApplied);
+      const expectedMileageValue = Number(breakdown.expectedMileageForAge);
+      const conditionFactorValue = Number(breakdown.conditionFactorApplied);
+      const minimumMarginValue = Number(breakdown.minimumMarginGBP);
+      const bucketLabel = breakdown.bodyTypeBucket ? describeBucket(breakdown.bodyTypeBucket) : '';
+      const popularityLabel = breakdown.popularityTier ? describePopularity(breakdown.popularityTier) : '';
+
+      const counterpartValue = isScrap ? Number(lastQuoteResult.resalePriceGBP) : Number(lastQuoteResult.scrapPriceGBP);
+      const counterpartLine = Number.isFinite(counterpartValue) && counterpartValue > 0
+        ? `${isScrap ? 'Alternative sell offer' : 'Alternative scrap offer'}: ${formatCurrencyGBP(counterpartValue)}`
+        : '';
+
+      const requestLines = [
+        `Request type: ${isScrap ? 'Scrap my car' : 'Sell my car'}`,
+        reg ? `Registration: ${reg}` : '',
+        make || model ? `Vehicle: ${[make, model].filter(Boolean).join(' ')}` : '',
+        year ? `Year: ${year}` : '',
+        bodyType ? `Body type: ${bodyType}` : '',
+        fuelDisplay ? `Fuel type: ${fuelDisplay}` : '',
+        engineDisplay ? `Engine size: ${engineDisplay}` : '',
+        mileageLine
+      ].filter(Boolean);
+
+      const offerLines = [
+        `Offer amount: ${formatCurrencyGBP(amount)}`,
+        counterpartLine,
+        `Quote tile used: ${source === 'retail' ? 'Sell my car' : 'Scrap my car'}`
+      ].filter(Boolean);
+
+      const breakdownLines = [
+        bucketLabel && bucketLabel !== 'Vehicle' ? `Body type bucket: ${bucketLabel}` : '',
+        popularityLabel ? `Parts demand tier: ${popularityLabel}` : '',
+        Number.isFinite(weightValue) && weightValue > 0 ? `Estimated weight: ${formatKg(weightValue)}` : '',
+        Number.isFinite(rateValue) && rateValue > 0 ? `Rate applied: ${formatRatePerTonne(rateValue)}` : '',
+        Number.isFinite(partsBufferValue) && partsBufferValue >= 0 ? `Parts buffer applied: ${formatCurrencyGBP(partsBufferValue)}` : '',
+        Number.isFinite(catalystValue) && catalystValue > 0 ? `Catalyst uplift: ${formatCurrencyGBP(catalystValue)}` : '',
+        Number.isFinite(collectionValue) && collectionValue > 0 ? `Collection fee deducted: ${formatCurrencyGBP(collectionValue)}` : '',
+        Number.isFinite(processingValue) && processingValue > 0 ? `Processing reserve deducted: ${formatCurrencyGBP(processingValue)}` : ''
+      ];
+
+      if (!isScrap) {
+        if (Number.isFinite(expectedMileageValue) && expectedMileageValue > 0) {
+          breakdownLines.push(`Expected mileage for age: ${formatMiles(expectedMileageValue)}`);
+        }
+        if (Number.isFinite(penaltyValue)) {
+          breakdownLines.push(`Mileage penalty applied: ${formatPenalty(penaltyValue)}`);
+        }
+        if (Number.isFinite(conditionFactorValue) && conditionFactorValue > 0) {
+          breakdownLines.push(`Condition factor: ${formatCondition(conditionFactorValue)}`);
+        }
+        if (Number.isFinite(minimumMarginValue) && minimumMarginValue > 0) {
+          breakdownLines.push(`Minimum margin over scrap: ${formatCurrencyGBP(minimumMarginValue)}`);
+        }
+      }
+
+      const formatSection = (title, lines) => {
+        const filtered = lines.filter(Boolean);
+        if (!filtered.length) return '';
+        return `${title}:\n- ${filtered.join('\n- ')}`;
+      };
+
+      const sections = [
+        formatSection('Vehicle & request', requestLines),
+        formatSection('Quote figures', offerLines),
+        formatSection('Breakdown notes', breakdownLines)
+      ].filter(Boolean);
+
+      const generatedAt = new Date().toLocaleString('en-GB', { timeZone: 'Europe/London' });
+      sections.push(`Generated via online quote tool on ${generatedAt}.`);
+
+      const subject = encodeURIComponent(`${isScrap ? 'Scrap' : 'Sell'} quote request – ${reg || 'vehicle'}`);
+      const body = encodeURIComponent(sections.join('\n\n'));
+      window.location.href = `mailto:support@mitchsautoservices.co.uk?subject=${subject}&body=${body}`;
     }
 
     function getQuoteFormValues() {
@@ -1711,9 +1844,20 @@
       }
     }
 
-    ensureCtaPrepared(SCRAP_ELEMENTS.cta);
-    ensureCtaPrepared(RETAIL_ELEMENTS.cta);
     resetQuoteTiles();
+
+    if (SCRAP_ELEMENTS.scrapButton) {
+      SCRAP_ELEMENTS.scrapButton.addEventListener('click', () => sendQuoteEmail('scrap', 'scrap'));
+    }
+    if (SCRAP_ELEMENTS.sellButton) {
+      SCRAP_ELEMENTS.sellButton.addEventListener('click', () => sendQuoteEmail('sell', 'scrap'));
+    }
+    if (RETAIL_ELEMENTS.sellButton) {
+      RETAIL_ELEMENTS.sellButton.addEventListener('click', () => sendQuoteEmail('sell', 'retail'));
+    }
+    if (RETAIL_ELEMENTS.scrapButton) {
+      RETAIL_ELEMENTS.scrapButton.addEventListener('click', () => sendQuoteEmail('scrap', 'retail'));
+    }
 
     if (QUOTE_FORM) {
       QUOTE_FORM.addEventListener('submit', submitQuoteRequest);
@@ -3385,6 +3529,16 @@
       const colour = vehicleDetails.colour || vehicleDetails.primaryColour || '';
       const motSummary = formatMotSummary(vehicleDetails);
       const taxSummary = formatTaxSummary(vehicleDetails);
+      const mileageInputValue = VRM_MILEAGE_INPUT ? VRM_MILEAGE_INPUT.value.trim() : '';
+      let vehicleMileageLine = '';
+      if (mileageInputValue) {
+        const numericMileage = Number(mileageInputValue.replace(/[^0-9]/g, ''));
+        if (Number.isFinite(numericMileage) && numericMileage > 0) {
+          vehicleMileageLine = `Mileage: ${Math.round(numericMileage).toLocaleString('en-GB')} miles`;
+        } else {
+          vehicleMileageLine = `Mileage: ${mileageInputValue}`;
+        }
+      }
       const serviceTitle = serviceInput.dataset.title || serviceInput.value || 'Selected service';
       const servicePrice = serviceInput.dataset.price || 'Price on request';
       const warrantyChoice = warrantyInput ? warrantyInput.value : '';
@@ -3407,7 +3561,8 @@
         engineDisplay ? `Engine size: ${engineDisplay}` : '',
         colour ? `Colour: ${colour}` : '',
         motSummary ? `MOT: ${motSummary}` : '',
-        taxSummary ? `Tax: ${taxSummary}` : ''
+        taxSummary ? `Tax: ${taxSummary}` : '',
+        vehicleMileageLine
       ].filter(Boolean);
 
       const bookingLines = [

@@ -585,197 +585,226 @@
     </footer>
 
     <script>
+      
       const SERVICES = [
         {
           id: 'diagnostic',
-          name: "Diagnostic / I Don't Know",
+          name: "Diagnostic/ I Don't Know",
           price: 50,
+          applicableTo: 'both',
           description:
-            'Full-system diagnostic with a report emailed to you. Ideal if you are unsure about the fault—book this and we will get to the bottom of the issue.'
+            'Book this when you are unsure about a fault. We run a full-system diagnostic, email you the report, and guide the next steps for noises, warning lights, or mystery issues.'
         },
         {
           id: 'air_filter',
           name: 'Air Filter Replacement',
           price: 80,
+          applicableTo: 'both',
           description:
-            'Fit a fresh air filter so the engine breathes properly again. Helps restore performance, smooth idle, and fuel economy when the filter is clogged.'
+            'Restore clean airflow to the engine so it can breathe properly again. Ideal when acceleration feels flat, the idle is rough, or the old filter looks dark and clogged.'
         },
         {
           id: 'basic_service',
           name: 'Basic Service Package',
           price: 100,
+          applicableTo: 'both',
           description:
-            'Engine oil replacement, oil filter, air filter, dust/pollen filter, coolant replacement, tyre pressure & tread inspection, headlights/rear lights inspection, and a full battery health check.'
+            'Essential annual fluids and filters: engine oil, oil filter, air filter, cabin filter, coolant top-up, plus tyre, light, and battery checks to keep everyday cars healthy.'
         },
         {
           id: 'battery_replacement',
           name: 'Battery Replacement (includes recoding)',
           price: 200,
+          applicableTo: 'both',
           description:
-            'Install a quality battery and recode it to the ECU where required. Perfect for slow cranks, flat batteries, and random electrical issues.'
+            'Fit a fresh battery and recode it to the ECU where required—perfect when cranking is slow, the battery light stays on, or the car keeps needing a jump start.'
         },
         {
           id: 'brake_change',
           name: 'Brake Change',
           price: 100,
+          applicableTo: 'both',
           description:
-            'Replace brake pads and inspect discs on both sides of the axle, ensuring solid stopping power and improved safety under braking.'
+            'Replace pads on both sides of the axle and inspect discs so stopping power is restored. Book this if you hear scraping, feel vibration, or the dash warns of low pads.'
         },
         {
           id: 'brake_fluid',
           name: 'Brake Fluid Flush',
           price: 70,
+          applicableTo: 'both',
           description:
-            'Flush out old, contaminated brake fluid to restore pedal feel and braking performance, reducing the risk of fade or ABS warnings.'
+            'Flush moisture-contaminated brake fluid to bring back a firm pedal and consistent braking—vital every two years or when the pedal feels spongy or fades under load.'
         },
         {
           id: 'battery_recharge',
           name: 'Car Battery Recharge (overnight)',
           price: 80,
+          applicableTo: 'both',
           description:
-            'Overnight slow-charge service to recover tired batteries after repeated jump starts or short journeys, ready for refitting the next morning.'
+            'Slow-charge your flat battery overnight so it is ready to refit. Ideal for vehicles left standing, short-trip driving, or after repeated jump starts.'
         },
         {
           id: 'diagnostic_check',
           name: 'Car Diagnostic Check',
           price: 50,
+          applicableTo: 'both',
           description:
-            'Comprehensive scan with professional tooling. We email you the findings so you can see exactly what needs attention.'
+            'Full electronic scan with a written report emailed to you. Choose this if the engine light is on, the car makes strange noises, or you simply need to find the fault.'
         },
         {
           id: 'car_refresh',
           name: 'Car Refresh Service Package',
           price: 600,
+          applicableTo: 'both',
           description:
-            'Engine oil, oil filter, air filter, dust/pollen filter, coolant change, spark plugs if needed, full brake check with pads/discs replaced if required, tyre inspections, lights, full battery test, battery replacement, and exterior lighting replacements.'
+            'Our full reset: every filter, coolant, spark plugs if required, full brake inspection with replacements where needed, tyre and light checks, battery test, and fresh bulbs—ideal before selling or when maintenance has been missed.'
         },
         {
           id: 'coolant',
           name: 'Coolant Change',
           price: 80,
+          applicableTo: 'both',
           description:
-            'Drain and refill with the correct coolant to protect the engine from overheating, corrosion, and internal leaks.'
+            'Drain and refill with the correct coolant mix to guard against overheating and internal corrosion. Book when the temperature gauge creeps up or coolant looks rusty.'
         },
         {
           id: 'pollen_filter',
           name: 'Dust/Pollen Filter Replacement',
           price: 80,
+          applicableTo: 'both',
           description:
-            'Improve cabin air quality and demisting by replacing the interior pollen filter, reducing smells and allergy triggers.'
+            'Freshen the cabin by replacing the interior filter—great when the vents smell musty, airflow is weak, or hay-fever symptoms flare while driving.'
         },
         {
           id: 'engine_oil',
           name: 'Engine Oil & Filter Change',
           price: 60,
+          applicableTo: 'both',
           description:
-            'Fresh engine oil and a new filter to protect against wear, keep the engine running smoothly, and reduce start-up noise.'
+            'Protect the engine with new oil and filter to reduce wear, quieten noisy start-ups, and reset overdue service lights.'
         },
         {
           id: 'fuel_filter',
           name: 'Fuel Filter Replacement',
           price: 50,
+          applicableTo: 'both',
           description:
-            'Swap the fuel filter to prevent debris from entering the fuel system, curing hesitation, hard starting, or poor MPG.'
+            'Keep fuel flowing cleanly by swapping a clogged filter—recommended if the car hesitates under load, is hard to start, or the MPG has dropped.'
         },
         {
           id: 'lights',
           name: 'Headlights & Rear Lights Replacement',
           price: 60,
+          applicableTo: 'both',
           description:
-            'Supply and fit fresh bulbs to keep you legal and safe at night, clearing dash warnings and improving visibility.'
+            'Restore bright, legal lighting front and rear to cure dim beams, failed bulbs, or dashboard bulb warnings.'
         },
         {
           id: 'major_service',
           name: 'Major Service Package',
           price: 350,
+          applicableTo: 'both',
           description:
-            'Engine oil, oil filter, air filter, dust/pollen filter, coolant change, brake fluid replacement, spark plugs if needed, and full brake replacement where required.'
+            'Comprehensive fluids, filters, spark plugs if required, brake fluid, and brake replacements where needed—ideal for high-mileage cars or when it has been years since a big service.'
         },
         {
           id: 'minor_service',
           name: 'Minor Service Package',
           price: 110,
+          applicableTo: 'both',
           description:
-            'Engine oil, oil filter, air filter, dust/pollen filter, and coolant replacement—ideal between major services.'
+            'Interim oil, filter, and coolant refresh plus air and cabin filters—perfect between major services or after a big mileage jump.'
         },
         {
           id: 'premium_service',
           name: 'Premium Service Package',
           price: 300,
+          applicableTo: 'both',
           description:
-            'Engine oil, oil filter, air filter, dust/pollen filter, coolant replacement, spark plugs if needed, plus brake, tyre, light, and battery health checks.'
+            'Enhanced service covering all key fluids and filters, spark plugs if required, and detailed brake, tyre, lighting, and battery inspections ahead of long journeys.'
         },
         {
           id: 'pre_mot',
           name: 'Pre-MOT Diagnosis & Repair Plan',
           price: 150,
+          applicableTo: 'both',
           description:
-            'Full MOT-style inspection with a repair plan so you can fix issues before the test and avoid costly retests.'
+            'Full MOT-style inspection with a prioritised repair list so you can fix failures in advance and avoid retest costs.'
         },
         {
           id: 'seasonal',
           name: 'Seasonal Maintenance Package',
           price: 150,
+          applicableTo: 'both',
           description:
-            'Battery health check, brake inspection, tyre inspection and pressure adjustment, cooling system check, and lights inspection to prepare for the season ahead.'
+            'Get ready for the season with battery, brake, tyre, cooling, and lighting checks—ideal before winter cold snaps or summer road trips.'
         },
         {
           id: 'tyre_health',
           name: 'Tyre Health Check',
           price: 35,
+          applicableTo: 'both',
           description:
-            'Inspect tread depth, wear pattern, pressures, valves, and sidewalls to keep your tyres legal and safe.'
+            'Measure tread depth, spot uneven wear, set pressures, and inspect valves and sidewalls. Book if the car pulls to one side or vibrates at speed.'
         },
         {
           id: 'wiper_motor',
           name: 'Window Wiper Motor Replacement',
           price: 50,
+          applicableTo: 'both',
           description:
-            'Replace sluggish or failed wiper motors so you regain smooth, reliable wiper action for clear visibility in the rain.'
+            'Replace a tired or seized wiper motor so the blades sweep smoothly again—ideal if they stop mid-screen or move painfully slowly.'
         },
         {
           id: 'air_con',
           name: 'Air Conditioning Top-Up/Recharge',
           price: 85,
+          applicableTo: 'both',
           description:
-            'Regas the air conditioning system, check for obvious leaks, and restore fast demisting and cold airflow.'
+            'Regas the air-con system, check for obvious leaks, and restore crisp cold air and fast demisting when vents only blow warm.'
         },
         {
           id: 'fuel_injector',
           name: 'Fuel Injector Replacement (includes Recoding)',
           price: 150,
+          applicableTo: 'both',
           description:
-            'Fit and recode replacement injectors to cure misfires, fuel smells, hard starting, or loss of power.'
+            'Fit and recode new injectors to solve misfires, fuel smells, rough idle, or poor MPG on modern petrol and diesel engines alike.'
         },
         {
           id: 'glow_plug',
           name: 'Glow Plug Replacement',
           price: 50,
+          applicableTo: 'diesel',
           description:
-            'Swap faulty glow plugs on diesel engines to improve cold starting, reduce white smoke, and smooth running from cold.'
+            'Diesel only: renew weak glow plugs to improve cold starts, clear early-morning smoke, and smooth out rough running until the engine warms through.'
         },
         {
           id: 'spark_plug',
           name: 'Spark Plug Replacement',
           price: 50,
+          applicableTo: 'petrol',
           description:
-            'Install fresh spark plugs on petrol engines for smoother idle, better acceleration, and improved fuel economy.'
+            'Petrol engines only: install fresh spark plugs to cure misfires, restore crisp acceleration, and improve fuel economy when the old plugs are worn.'
         },
         {
           id: 'ignition',
           name: 'Ignition Coils / Leads Replacement',
           price: 80,
+          applicableTo: 'petrol',
           description:
-            'Replace failing coils or leads to cure misfires, jerky acceleration, and check-engine-light warnings.'
+            'Petrol engines only: replace failing coils or leads that trigger misfires, flashing engine lights, or jerky acceleration under load.'
         },
         {
           id: 'handbrake',
           name: 'Handbrake Adjustment',
           price: 150,
+          applicableTo: 'both',
           description:
-            'Adjust and balance the handbrake so it holds securely on hills and passes MOT tests confidently.'
+            'Rebalance and adjust the parking brake so it holds firmly on hills, clicks fewer notches, and passes MOT brake efficiency checks.'
         }
       ];
+
 
       const API_URL = '/api/vrm';
       const vrmInput = document.getElementById('vrm');
@@ -831,26 +860,49 @@
       let selectedMode = '';
       let lastMobileAddress = { door: '', street: '', county: '', postcode: '' };
 
-      // Populate services grid
-      SERVICES.forEach((service) => {
-        const button = document.createElement('button');
-        button.type = 'button';
-        button.className = 'service-card';
-        button.dataset.serviceId = service.id;
-        button.dataset.price = service.price;
-        button.setAttribute('aria-pressed', 'false');
-        button.innerHTML = `
-          <span class="service-name">${service.name}</span>
-          <span class="service-price">From £${service.price}</span>
-          <span class="hint">${service.description}</span>
-        `;
-        serviceGrid.appendChild(button);
-      });
+      function renderServicesForFuel(fuelType = '') {
+        const fuel = fuelType.toLowerCase();
+        serviceGrid.innerHTML = '';
+
+        const available = SERVICES.filter((service) => {
+          if (!service.applicableTo || service.applicableTo === 'both') return true;
+          if (!fuel) return false;
+          if (service.applicableTo === 'petrol') return fuel.includes('petrol');
+          if (service.applicableTo === 'diesel') return fuel.includes('diesel');
+          return false;
+        });
+
+        if (!available.length) {
+          const message = document.createElement('p');
+          message.className = 'hint';
+          message.textContent = 'Service list unavailable for this fuel type. Please contact us for advice.';
+          serviceGrid.appendChild(message);
+          return;
+        }
+
+        available.forEach((service) => {
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.className = 'service-card';
+          button.dataset.serviceId = service.id;
+          button.dataset.price = service.price;
+          button.setAttribute('aria-pressed', 'false');
+          button.innerHTML = `
+            <span class="service-name">${service.name}</span>
+            <span class="service-price">From £${service.price}</span>
+            <span class="hint">${service.description}</span>
+          `;
+          serviceGrid.appendChild(button);
+        });
+      }
 
       function resetFlowAfterLookup() {
         selectedService = null;
         selectedMode = '';
         lastMobileAddress = { door: '', street: '', county: '', postcode: '' };
+
+        renderServicesForFuel(vehicleData && vehicleData.fuelType ? vehicleData.fuelType : '');
+
         selectedServiceSummary.hidden = true;
         selectedServiceSummary.innerHTML = '';
         servicesDetails.hidden = false;

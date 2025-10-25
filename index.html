@@ -234,17 +234,18 @@
       flex-direction: column;
       gap: 40px;
     }
-    .quote-section {
-      display: flex;
-      flex-direction: column;
-      gap: 26px;
-    }
     .quote-card {
       padding: 30px 32px;
       border-radius: 28px;
       background: linear-gradient(155deg, rgba(255, 255, 255, 0.08), rgba(8, 12, 18, 0.92));
       border: 1px solid rgba(255, 255, 255, 0.16);
       box-shadow: 0 32px 62px rgba(0, 0, 0, 0.32);
+    }
+    .quote-card__header {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 22px;
     }
     .quote-card__title {
       margin: 0 0 12px;
@@ -255,20 +256,51 @@
       margin: 0 0 24px;
       color: rgba(244, 245, 247, 0.86);
     }
-    .quote-form {
+    .quote-inline-form {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
       gap: 18px;
       align-items: end;
+      margin-bottom: 22px;
     }
-    .quote-form .form-field {
+    .quote-inline-form label {
+      font-weight: 700;
+      margin-bottom: 6px;
+      display: inline-block;
+    }
+    .quote-inline-form input {
+      width: 100%;
+    }
+    .quote-form-actions {
+      display: flex;
+      align-items: flex-end;
+    }
+    .quote-form-actions button {
+      min-width: 190px;
+    }
+    .quote-display {
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 16px;
     }
-    .quote-form button[type="submit"] {
-      justify-self: flex-start;
-      min-width: 180px;
+    .quote-value {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 18px;
+    }
+    .quote-value span {
+      font-weight: 700;
+      color: rgba(244, 245, 247, 0.7);
+    }
+    .quote-value strong {
+      font-size: 2.4rem;
+      letter-spacing: 0.015em;
+    }
+    .quote-disclaimer {
+      margin: 0;
+      color: rgba(244, 245, 247, 0.75);
+      font-weight: 600;
     }
     .quote-message {
       margin-top: 14px;
@@ -416,17 +448,14 @@
       font-size: 0.9rem;
       color: rgba(244, 245, 247, 0.72);
     }
-    .quote-empty {
-      margin: 0;
-      color: rgba(244, 245, 247, 0.7);
-      font-weight: 600;
-    }
-    .quote-section.is-loading .quote-cta,
-    .quote-section.is-loading .quote-toggle {
+    .quote-card.is-loading .quote-cta,
+    .quote-card.is-loading .quote-toggle,
+    .quote-card.is-loading .quote-form-actions button,
+    .quote-card.is-loading .quote-inline-form button {
       pointer-events: none;
       opacity: 0.7;
     }
-    .quote-section.is-loading .quote-toggle::after {
+    .quote-card.is-loading .quote-toggle::after {
       content: '…';
     }
     .modes-grid {
@@ -1042,94 +1071,7 @@
   </section>
 
   <main class="container main-content">
-    <section class="quote-section" aria-labelledby="quoteHeading">
-      <div class="quote-card">
-        <h2 id="quoteHeading" class="quote-card__title">Get indicative scrap &amp; trade offers</h2>
-        <p class="quote-card__lead">Use your registration and mileage to see today&#8217;s guide prices. Quotes update instantly based on our latest yard rates and parts demand.</p>
-        <form id="quoteForm" class="quote-form" novalidate>
-          <div class="form-field">
-            <label for="quoteReg">Registration</label>
-            <input id="quoteReg" name="reg" placeholder="e.g. NU10 HXC" maxlength="9" autocomplete="off" required>
-          </div>
-          <div class="form-field">
-            <label for="quoteMileage">Mileage</label>
-            <input id="quoteMileage" name="mileage" type="number" min="0" step="100" placeholder="Current mileage" required>
-          </div>
-          <button id="quoteSubmit" type="submit" disabled>Get quote</button>
-        </form>
-        <p id="quoteMessage" class="quote-message hidden"></p>
-      </div>
-      <div class="quote-tiles" role="list">
-        <article class="quote-tile" data-kind="scrap" role="listitem">
-          <div class="quote-tile__header">
-            <div>
-              <h3>Scrap my car</h3>
-              <p class="quote-tile__caption">Best for end-of-life vehicles</p>
-            </div>
-            <div class="quote-price">
-              <strong id="scrapPriceValue">£—</strong>
-              <span class="quote-badge">Indicative offer</span>
-            </div>
-          </div>
-          <p class="quote-empty" id="scrapPlaceholder">Enter your reg and mileage to see today&#8217;s guide price.</p>
-          <div class="quote-actions">
-            <button type="button" class="quote-cta" id="scrapEmailPrimary" disabled>Scrap my car</button>
-            <button type="button" class="quote-cta quote-cta--secondary" id="scrapEmailSecondary" disabled>Sell my car</button>
-            <button type="button" class="quote-toggle" id="scrapToggle" aria-expanded="false" aria-controls="scrapBreakdown">View breakdown</button>
-          </div>
-          <div id="scrapBreakdown" class="quote-breakdown" hidden>
-            <ul class="quote-list">
-              <li><span>Estimated weight</span><strong id="scrapWeight">–</strong></li>
-              <li><span>Rate applied</span><strong id="scrapRate">–</strong></li>
-              <li><span>Parts buffer</span><strong id="scrapParts">–</strong></li>
-              <li id="scrapCatalystRow"><span>Catalyst uplift</span><strong id="scrapCatalyst">–</strong></li>
-              <li id="scrapCollectionRow"><span>Collection fee</span><strong id="scrapCollection">–</strong></li>
-              <li id="scrapProcessingRow"><span>Processing reserve</span><strong id="scrapProcessing">–</strong></li>
-            </ul>
-            <p class="quote-note" id="scrapPopularityNote"></p>
-          </div>
-        </article>
-        <article class="quote-tile" data-kind="retail" role="listitem">
-          <div class="quote-tile__header">
-            <div>
-              <h3>Sell my car</h3>
-              <p class="quote-tile__caption">Retail-ready trade-in offer</p>
-            </div>
-            <div class="quote-price">
-              <strong id="retailPriceValue">£—</strong>
-              <span class="quote-badge">Indicative offer</span>
-            </div>
-          </div>
-          <p class="quote-empty" id="retailPlaceholder">Get an estimate that keeps margin for prep and parts.</p>
-          <div class="quote-actions">
-            <button type="button" class="quote-cta" id="retailEmailPrimary" disabled>Sell my car</button>
-            <button type="button" class="quote-cta quote-cta--secondary" id="retailEmailSecondary" disabled>Scrap my car</button>
-            <button type="button" class="quote-toggle" id="retailToggle" aria-expanded="false" aria-controls="retailBreakdown">View breakdown</button>
-          </div>
-          <div id="retailBreakdown" class="quote-breakdown" hidden>
-            <ul class="quote-list">
-              <li><span>Estimated weight</span><strong id="retailWeight">–</strong></li>
-              <li><span>Rate reference</span><strong id="retailRate">–</strong></li>
-              <li><span>Vehicle age</span><strong id="retailAge">–</strong></li>
-              <li><span>Expected mileage</span><strong id="retailExpected">–</strong></li>
-              <li><span>Mileage penalty</span><strong id="retailPenalty">–</strong></li>
-              <li><span>Condition factor</span><strong id="retailCondition">–</strong></li>
-              <li><span>Margin over scrap</span><strong id="retailMargin">–</strong></li>
-            </ul>
-            <p class="quote-note" id="retailConfidenceNote"></p>
-          </div>
-        </article>
-      </div>
-    </section>
-
-    <div class="modes-grid">
-      <div class="mode-card mode-card--disabled" aria-disabled="true">
-        <h3>Mobile service</h3>
-        <p>Our fully equipped van brings the workshop to your driveway or workplace for servicing, diagnostics, battery work and brake repairs without the travel hassle. This is useful if you are worried about driving your car so you don’t damage it even more.</p>
-        <span class="mode-card__status">Currently unavailable</span>
-        <p class="mode-card__note">Our van is off the road for repairs so mobile visits are paused until further notice. Book a garage appointment below and we’ll let you know as soon as mobile service returns.</p>
-      </div>
-      <div class="mode-card">
+<div class="mode-card">
         <h3>Garage service</h3>
         <p>Drop the car with us at Unit 5 for pit access, larger repairs and longer jobs. This is when you want to drop it off with us and let us do our thing with better tools and better equipment. We keep you updated throughout and get you back on the road quickly.</p>
       </div>
@@ -1329,6 +1271,106 @@
         <p class="footer-note">Tap Finish to send us an email with everything we need, we will get back with you same day.</p>
       </div>
     </section>
+
+    <div class="modes-grid">
+      <div class="mode-card mode-card--disabled" aria-disabled="true">
+        <h3>Mobile service</h3>
+        <p>Our fully equipped van brings the workshop to your driveway or workplace for servicing, diagnostics, battery work and brake repairs without the travel hassle. This is useful if you are worried about driving your car so you don’t damage it even more.</p>
+        <span class="mode-card__status">Currently unavailable</span>
+        <p class="mode-card__note">Our van is off the road for repairs so mobile visits are paused until further notice. Book a garage appointment below and we’ll let you know as soon as mobile service returns.</p>
+      </div>
+      <div class="mode-card">
+        <h3>Garage service</h3>
+        <p>Drop the car with us at Unit 5 for pit access, larger repairs and longer jobs. This is when you want to drop it off with us and let us do our thing with better tools and better equipment. We keep you updated throughout and get you back on the road quickly.</p>
+      </div>
+    </div>
+
+    <section id="scrapCard" class="card quote-card">
+      <div class="quote-card__header">
+        <h2>Scrap my car – instant estimate</h2>
+        <p class="quote-card__lead">Enter the vehicle details to see today’s guide scrap offer. This is an estimate only – we’ll confirm the final price once we inspect the vehicle in person.</p>
+      </div>
+      <form id="scrapForm" class="quote-inline-form" novalidate>
+        <div>
+          <label for="scrapReg">Vehicle registration</label>
+          <input id="scrapReg" name="scrapReg" placeholder="e.g. NU10 HXC" maxlength="9" autocomplete="off" required>
+        </div>
+        <div>
+          <label for="scrapMileage">Vehicle mileage</label>
+          <input id="scrapMileage" name="scrapMileage" type="number" min="0" step="100" placeholder="Current mileage" required>
+        </div>
+        <div class="quote-form-actions">
+          <button id="scrapEstimateButton" type="submit">Get scrap estimate</button>
+        </div>
+      </form>
+      <div class="quote-display">
+        <div class="quote-value">
+          <span>Estimated scrap offer</span>
+          <strong id="scrapPriceValue">£—</strong>
+        </div>
+        <p class="quote-disclaimer">Estimates use live scrap rates and parts buffers – final prices are confirmed after inspection.</p>
+        <div class="quote-actions">
+          <button type="button" class="quote-cta" id="scrapConfirmButton" disabled>Scrap my car</button>
+          <button type="button" class="quote-toggle" id="scrapToggle" aria-expanded="false" aria-controls="scrapBreakdown" disabled>View breakdown</button>
+        </div>
+        <div id="scrapBreakdown" class="quote-breakdown" hidden>
+          <ul class="quote-list">
+            <li><span>Estimated weight</span><strong id="scrapWeight">–</strong></li>
+            <li><span>Rate applied</span><strong id="scrapRate">–</strong></li>
+            <li><span>Parts buffer</span><strong id="scrapParts">–</strong></li>
+            <li id="scrapCatalystRow"><span>Catalyst uplift</span><strong id="scrapCatalyst">–</strong></li>
+            <li id="scrapCollectionRow"><span>Collection fee</span><strong id="scrapCollection">–</strong></li>
+            <li id="scrapProcessingRow"><span>Processing reserve</span><strong id="scrapProcessing">–</strong></li>
+          </ul>
+          <p class="quote-note" id="scrapPopularityNote"></p>
+        </div>
+        <p id="scrapMessage" class="quote-message hidden"></p>
+      </div>
+    </section>
+
+    <section id="retailCard" class="card quote-card">
+      <div class="quote-card__header">
+        <h2>Sell my car – instant estimate</h2>
+        <p class="quote-card__lead">See what we can offer to buy your car. This guide price keeps a healthy prep margin – the confirmed offer follows an in-person appraisal.</p>
+      </div>
+      <form id="retailForm" class="quote-inline-form" novalidate>
+        <div>
+          <label for="retailReg">Vehicle registration</label>
+          <input id="retailReg" name="retailReg" placeholder="e.g. NU10 HXC" maxlength="9" autocomplete="off" required>
+        </div>
+        <div>
+          <label for="retailMileage">Vehicle mileage</label>
+          <input id="retailMileage" name="retailMileage" type="number" min="0" step="100" placeholder="Current mileage" required>
+        </div>
+        <div class="quote-form-actions">
+          <button id="retailEstimateButton" type="submit">Get sell estimate</button>
+        </div>
+      </form>
+      <div class="quote-display">
+        <div class="quote-value">
+          <span>Estimated buy-in offer</span>
+          <strong id="retailPriceValue">£—</strong>
+        </div>
+        <p class="quote-disclaimer">Estimates factor in mileage, prep time and minimum margins – final offers are confirmed after we see the vehicle.</p>
+        <div class="quote-actions">
+          <button type="button" class="quote-cta" id="retailConfirmButton" disabled>Sell my car</button>
+          <button type="button" class="quote-toggle" id="retailToggle" aria-expanded="false" aria-controls="retailBreakdown" disabled>View breakdown</button>
+        </div>
+        <div id="retailBreakdown" class="quote-breakdown" hidden>
+          <ul class="quote-list">
+            <li><span>Estimated weight</span><strong id="retailWeight">–</strong></li>
+            <li><span>Rate reference</span><strong id="retailRate">–</strong></li>
+            <li><span>Vehicle age</span><strong id="retailAge">–</strong></li>
+            <li><span>Expected mileage</span><strong id="retailExpected">–</strong></li>
+            <li><span>Mileage penalty</span><strong id="retailPenalty">–</strong></li>
+            <li><span>Condition factor</span><strong id="retailCondition">–</strong></li>
+            <li><span>Margin over scrap</span><strong id="retailMargin">–</strong></li>
+          </ul>
+          <p class="quote-note" id="retailConfidenceNote"></p>
+        </div>
+        <p id="retailMessage" class="quote-message hidden"></p>
+      </div>
+    </section>
   </main>
 
   <script>
@@ -1338,48 +1380,62 @@
     const VEHICLE_NOT_FOUND_MESSAGE = 'We are unable to find your vehicle, please check you have entered the reg correctly.';
     const GARAGE_ADDRESS_TEXT = 'Unit 5, Wingate Grange Industrial Estate, TS28 5AH';
     const QUOTE_API_URL = '/api/quote';
-    const QUOTE_SECTION = document.querySelector('.quote-section');
-    const QUOTE_FORM = document.getElementById('quoteForm');
-    const QUOTE_REG_INPUT = document.getElementById('quoteReg');
-    const QUOTE_MILEAGE_INPUT = document.getElementById('quoteMileage');
+    const QUOTE_CARDS = {
+      scrap: {
+        card: document.getElementById('scrapCard'),
+        form: document.getElementById('scrapForm'),
+        regInput: document.getElementById('scrapReg'),
+        mileageInput: document.getElementById('scrapMileage'),
+        estimateButton: document.getElementById('scrapEstimateButton'),
+        confirmButton: document.getElementById('scrapConfirmButton'),
+        toggle: document.getElementById('scrapToggle'),
+        message: document.getElementById('scrapMessage'),
+        elements: {
+          price: document.getElementById('scrapPriceValue'),
+          breakdown: document.getElementById('scrapBreakdown'),
+          weight: document.getElementById('scrapWeight'),
+          rate: document.getElementById('scrapRate'),
+          parts: document.getElementById('scrapParts'),
+          catalystRow: document.getElementById('scrapCatalystRow'),
+          catalyst: document.getElementById('scrapCatalyst'),
+          collectionRow: document.getElementById('scrapCollectionRow'),
+          collection: document.getElementById('scrapCollection'),
+          processingRow: document.getElementById('scrapProcessingRow'),
+          processing: document.getElementById('scrapProcessing'),
+          popularityNote: document.getElementById('scrapPopularityNote')
+        },
+        lastResult: null,
+        loading: false
+      },
+      retail: {
+        card: document.getElementById('retailCard'),
+        form: document.getElementById('retailForm'),
+        regInput: document.getElementById('retailReg'),
+        mileageInput: document.getElementById('retailMileage'),
+        estimateButton: document.getElementById('retailEstimateButton'),
+        confirmButton: document.getElementById('retailConfirmButton'),
+        toggle: document.getElementById('retailToggle'),
+        message: document.getElementById('retailMessage'),
+        elements: {
+          price: document.getElementById('retailPriceValue'),
+          breakdown: document.getElementById('retailBreakdown'),
+          weight: document.getElementById('retailWeight'),
+          rate: document.getElementById('retailRate'),
+          age: document.getElementById('retailAge'),
+          expected: document.getElementById('retailExpected'),
+          penalty: document.getElementById('retailPenalty'),
+          condition: document.getElementById('retailCondition'),
+          margin: document.getElementById('retailMargin'),
+          confidenceNote: document.getElementById('retailConfidenceNote')
+        },
+        lastResult: null,
+        loading: false
+      }
+    };
+    const QUOTE_TOGGLES = Object.values(QUOTE_CARDS)
+      .map(card => card.toggle)
+      .filter(Boolean);
     const VRM_MILEAGE_INPUT = document.getElementById('vrmMileage');
-    const QUOTE_SUBMIT = document.getElementById('quoteSubmit');
-    const QUOTE_MESSAGE = document.getElementById('quoteMessage');
-    const SCRAP_ELEMENTS = {
-      price: document.getElementById('scrapPriceValue'),
-      placeholder: document.getElementById('scrapPlaceholder'),
-      scrapButton: document.getElementById('scrapEmailPrimary'),
-      sellButton: document.getElementById('scrapEmailSecondary'),
-      breakdown: document.getElementById('scrapBreakdown'),
-      weight: document.getElementById('scrapWeight'),
-      rate: document.getElementById('scrapRate'),
-      parts: document.getElementById('scrapParts'),
-      catalystRow: document.getElementById('scrapCatalystRow'),
-      catalyst: document.getElementById('scrapCatalyst'),
-      collectionRow: document.getElementById('scrapCollectionRow'),
-      collection: document.getElementById('scrapCollection'),
-      processingRow: document.getElementById('scrapProcessingRow'),
-      processing: document.getElementById('scrapProcessing'),
-      popularityNote: document.getElementById('scrapPopularityNote')
-    };
-    const RETAIL_ELEMENTS = {
-      price: document.getElementById('retailPriceValue'),
-      placeholder: document.getElementById('retailPlaceholder'),
-      sellButton: document.getElementById('retailEmailPrimary'),
-      scrapButton: document.getElementById('retailEmailSecondary'),
-      breakdown: document.getElementById('retailBreakdown'),
-      weight: document.getElementById('retailWeight'),
-      rate: document.getElementById('retailRate'),
-      age: document.getElementById('retailAge'),
-      expected: document.getElementById('retailExpected'),
-      penalty: document.getElementById('retailPenalty'),
-      condition: document.getElementById('retailCondition'),
-      margin: document.getElementById('retailMargin'),
-      confidenceNote: document.getElementById('retailConfidenceNote')
-    };
-    const QUOTE_TOGGLES = Array.from(document.querySelectorAll('.quote-toggle'));
-    let lastQuoteResult = null;
-    let quoteIsLoading = false;
     const SERVICES_CARD = document.getElementById('servicesCard');
     const SERVICES_MESSAGE = document.getElementById('servicesMessage');
     const SERVICE_SEARCH_WRAPPER = document.getElementById('serviceSearchWrapper');
@@ -1479,51 +1535,6 @@
       if (!tier) return 'Standard';
       return POPULARITY_LABELS[tier] || (tier.charAt(0).toUpperCase() + tier.slice(1));
     }
-
-    function setQuoteMessage(message) {
-      if (!QUOTE_MESSAGE) return;
-      if (!message) {
-        QUOTE_MESSAGE.textContent = '';
-        QUOTE_MESSAGE.classList.add('hidden');
-      } else {
-        QUOTE_MESSAGE.textContent = message;
-        QUOTE_MESSAGE.classList.remove('hidden');
-      }
-    }
-
-    function isQuoteFormValid() {
-      if (!QUOTE_REG_INPUT || !QUOTE_MILEAGE_INPUT) return false;
-      return isQuoteRegValid(QUOTE_REG_INPUT.value) && isMileageValid(QUOTE_MILEAGE_INPUT.value);
-    }
-
-    function updateQuoteSubmitState() {
-      if (!QUOTE_SUBMIT) return;
-      QUOTE_SUBMIT.disabled = quoteIsLoading || !isQuoteFormValid();
-      refreshQuoteActionState();
-    }
-
-    function setQuoteLoadingState(isLoading) {
-      quoteIsLoading = Boolean(isLoading);
-      if (QUOTE_SECTION) {
-        QUOTE_SECTION.classList.toggle('is-loading', quoteIsLoading);
-      }
-      if (QUOTE_SUBMIT) {
-        QUOTE_SUBMIT.textContent = quoteIsLoading ? 'Calculating…' : 'Get quote';
-      }
-      updateQuoteSubmitState();
-    }
-
-    function collapseQuotePanels() {
-      QUOTE_TOGGLES.forEach(button => {
-        if (!button) return;
-        button.setAttribute('aria-expanded', 'false');
-        const target = document.getElementById(button.getAttribute('aria-controls'));
-        if (target) {
-          target.hidden = true;
-        }
-      });
-    }
-
     function setQuoteButtonState(button, enabled) {
       if (!button) return;
       button.disabled = !enabled;
@@ -1532,33 +1543,6 @@
       } else {
         button.classList.remove('is-disabled');
       }
-    }
-
-    function refreshQuoteActionState() {
-      if (quoteIsLoading || !lastQuoteResult) {
-        setQuoteButtonState(SCRAP_ELEMENTS.scrapButton, false);
-        setQuoteButtonState(SCRAP_ELEMENTS.sellButton, false);
-        setQuoteButtonState(RETAIL_ELEMENTS.sellButton, false);
-        setQuoteButtonState(RETAIL_ELEMENTS.scrapButton, false);
-        return;
-      }
-
-      const { reg, mileage } = getQuoteFormValues();
-      const normalisedMileage = Math.max(0, Math.round(Number(mileage || 0)));
-      const matches =
-        normaliseQuoteReg(reg) === (lastQuoteResult.reg || '') &&
-        normalisedMileage === Math.max(0, Math.round(Number(lastQuoteResult.mileage || 0)));
-
-      const scrapValid =
-        matches && Number.isFinite(Number(lastQuoteResult.scrapPriceGBP)) && Number(lastQuoteResult.scrapPriceGBP) > 0;
-      const retailValid =
-        matches && Number.isFinite(Number(lastQuoteResult.resalePriceGBP)) && Number(lastQuoteResult.resalePriceGBP) > 0;
-
-      setQuoteButtonState(SCRAP_ELEMENTS.scrapButton, scrapValid);
-      setQuoteButtonState(RETAIL_ELEMENTS.scrapButton, scrapValid);
-      setQuoteButtonState(SCRAP_ELEMENTS.sellButton, retailValid);
-      setQuoteButtonState(RETAIL_ELEMENTS.sellButton, retailValid);
-      refreshQuoteActionState();
     }
 
     function setRowValue(rowEl, valueEl, rawValue, formatter = formatCurrencyGBP) {
@@ -1573,114 +1557,225 @@
       }
     }
 
-    function resetQuoteTiles() {
-      lastQuoteResult = null;
-      if (SCRAP_ELEMENTS.price) SCRAP_ELEMENTS.price.textContent = '£—';
-      if (SCRAP_ELEMENTS.placeholder) SCRAP_ELEMENTS.placeholder.classList.remove('hidden');
-      if (SCRAP_ELEMENTS.weight) SCRAP_ELEMENTS.weight.textContent = '–';
-      if (SCRAP_ELEMENTS.rate) SCRAP_ELEMENTS.rate.textContent = '–';
-      if (SCRAP_ELEMENTS.parts) SCRAP_ELEMENTS.parts.textContent = '–';
-      if (SCRAP_ELEMENTS.catalystRow) SCRAP_ELEMENTS.catalystRow.hidden = true;
-      if (SCRAP_ELEMENTS.collectionRow) SCRAP_ELEMENTS.collectionRow.hidden = true;
-      if (SCRAP_ELEMENTS.processingRow) SCRAP_ELEMENTS.processingRow.hidden = true;
-      if (SCRAP_ELEMENTS.popularityNote) SCRAP_ELEMENTS.popularityNote.textContent = '';
-
-      if (RETAIL_ELEMENTS.price) RETAIL_ELEMENTS.price.textContent = '£—';
-      if (RETAIL_ELEMENTS.placeholder) RETAIL_ELEMENTS.placeholder.classList.remove('hidden');
-      if (RETAIL_ELEMENTS.weight) RETAIL_ELEMENTS.weight.textContent = '–';
-      if (RETAIL_ELEMENTS.rate) RETAIL_ELEMENTS.rate.textContent = '–';
-      if (RETAIL_ELEMENTS.age) RETAIL_ELEMENTS.age.textContent = '–';
-      if (RETAIL_ELEMENTS.expected) RETAIL_ELEMENTS.expected.textContent = '–';
-      if (RETAIL_ELEMENTS.penalty) RETAIL_ELEMENTS.penalty.textContent = '0%';
-      if (RETAIL_ELEMENTS.condition) RETAIL_ELEMENTS.condition.textContent = '—';
-      if (RETAIL_ELEMENTS.margin) RETAIL_ELEMENTS.margin.textContent = '£—';
-      if (RETAIL_ELEMENTS.confidenceNote) RETAIL_ELEMENTS.confidenceNote.textContent = '';
-
-      setQuoteButtonState(SCRAP_ELEMENTS.scrapButton, false);
-      setQuoteButtonState(SCRAP_ELEMENTS.sellButton, false);
-      setQuoteButtonState(RETAIL_ELEMENTS.sellButton, false);
-      setQuoteButtonState(RETAIL_ELEMENTS.scrapButton, false);
-      collapseQuotePanels();
-    }
-
-    function updateScrapTile(result) {
-      const breakdown = result.breakdown || {};
-      if (SCRAP_ELEMENTS.price) SCRAP_ELEMENTS.price.textContent = formatCurrencyGBP(result.scrapPriceGBP);
-      if (SCRAP_ELEMENTS.placeholder) SCRAP_ELEMENTS.placeholder.classList.add('hidden');
-      if (SCRAP_ELEMENTS.weight) SCRAP_ELEMENTS.weight.textContent = formatKg(breakdown.estimatedWeightKg);
-      if (SCRAP_ELEMENTS.rate) SCRAP_ELEMENTS.rate.textContent = formatRatePerTonne(breakdown.ratePerTonneApplied);
-      if (SCRAP_ELEMENTS.parts) SCRAP_ELEMENTS.parts.textContent = formatCurrencyGBP(breakdown.partsBufferApplied);
-      setRowValue(SCRAP_ELEMENTS.catalystRow, SCRAP_ELEMENTS.catalyst, breakdown.catalystAppliedGBP);
-      setRowValue(SCRAP_ELEMENTS.collectionRow, SCRAP_ELEMENTS.collection, breakdown.collectionFeeGBP);
-      setRowValue(SCRAP_ELEMENTS.processingRow, SCRAP_ELEMENTS.processing, breakdown.processingReserveGBP);
-      if (SCRAP_ELEMENTS.popularityNote) {
-        const bucketLabel = describeBucket(breakdown.bodyTypeBucket);
-        const tierLabel = describePopularity(breakdown.popularityTier);
-        const buffer = formatCurrencyGBP(breakdown.partsBufferApplied);
-        SCRAP_ELEMENTS.popularityNote.textContent = `Body type bucket: ${bucketLabel}. Parts demand tier: ${tierLabel} (buffer ${buffer}).`;
+    function setQuoteMessageFor(kind, message) {
+      const card = QUOTE_CARDS[kind];
+      if (!card || !card.message) return;
+      if (!message) {
+        card.message.textContent = '';
+        card.message.classList.add('hidden');
+      } else {
+        card.message.textContent = message;
+        card.message.classList.remove('hidden');
       }
     }
 
-    function updateRetailTile(result) {
-      const breakdown = result.breakdown || {};
-      if (RETAIL_ELEMENTS.price) RETAIL_ELEMENTS.price.textContent = formatCurrencyGBP(result.resalePriceGBP);
-      if (RETAIL_ELEMENTS.placeholder) RETAIL_ELEMENTS.placeholder.classList.add('hidden');
-      if (RETAIL_ELEMENTS.weight) RETAIL_ELEMENTS.weight.textContent = formatKg(breakdown.estimatedWeightKg);
-      if (RETAIL_ELEMENTS.rate) RETAIL_ELEMENTS.rate.textContent = formatRatePerTonne(breakdown.ratePerTonneApplied);
-      if (RETAIL_ELEMENTS.age) {
-        const age = Math.max(0, Math.round(Number(breakdown.ageYears || 0)));
-        RETAIL_ELEMENTS.age.textContent = `${age} year${age === 1 ? '' : 's'}`;
+    function resetQuoteCard(kind) {
+      const card = QUOTE_CARDS[kind];
+      if (!card) return;
+      card.lastResult = null;
+      card.loading = false;
+      if (card.card) card.card.classList.remove('is-loading');
+      if (card.estimateButton) {
+        const label = typeof card.estimateLabel === 'string' ? card.estimateLabel : card.estimateButton.textContent;
+        card.estimateButton.textContent = label;
+        card.estimateButton.disabled = false;
       }
-      if (RETAIL_ELEMENTS.expected) RETAIL_ELEMENTS.expected.textContent = formatMiles(breakdown.expectedMileageForAge);
-      if (RETAIL_ELEMENTS.penalty) RETAIL_ELEMENTS.penalty.textContent = formatPenalty(breakdown.mileagePenaltyApplied);
-      if (RETAIL_ELEMENTS.condition) RETAIL_ELEMENTS.condition.textContent = formatCondition(breakdown.conditionFactorApplied);
-      if (RETAIL_ELEMENTS.margin) {
-        const margin = Number(result.resalePriceGBP) - Number(result.scrapPriceGBP);
-        RETAIL_ELEMENTS.margin.textContent = formatCurrencyGBP(margin);
+      if (card.elements.price) card.elements.price.textContent = '£—';
+      if (card.elements.breakdown) card.elements.breakdown.hidden = true;
+      if (card.toggle) {
+        card.toggle.disabled = true;
+        card.toggle.setAttribute('aria-expanded', 'false');
       }
-      if (RETAIL_ELEMENTS.confidenceNote) {
-        const minMargin = formatCurrencyGBP(breakdown.minimumMarginGBP);
-        RETAIL_ELEMENTS.confidenceNote.textContent = `Ensures at least ${minMargin} over scrap after rounding. Confidence: medium.`;
+      setQuoteMessageFor(kind, '');
+      if (kind === 'scrap') {
+        const elements = card.elements;
+        if (elements.weight) elements.weight.textContent = '–';
+        if (elements.rate) elements.rate.textContent = '–';
+        if (elements.parts) elements.parts.textContent = '–';
+        if (elements.catalystRow) elements.catalystRow.hidden = true;
+        if (elements.collectionRow) elements.collectionRow.hidden = true;
+        if (elements.processingRow) elements.processingRow.hidden = true;
+        if (elements.popularityNote) elements.popularityNote.textContent = '';
+      } else if (kind === 'retail') {
+        const elements = card.elements;
+        if (elements.weight) elements.weight.textContent = '–';
+        if (elements.rate) elements.rate.textContent = '–';
+        if (elements.age) elements.age.textContent = '–';
+        if (elements.expected) elements.expected.textContent = '–';
+        if (elements.penalty) elements.penalty.textContent = '0%';
+        if (elements.condition) elements.condition.textContent = '—';
+        if (elements.margin) elements.margin.textContent = '£—';
+        if (elements.confidenceNote) elements.confidenceNote.textContent = '';
+      }
+      setQuoteButtonState(card.confirmButton, false);
+    }
+
+    function isResultValid(kind, result) {
+      if (!result) return false;
+      if (kind === 'scrap') {
+        return Number.isFinite(Number(result.scrapPriceGBP)) && Number(result.scrapPriceGBP) > 0;
+      }
+      return Number.isFinite(Number(result.resalePriceGBP)) && Number(result.resalePriceGBP) > 0;
+    }
+
+    function updateQuoteActionStates(kind) {
+      const card = QUOTE_CARDS[kind];
+      if (!card) return;
+      const isValid = isResultValid(kind, card.lastResult);
+      const disabled = card.loading || !isValid;
+      setQuoteButtonState(card.confirmButton, !disabled);
+      if (card.toggle) {
+        card.toggle.disabled = disabled;
+        if (disabled) {
+          card.toggle.setAttribute('aria-expanded', 'false');
+          if (card.elements.breakdown) {
+            card.elements.breakdown.hidden = true;
+          }
+        }
       }
     }
 
-    function applyQuoteResult(result) {
-      if (!result || !result.breakdown) return;
-      const reg = result.reg ? normaliseQuoteReg(result.reg) : '';
-      const mileage = Math.max(0, Math.round(Number(result.mileage || 0)));
-      const enriched = { ...result, reg, mileage };
-      lastQuoteResult = enriched;
-      updateScrapTile(enriched);
-      updateRetailTile(enriched);
-
-      const scrapValid = Number.isFinite(Number(enriched.scrapPriceGBP)) && Number(enriched.scrapPriceGBP) > 0;
-      const retailValid = Number.isFinite(Number(enriched.resalePriceGBP)) && Number(enriched.resalePriceGBP) > 0;
-
-      setQuoteButtonState(SCRAP_ELEMENTS.scrapButton, scrapValid);
-      setQuoteButtonState(RETAIL_ELEMENTS.scrapButton, scrapValid);
-      setQuoteButtonState(SCRAP_ELEMENTS.sellButton, retailValid);
-      setQuoteButtonState(RETAIL_ELEMENTS.sellButton, retailValid);
-      refreshQuoteActionState();
+    function setQuoteLoading(kind, isLoading) {
+      const card = QUOTE_CARDS[kind];
+      if (!card) return;
+      card.loading = Boolean(isLoading);
+      if (card.card) {
+        card.card.classList.toggle('is-loading', card.loading);
+      }
+      if (card.estimateButton) {
+        if (card.loading) {
+          card.estimateButton.textContent = 'Calculating…';
+          card.estimateButton.disabled = true;
+        } else {
+          card.estimateButton.disabled = false;
+          const label = typeof card.estimateLabel === 'string' ? card.estimateLabel : card.estimateButton.textContent;
+          card.estimateButton.textContent = label;
+        }
+      }
+      updateQuoteActionStates(kind);
     }
 
-    function sendQuoteEmail(action, source) {
-      if (!lastQuoteResult) {
-        alert('Please get an up-to-date quote first.');
+    function applyQuoteToCard(kind, apiResult, regValue, mileageValue) {
+      const card = QUOTE_CARDS[kind];
+      if (!card || !apiResult) return;
+      const breakdown = apiResult.breakdown || {};
+      const reg = normaliseQuoteReg(regValue || apiResult.reg || '');
+      const mileageSource = mileageValue !== undefined && mileageValue !== null ? mileageValue : apiResult.mileage || 0;
+      const mileage = Math.max(0, Math.round(Number(mileageSource)));
+      const enriched = { ...apiResult, reg, mileage };
+      card.lastResult = enriched;
+      if (card.elements.price) {
+        const amount = kind === 'scrap' ? enriched.scrapPriceGBP : enriched.resalePriceGBP;
+        card.elements.price.textContent = formatCurrencyGBP(amount);
+      }
+      if (kind === 'scrap') {
+        const elements = card.elements;
+        if (elements.weight) elements.weight.textContent = formatKg(breakdown.estimatedWeightKg);
+        if (elements.rate) elements.rate.textContent = formatRatePerTonne(breakdown.ratePerTonneApplied);
+        if (elements.parts) elements.parts.textContent = formatCurrencyGBP(breakdown.partsBufferApplied);
+        setRowValue(elements.catalystRow, elements.catalyst, breakdown.catalystAppliedGBP);
+        setRowValue(elements.collectionRow, elements.collection, breakdown.collectionFeeGBP);
+        setRowValue(elements.processingRow, elements.processing, breakdown.processingReserveGBP);
+        if (elements.popularityNote) {
+          const bucketLabel = describeBucket(breakdown.bodyTypeBucket);
+          const tierLabel = describePopularity(breakdown.popularityTier);
+          const buffer = formatCurrencyGBP(breakdown.partsBufferApplied);
+          elements.popularityNote.textContent = `Body type bucket: ${bucketLabel}. Parts demand tier: ${tierLabel} (buffer ${buffer}).`;
+        }
+      } else if (kind === 'retail') {
+        const elements = card.elements;
+        if (elements.weight) elements.weight.textContent = formatKg(breakdown.estimatedWeightKg);
+        if (elements.rate) elements.rate.textContent = formatRatePerTonne(breakdown.ratePerTonneApplied);
+        if (elements.age) {
+          const age = Math.max(0, Math.round(Number(breakdown.ageYears || 0)));
+          elements.age.textContent = `${age} year${age === 1 ? '' : 's'}`;
+        }
+        if (elements.expected) elements.expected.textContent = formatMiles(breakdown.expectedMileageForAge);
+        if (elements.penalty) elements.penalty.textContent = formatPenalty(breakdown.mileagePenaltyApplied);
+        if (elements.condition) elements.condition.textContent = formatCondition(breakdown.conditionFactorApplied);
+        if (elements.margin) {
+          const margin = Number(enriched.resalePriceGBP) - Number(enriched.scrapPriceGBP);
+          elements.margin.textContent = formatCurrencyGBP(margin);
+        }
+        if (elements.confidenceNote) {
+          const minMargin = formatCurrencyGBP(breakdown.minimumMarginGBP);
+          elements.confidenceNote.textContent = `Ensures at least ${minMargin} over scrap after rounding. Confidence: medium.`;
+        }
+      }
+      setQuoteMessageFor(kind, '');
+      updateQuoteActionStates(kind);
+    }
+
+    async function handleQuoteSubmit(kind, event) {
+      if (event) {
+        event.preventDefault();
+      }
+      const card = QUOTE_CARDS[kind];
+      if (!card || card.loading) return;
+      const reg = card.regInput ? normaliseQuoteReg(card.regInput.value) : '';
+      const mileageRaw = card.mileageInput ? card.mileageInput.value : '';
+      if (!isQuoteRegValid(reg)) {
+        setQuoteMessageFor(kind, 'Please enter a valid registration (at least 5 characters).');
         return;
       }
+      if (!isMileageValid(mileageRaw)) {
+        setQuoteMessageFor(kind, 'Mileage must be a non-negative number.');
+        return;
+      }
+      setQuoteMessageFor(kind, '');
+      setQuoteLoading(kind, true);
+      try {
+        const mileage = Number(mileageRaw);
+        const response = await fetch(QUOTE_API_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ reg, mileage }),
+          cache: 'no-store'
+        });
+        const data = await response.json().catch(() => null);
+        if (!response.ok) {
+          const message = (data && data.error) || 'Unable to calculate an estimate right now.';
+          throw new Error(message);
+        }
+        applyQuoteToCard(kind, data, reg, mileage);
+      } catch (error) {
+        resetQuoteCard(kind);
+        setQuoteMessageFor(kind, error && error.message ? error.message : 'We couldn’t calculate an estimate just now. Please try again shortly.');
+      } finally {
+        setQuoteLoading(kind, false);
+      }
+    }
 
-      const isScrap = action === 'scrap';
-      const amount = isScrap ? Number(lastQuoteResult.scrapPriceGBP) : Number(lastQuoteResult.resalePriceGBP);
+    function toggleQuotePanel(button) {
+      const targetId = button.getAttribute('aria-controls');
+      const target = document.getElementById(targetId);
+      if (!target) return;
+      const expanded = button.getAttribute('aria-expanded') === 'true';
+      button.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+      target.hidden = expanded;
+    }
+
+    function sendQuoteEmail(kind) {
+      const card = QUOTE_CARDS[kind];
+      if (!card || card.loading) {
+        alert('Please get an up-to-date estimate first.');
+        return;
+      }
+      const result = card.lastResult;
+      if (!isResultValid(kind, result)) {
+        alert('Please get an up-to-date estimate first.');
+        return;
+      }
+      const isScrap = kind === 'scrap';
+      const amount = Number(isScrap ? result.scrapPriceGBP : result.resalePriceGBP);
       if (!Number.isFinite(amount) || amount <= 0) {
-        alert('We need a fresh quote before we can send the offer details.');
+        alert('Please get an up-to-date estimate first.');
         return;
       }
-
-      const reg = (lastQuoteResult.reg || '').toUpperCase();
-      const mileageValue = Math.max(0, Math.round(Number(lastQuoteResult.mileage || 0)));
+      const reg = (result.reg || '').toUpperCase();
+      const mileageValue = Math.max(0, Math.round(Number(result.mileage || 0)));
       const mileageLine = mileageValue > 0 ? `Mileage provided: ${formatMiles(mileageValue)}` : '';
-
-      const vehicleDetails = lastQuoteResult.vehicleDetails || {};
+      const vehicleDetails = result.vehicleDetails || {};
       const make = titleCaseVehicleName(vehicleDetails.make);
       let model = titleCaseVehicleName(resolveVehicleModel(vehicleDetails));
       if (make && model && model.toLowerCase() === make.toLowerCase()) {
@@ -1690,8 +1785,7 @@
       const bodyType = vehicleDetails.bodyType || vehicleDetails.bodyTypeDescription || '';
       const fuelDisplay = formatFuelDisplay(vehicleDetails.fuelType);
       const engineDisplay = formatEngineCapacity(vehicleDetails.engineCapacity || vehicleDetails.engineSize);
-
-      const breakdown = lastQuoteResult.breakdown || {};
+      const breakdown = result.breakdown || {};
       const weightValue = Number(breakdown.estimatedWeightKg);
       const rateValue = Number(breakdown.ratePerTonneApplied);
       const partsBufferValue = Number(breakdown.partsBufferApplied);
@@ -1704,12 +1798,10 @@
       const minimumMarginValue = Number(breakdown.minimumMarginGBP);
       const bucketLabel = breakdown.bodyTypeBucket ? describeBucket(breakdown.bodyTypeBucket) : '';
       const popularityLabel = breakdown.popularityTier ? describePopularity(breakdown.popularityTier) : '';
-
-      const counterpartValue = isScrap ? Number(lastQuoteResult.resalePriceGBP) : Number(lastQuoteResult.scrapPriceGBP);
+      const counterpartValue = isScrap ? Number(result.resalePriceGBP) : Number(result.scrapPriceGBP);
       const counterpartLine = Number.isFinite(counterpartValue) && counterpartValue > 0
         ? `${isScrap ? 'Alternative sell offer' : 'Alternative scrap offer'}: ${formatCurrencyGBP(counterpartValue)}`
         : '';
-
       const requestLines = [
         `Request type: ${isScrap ? 'Scrap my car' : 'Sell my car'}`,
         reg ? `Registration: ${reg}` : '',
@@ -1720,13 +1812,11 @@
         engineDisplay ? `Engine size: ${engineDisplay}` : '',
         mileageLine
       ].filter(Boolean);
-
       const offerLines = [
         `Offer amount: ${formatCurrencyGBP(amount)}`,
         counterpartLine,
-        `Quote tile used: ${source === 'retail' ? 'Sell my car' : 'Scrap my car'}`
+        'Note: Estimate generated online – final amount confirmed after we inspect the vehicle in person.'
       ].filter(Boolean);
-
       const breakdownLines = [
         bucketLabel && bucketLabel !== 'Vehicle' ? `Body type bucket: ${bucketLabel}` : '',
         popularityLabel ? `Parts demand tier: ${popularityLabel}` : '',
@@ -1737,12 +1827,11 @@
         Number.isFinite(collectionValue) && collectionValue > 0 ? `Collection fee deducted: ${formatCurrencyGBP(collectionValue)}` : '',
         Number.isFinite(processingValue) && processingValue > 0 ? `Processing reserve deducted: ${formatCurrencyGBP(processingValue)}` : ''
       ];
-
       if (!isScrap) {
         if (Number.isFinite(expectedMileageValue) && expectedMileageValue > 0) {
           breakdownLines.push(`Expected mileage for age: ${formatMiles(expectedMileageValue)}`);
         }
-        if (Number.isFinite(penaltyValue)) {
+        if (Number.isFinite(penaltyValue) && penaltyValue > 0) {
           breakdownLines.push(`Mileage penalty applied: ${formatPenalty(penaltyValue)}`);
         }
         if (Number.isFinite(conditionFactorValue) && conditionFactorValue > 0) {
@@ -1752,138 +1841,57 @@
           breakdownLines.push(`Minimum margin over scrap: ${formatCurrencyGBP(minimumMarginValue)}`);
         }
       }
-
-      const formatSection = (title, lines) => {
-        const filtered = lines.filter(Boolean);
+      const formatSection = (title, sectionLines) => {
+        const filtered = sectionLines.filter(Boolean);
         if (!filtered.length) return '';
-        return `${title}:\n- ${filtered.join('\n- ')}`;
+        return `${title}:
+- ${filtered.join('
+- ')}`;
       };
-
       const sections = [
         formatSection('Vehicle & request', requestLines),
         formatSection('Quote figures', offerLines),
         formatSection('Breakdown notes', breakdownLines)
       ].filter(Boolean);
-
       const generatedAt = new Date().toLocaleString('en-GB', { timeZone: 'Europe/London' });
       sections.push(`Generated via online quote tool on ${generatedAt}.`);
-
       const subject = encodeURIComponent(`${isScrap ? 'Scrap' : 'Sell'} quote request – ${reg || 'vehicle'}`);
-      const body = encodeURIComponent(sections.join('\n\n'));
+      const body = encodeURIComponent(sections.join('
+
+'));
       window.location.href = `mailto:support@mitchsautoservices.co.uk?subject=${subject}&body=${body}`;
     }
 
-    function getQuoteFormValues() {
-      const reg = QUOTE_REG_INPUT ? normaliseQuoteReg(QUOTE_REG_INPUT.value) : '';
-      const mileage = QUOTE_MILEAGE_INPUT ? Number(QUOTE_MILEAGE_INPUT.value) : NaN;
-      return { reg, mileage };
-    }
-
-    function toggleQuotePanel(button) {
-      const targetId = button.getAttribute('aria-controls');
-      const target = document.getElementById(targetId);
-      if (!target) return;
-      const expanded = button.getAttribute('aria-expanded') === 'true';
-      button.setAttribute('aria-expanded', expanded ? 'false' : 'true');
-      target.hidden = expanded;
-    }
-
-    async function submitQuoteRequest(event) {
-      event.preventDefault();
-      if (quoteIsLoading) return;
-      if (!QUOTE_FORM) return;
-
-      const { reg, mileage } = getQuoteFormValues();
-
-      if (!reg || reg.length < 5) {
-        setQuoteMessage('Please enter a valid registration (at least 5 characters).');
-        return;
+    Object.entries(QUOTE_CARDS).forEach(([kind, card]) => {
+      if (!card) return;
+      if (card.estimateButton) {
+        card.estimateLabel = card.estimateButton.textContent.trim();
       }
-
-      if (!Number.isFinite(mileage) || mileage < 0) {
-        setQuoteMessage('Mileage must be a non-negative number.');
-        return;
+      resetQuoteCard(kind);
+      if (card.form) {
+        card.form.addEventListener('submit', (event) => handleQuoteSubmit(kind, event));
       }
-
-      setQuoteMessage('');
-      setQuoteLoadingState(true);
-
-      try {
-        const response = await fetch(QUOTE_API_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ reg, mileage }),
-          cache: 'no-store'
+      if (card.regInput) {
+        card.regInput.addEventListener('input', () => {
+          card.regInput.value = normaliseQuoteReg(card.regInput.value);
+          setQuoteMessageFor(kind, '');
         });
-
-        let data = null;
-        try {
-          data = await response.json();
-        } catch (parseError) {
-          data = null;
-        }
-
-        if (!response.ok) {
-          const message = (data && data.error) || 'Unable to calculate a quote right now.';
-          const error = new Error(message);
-          error.status = response.status;
-          throw error;
-        }
-
-        applyQuoteResult(data);
-        setQuoteMessage('');
-      } catch (error) {
-        resetQuoteTiles();
-        if (error && (error.status === 400 || error.status === 404)) {
-          setQuoteMessage(error.message || 'Please check the details and try again.');
-        } else {
-          setQuoteMessage('We couldn’t calculate a quote just now. Please try again shortly.');
-        }
-      } finally {
-        setQuoteLoadingState(false);
       }
-    }
-
-    resetQuoteTiles();
-
-    if (SCRAP_ELEMENTS.scrapButton) {
-      SCRAP_ELEMENTS.scrapButton.addEventListener('click', () => sendQuoteEmail('scrap', 'scrap'));
-    }
-    if (SCRAP_ELEMENTS.sellButton) {
-      SCRAP_ELEMENTS.sellButton.addEventListener('click', () => sendQuoteEmail('sell', 'scrap'));
-    }
-    if (RETAIL_ELEMENTS.sellButton) {
-      RETAIL_ELEMENTS.sellButton.addEventListener('click', () => sendQuoteEmail('sell', 'retail'));
-    }
-    if (RETAIL_ELEMENTS.scrapButton) {
-      RETAIL_ELEMENTS.scrapButton.addEventListener('click', () => sendQuoteEmail('scrap', 'retail'));
-    }
-
-    if (QUOTE_FORM) {
-      QUOTE_FORM.addEventListener('submit', submitQuoteRequest);
-    }
-
-    if (QUOTE_REG_INPUT) {
-      QUOTE_REG_INPUT.addEventListener('input', () => {
-        QUOTE_REG_INPUT.value = QUOTE_REG_INPUT.value.toUpperCase();
-        setQuoteMessage('');
-        updateQuoteSubmitState();
-      });
-    }
-
-    if (QUOTE_MILEAGE_INPUT) {
-      QUOTE_MILEAGE_INPUT.addEventListener('input', () => {
-        setQuoteMessage('');
-        updateQuoteSubmitState();
-      });
-    }
+      if (card.mileageInput) {
+        card.mileageInput.addEventListener('input', () => setQuoteMessageFor(kind, ''));
+      }
+      if (card.confirmButton) {
+        card.confirmButton.addEventListener('click', () => sendQuoteEmail(kind));
+      }
+    });
 
     QUOTE_TOGGLES.forEach(button => {
       if (!button) return;
-      button.addEventListener('click', () => toggleQuotePanel(button));
+      button.addEventListener('click', () => {
+        if (button.disabled) return;
+        toggleQuotePanel(button);
+      });
     });
-
-    updateQuoteSubmitState();
 
     function isModeDisabled(modeKey = '') {
       if (!modeKey) {

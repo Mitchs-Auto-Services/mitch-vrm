@@ -699,8 +699,9 @@
           <summary>Scrap My Car</summary>
           <div class="panel-body">
             <p class="quote-hint">
-              Let us know the mileage and how you would like us to handle the vehicle. We will email an estimate that includes a
-              full breakdown with the vehicle price and the pick up price* so you know exactly where the figures come from.
+              Let us know the mileage and how you would like us to handle the vehicle. Complete cars are valued at roughly £160 per
+              tonne plus a £100 parts buffer, while bare shells use around £100 per tonne for the steel value. We will email a
+              full breakdown showing the drop-off payout, collection deduction*, and shell-only figure.
             </p>
             <form id="scrapForm" class="quote-form" novalidate>
               <label for="scrapVrm">Registration (VRM)</label>
@@ -771,7 +772,7 @@
                 </div>
               </div>
 
-              <div class="quote-note">All scrap values are estimates until we inspect the vehicle in person.</div>
+              <div class="quote-note">All scrap values include a £100 parts buffer and remain estimates until we inspect the vehicle in person.</div>
 
               <div class="submit-row">
                 <button type="submit">Scrap My Car</button>
@@ -785,8 +786,9 @@
           <summary>Sell My Car</summary>
           <div class="panel-body">
             <p class="quote-hint">
-              Share your mileage and how you would like to hand the vehicle over. We will reply with an estimated offer and a br
-              eakdown so you can compare the vehicle price and any optional pickup costs.
+              Share your mileage and how you would like to hand the vehicle over. We start with a realistic retail price for the model,
+              deduct repairs, prep, collection, and a £300–£500 profit target, then round to the nearest £25 so you can see the safe maximum
+              we can offer alongside the scrap fallback.
             </p>
             <form id="sellForm" class="quote-form" novalidate>
               <label for="sellVrm">Registration (VRM)</label>
@@ -857,7 +859,7 @@
                 </div>
               </div>
 
-              <div class="quote-note">Offers are estimates until we have inspected the vehicle in person.</div>
+              <div class="quote-note">Offers factor in repairs, costs, and a £300–£500 profit target, and stay as estimates until we inspect the vehicle in person.</div>
 
               <div class="submit-row">
                 <button type="submit">Sell My Car</button>
@@ -1466,21 +1468,56 @@
         }
 
         const defaults = {
-          hatchback: 1200,
-          saloon: 1350,
-          estate: 1400,
-          suv: 1600,
-          mpv: 1600,
-          '4x4': 1750,
-          van: 1700,
-          other: 1300
+          hatchback: 1100,
+          saloon: 1250,
+          estate: 1350,
+          suv: 1500,
+          mpv: 1500,
+          '4x4': 1650,
+          van: 1500,
+          other: 1200
         };
 
         const bucket = getBodyTypeBucket(vehicle.bodyType || vehicle.bodyTypeDescription || '');
         return defaults[bucket] || defaults.other;
       }
 
-      function roundCurrency(value, step = 10) {
+      function estimateShellWeightKg(vehicle = {}, completeWeightKg = 0) {
+        const make = (vehicle.make || '').toLowerCase();
+        const model = (vehicle.model || '').toLowerCase();
+        const knownShells = [
+          { match: ['peugeot', 'partner'], weight: 1000 },
+          { match: ['honda', 'civic'], weight: 850 },
+          { match: ['fiat', 'punto'], weight: 750 }
+        ];
+
+        for (const entry of knownShells) {
+          const matches = entry.match.every((term) => make.includes(term) || model.includes(term));
+          if (matches) return entry.weight;
+        }
+
+        const bucket = getBodyTypeBucket(vehicle.bodyType || vehicle.bodyTypeDescription || '');
+        const defaults = {
+          hatchback: 825,
+          saloon: 925,
+          estate: 1000,
+          suv: 1100,
+          mpv: 1100,
+          '4x4': 1150,
+          van: 1050,
+          other: 800
+        };
+
+        const baseline = defaults[bucket] || defaults.other;
+        const knownWeight = Number(completeWeightKg) && Number(completeWeightKg) > 0 ? Number(completeWeightKg) : null;
+        if (!knownWeight) return baseline;
+
+        const reduced = Math.max(baseline, knownWeight * 0.6);
+        const maxShell = Math.max(knownWeight - 200, baseline);
+        return Math.max(700, Math.min(reduced, maxShell));
+      }
+
+      function roundCurrency(value, step = 25) {
         return Math.max(0, Math.round(value / step) * step);
       }
 
@@ -1489,46 +1526,119 @@
         return `£${Math.round(numeric).toLocaleString('en-GB')}`;
       }
 
-      function computeScrapEstimate(vehicle, mileage) {
+      function computeScrapEstimate(vehicle) {
         const weightKg = estimateWeightKg(vehicle);
-        const vehiclePrice = roundCurrency((weightKg / 1000) * 160, 10);
-        const pickupPrice = 100;
+        const shellWeightKg = estimateShellWeightKg(vehicle, weightKg);
+        const ratePerTonneComplete = 160;
+        const ratePerTonneShell = 100;
+        const partsBuffer = 100;
+        const collectionCost = 100;
+
+        const completeRaw = (weightKg / 1000) * ratePerTonneComplete + partsBuffer;
+        const completeOffer = roundCurrency(completeRaw, 25);
+
+        const shellRaw = (shellWeightKg / 1000) * ratePerTonneShell;
+        const shellOffer = roundCurrency(shellRaw, 25);
+
         return {
           weightKg,
-          vehiclePrice,
-          pickupPrice,
-          totalDrop: vehiclePrice,
-          totalPickup: vehiclePrice + pickupPrice
+          shellWeightKg,
+          ratePerTonneComplete,
+          ratePerTonneShell,
+          partsBuffer,
+          collectionCost,
+          dropOffOffer: completeOffer,
+          pickupOffer: Math.max(0, completeOffer - collectionCost),
+          shellDropOffOffer: shellOffer,
+          shellPickupOffer: Math.max(0, shellOffer - collectionCost)
         };
       }
 
-      function computeSellEstimate(vehicle, mileage, scrapVehiclePrice) {
+      function estimateRetailValue(vehicle = {}, mileage = 0) {
+        const bucket = getBodyTypeBucket(vehicle.bodyType || vehicle.bodyTypeDescription || '');
+        const baseRetail = {
+          hatchback: 8500,
+          saloon: 9500,
+          estate: 10000,
+          suv: 13000,
+          mpv: 10500,
+          '4x4': 12500,
+          van: 10500,
+          other: 7500
+        };
+
+        const currentYear = new Date().getFullYear();
+        const year = Number(vehicle.yearOfManufacture) || currentYear - 12;
+        const age = Math.max(0, currentYear - year);
+        let multiplier = 0.25;
+
+        if (age <= 2) multiplier = 0.7;
+        else if (age <= 4) multiplier = 0.55;
+        else if (age <= 7) multiplier = 0.45;
+        else if (age <= 10) multiplier = 0.32;
+
+        let retail = (baseRetail[bucket] || baseRetail.other) * multiplier;
+
+        const miles = Number(mileage) || 0;
+        const expectedMiles = Math.max(12000 * Math.max(age, 1), 6000);
+
+        if (miles && miles > expectedMiles) {
+          const penaltySteps = Math.ceil((miles - expectedMiles) / 10000);
+          retail *= Math.max(0.5, 1 - penaltySteps * 0.05);
+        } else if (miles && miles < expectedMiles * 0.7) {
+          retail *= 1.08;
+        }
+
+        return {
+          retailEstimate: retail,
+          retailRounded: roundCurrency(retail, 25),
+          age,
+          expectedMiles
+        };
+      }
+
+      function computeSellEstimate(vehicle, mileage, scrapEstimate, fulfilment) {
         const now = new Date().getFullYear();
         const year = Number(vehicle.yearOfManufacture) || now - 8;
         const age = Math.max(0, now - year);
-        let offer = scrapVehiclePrice + 400;
+        const mileageValue = Number(mileage) || 0;
+        const { retailEstimate, retailRounded, expectedMiles } = estimateRetailValue(vehicle, mileageValue);
 
-        if (age <= 3) {
-          offer += 250;
-        } else if (age <= 7) {
-          offer += 150;
-        } else if (age >= 10) {
-          offer -= 150;
-        }
+        const baseRepair = age <= 3 ? 400 : age <= 6 ? 650 : age <= 10 ? 850 : 1000;
+        const mileagePenalty = mileageValue > expectedMiles ? Math.ceil((mileageValue - expectedMiles) / 15000) * 150 : 0;
+        const repairCosts = baseRepair + mileagePenalty;
+        const prepCosts = 180; // fluids, valeting, admin
+        const fulfilmentBucket = getBodyTypeBucket(vehicle.bodyType || vehicle.bodyTypeDescription || '');
+        const profitTargetBase = fulfilmentBucket === 'van' || fulfilmentBucket === '4x4' || fulfilmentBucket === 'suv' ? 450 : 375;
+        const boundedProfit = Math.max(300, Math.min(500, profitTargetBase));
+        const collectionCost = fulfilment === 'pickup' ? 100 : 0;
 
-        const mileageValue = Number(mileage);
-        if (Number.isFinite(mileageValue)) {
-          if (mileageValue < 60000) {
-            offer += 200;
-          } else if (mileageValue > 120000) {
-            offer -= 150;
+        const maxOffer = retailEstimate - (repairCosts + prepCosts + boundedProfit + collectionCost);
+        let offerCandidate;
+        if (!Number.isFinite(maxOffer) || maxOffer <= 0) {
+          offerCandidate = scrapEstimate.dropOffOffer;
+        } else if (maxOffer <= scrapEstimate.dropOffOffer) {
+          offerCandidate = scrapEstimate.dropOffOffer;
+        } else {
+          offerCandidate = maxOffer;
+          if (maxOffer >= scrapEstimate.dropOffOffer + 150) {
+            offerCandidate = Math.max(scrapEstimate.dropOffOffer + 150, Math.min(maxOffer, offerCandidate));
           }
         }
 
-        offer = Math.max(offer, scrapVehiclePrice + 150);
-        offer = roundCurrency(offer, 25);
+        const offer = roundCurrency(Math.max(offerCandidate, scrapEstimate.dropOffOffer), 25);
 
-        return { age, offer };
+        return {
+          age,
+          offer,
+          retail: roundCurrency(Math.max(retailRounded, offer), 25),
+          repairCosts: roundCurrency(repairCosts, 25),
+          prepCosts: roundCurrency(prepCosts, 25),
+          profitTarget: roundCurrency(boundedProfit, 25),
+          collectionCost,
+          mileagePenalty: roundCurrency(mileagePenalty, 25),
+          expectedMiles
+        };
       }
 
       Object.values(quoteForms).forEach((config) => {
@@ -1580,30 +1690,38 @@
           return;
         }
 
-        const scrapEstimate = computeScrapEstimate(vehicle, mileageValue);
+        const scrapEstimate = computeScrapEstimate(vehicle);
         let sellEstimate = null;
         if (config.type === 'sell') {
-          sellEstimate = computeSellEstimate(vehicle, mileageValue, scrapEstimate.vehiclePrice);
+          sellEstimate = computeSellEstimate(vehicle, mileageValue, scrapEstimate, config.selectedFulfilment);
         }
 
         const vehicleName = `${vehicle.make || ''} ${vehicle.model || ''}`.trim() || 'Vehicle';
         if (config.result) {
           const parts = [
             `<strong>${vehicleName}</strong>`,
-            `<div>Approximate weight used: ${Math.round(scrapEstimate.weightKg)} kg</div>`
+            `<div>Complete car weight used: ${Math.round(scrapEstimate.weightKg)} kg at £${scrapEstimate.ratePerTonneComplete} per tonne.</div>`,
+            `<div>Parts buffer included: ${formatGBP(scrapEstimate.partsBuffer)} (covers saleable items).</div>`
           ];
           if (config.type === 'scrap') {
             parts.push(
-              `<div>Vehicle price estimate: ${formatGBP(scrapEstimate.vehiclePrice)}</div>`,
-              `<div>Pick up price*: ${formatGBP(scrapEstimate.pickupPrice)} (only applies if you choose collection)</div>`
+              `<div>Drop-off payout estimate (complete car): ${formatGBP(scrapEstimate.dropOffOffer)}</div>`,
+              `<div>Collection service (if required): ${formatGBP(scrapEstimate.collectionCost)}* deducted from the payout when we collect.</div>`,
+              `<div>Net payout with pickup: ${formatGBP(scrapEstimate.pickupOffer)}</div>`,
+              `<div>Bare shell steel value: ${formatGBP(scrapEstimate.shellDropOffOffer)} (assumes ~${Math.round(scrapEstimate.shellWeightKg)} kg at £${scrapEstimate.ratePerTonneShell} per tonne)</div>`,
+              `<div>Bare shell net with pickup: ${formatGBP(scrapEstimate.shellPickupOffer)}</div>`
             );
           } else {
+            const pickupDeduction = config.selectedFulfilment === 'pickup' ? scrapEstimate.collectionCost : 0;
             parts.push(
-              `<div>Estimated offer: ${formatGBP(sellEstimate.offer)}</div>`,
-              `<div>Pick up price*: ${formatGBP(scrapEstimate.pickupPrice)} (optional if you need collection)</div>`
+              `<div>Retail offer ceiling: ${formatGBP(sellEstimate.offer)}</div>`,
+              `<div>Retail baseline used: ${formatGBP(sellEstimate.retail)}</div>`,
+              `<div>Costs accounted: repairs ${formatGBP(sellEstimate.repairCosts)}, prep ${formatGBP(sellEstimate.prepCosts)}, profit target ${formatGBP(sellEstimate.profitTarget)}${pickupDeduction ? `, collection ${formatGBP(pickupDeduction)}*` : ''}</div>`,
+              `<div>Expected mileage for age: ~${Math.round(sellEstimate.expectedMiles).toLocaleString('en-GB')} miles</div>`,
+              `<div>Scrap fallback (complete car): ${formatGBP(scrapEstimate.dropOffOffer)}</div>`
             );
           }
-          parts.push('<div class="quote-note">All estimates are confirmed once we inspect the vehicle in person.</div>');
+          parts.push('<div class="quote-note">All estimates are rounded to the nearest £25 and confirmed once we inspect the vehicle in person.</div>');
           config.result.innerHTML = parts.join('');
         }
 
@@ -1624,6 +1742,11 @@
         const fulfilmentText =
           config.selectedFulfilment === 'pickup' ? 'Have car picked up' : 'Drop off at garage';
 
+        const dropOffText = formatGBP(scrapEstimate.dropOffOffer);
+        const pickupNetText = formatGBP(scrapEstimate.pickupOffer);
+        const shellDropText = formatGBP(scrapEstimate.shellDropOffOffer);
+        const shellPickupText = formatGBP(scrapEstimate.shellPickupOffer);
+
         const bodyLines = [
           `${config.type === 'scrap' ? 'Scrap my car' : 'Sell my car'} enquiry from the website`,
           '',
@@ -1634,12 +1757,26 @@
           vehicle.fuelType ? `Fuel: ${vehicle.fuelType}` : null,
           '',
           `Fulfilment preference: ${fulfilmentText}`,
-          `Estimated vehicle price: ${formatGBP(scrapEstimate.vehiclePrice)}`,
-          `Pickup price*: ${formatGBP(scrapEstimate.pickupPrice)}`
+          `Scrap payout (drop-off, complete car): ${dropOffText}`,
+          `Scrap payout (pickup after collection deduction): ${pickupNetText}`,
+          `Bare shell value (drop-off): ${shellDropText}`,
+          `Bare shell value (pickup): ${shellPickupText}`,
+          `Scrap rate: £${scrapEstimate.ratePerTonneComplete} per tonne with £${scrapEstimate.partsBuffer} parts buffer (shells use £${scrapEstimate.ratePerTonneShell}/tonne).`,
+          `Collection service charge: ${formatGBP(scrapEstimate.collectionCost)}* if pickup requested`
         ].filter(Boolean);
 
         if (config.type === 'sell' && sellEstimate) {
-          bodyLines.push(`Estimated retail offer: ${formatGBP(sellEstimate.offer)}`);
+          bodyLines.push(
+            '',
+            'Retail purchase analysis:',
+            `Retail baseline considered: ${formatGBP(sellEstimate.retail)}`,
+            `Repair allowance: ${formatGBP(sellEstimate.repairCosts)} (includes mileage penalty of ${formatGBP(sellEstimate.mileagePenalty)})`,
+            `Preparation & admin: ${formatGBP(sellEstimate.prepCosts)}`,
+            `Profit target built in: ${formatGBP(sellEstimate.profitTarget)}`,
+            `Collection allowance included: ${formatGBP(sellEstimate.collectionCost)}${sellEstimate.collectionCost ? ' (pickup)' : ' (drop-off)'}`,
+            `Expected mileage for age: ~${Math.round(sellEstimate.expectedMiles).toLocaleString('en-GB')} miles`,
+            `Recommended offer (rounded to nearest £25): ${formatGBP(sellEstimate.offer)}`
+          );
         }
 
         if (config.selectedFulfilment === 'pickup') {

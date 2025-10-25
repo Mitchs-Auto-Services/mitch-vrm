@@ -1,92 +1,505 @@
 <!doctype html>
 <html lang="en">
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Mitch’s Auto – Check my reg</title>
-<style>
-  body{font-family:system-ui,Arial,sans-serif;max-width:720px;margin:24px auto;padding:0 16px}
-  .card{border:1px solid #ddd;border-radius:8px;padding:16px;margin:12px 0}
-  .row{display:flex;gap:8px}
-  input,select,button{padding:10px;border:1px solid #ccc;border-radius:6px}
-  button{cursor:pointer}
-  .hint{color:#666;font-size:0.9rem}
-  .price{font-weight:700}
-</style>
-<h1>Find services for your exact car</h1>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Mitchs Auto Services</title>
+    <style>
+      :root {
+        --orange: #ff6f3d;
+        --black: #0b0b0d;
+        --silver: #c5c7ce;
+        --white: #ffffff;
+        --card-bg: rgba(28, 30, 34, 0.92);
+        --card-border: rgba(197, 199, 206, 0.15);
+        --disabled: rgba(128, 128, 128, 0.35);
+      }
 
-<div class="card">
-  <form id="vrmForm">
-    <label>Registration (VRM)</label>
-    <div class="row">
-      <input id="vrm" placeholder="e.g. AB12 CDE" required />
-      <button type="submit">Look up</button>
-    </div>
-    <div class="hint">We use official DVLA data. No spam.</div>
-  </form>
-</div>
+      * {
+        box-sizing: border-box;
+      }
 
-<div id="vehicle" class="card" style="display:none"></div>
+      body {
+        margin: 0;
+        font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+        background: linear-gradient(180deg, #050505 0%, #15171b 100%);
+        color: var(--white);
+      }
 
-<div id="services" class="card" style="display:none">
-  <label>Select a service</label>
-  <select id="service">
-    <option value="">— choose —</option>
-    <option value="diagnostics">Diagnostics (flat)</option>
-    <option value="oil">Oil & Filter Change (from)</option>
-    <option value="brakes_front">Front Brake Pads (from)</option>
-    <option value="battery">Battery Replacement (from)</option>
-    <option value="inspection">General Inspection (per hour)</option>
-  </select>
-  <div id="pricing" style="margin-top:8px"></div>
-  <button id="quoteBtn" style="margin-top:12px;display:none">Get exact quote</button>
-  <div class="hint">Parts priced to your reg; fixed quote before work starts.</div>
-</div>
+      a {
+        color: inherit;
+      }
 
-<script>
-  // CHANGE THESE IF YOU LIKE
-  const PRICES = { labourHourly: 55, diagnosticsFlat: 50, oilFrom: 40, brakesFrontFrom: 60, batteryFrom: 35 };
+      header {
+        background: var(--black);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      }
 
-  // We'll replace API_URL after deployment
-  let API_URL = '/api/vrm';
+      .header-inner {
+        max-width: 1080px;
+        margin: 0 auto;
+        padding: 18px 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+      }
 
-  document.getElementById("vrmForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const vrm = document.getElementById("vrm").value.trim();
-    const out = document.getElementById("vehicle");
-    out.style.display = "block";
-    out.textContent = "Looking up vehicle…";
-    try {
-      const res = await fetch(API_URL, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ vrm }) });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data && (data.message || data.error) || "Lookup failed");
+      .brand {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
 
-      out.innerHTML = `
-        <strong>${data.make || ""} ${data.model || ""}</strong>
-        <div>${data.fuelType || ""} • ${data.engineCapacity ? (data.engineCapacity/1000 + "L") : ""} • ${data.colour || ""}</div>
-        <div class="hint">Reg: ${vrm.toUpperCase()}</div>
-      `;
-      document.getElementById("services").style.display = "block";
-    } catch(err){
-      out.textContent = err.message || "Couldn’t find vehicle.";
-    }
-  });
+      .brand h1 {
+        margin: 0;
+        font-size: clamp(1.4rem, 2vw, 1.8rem);
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
 
-  document.getElementById("service").addEventListener("change", (e) => {
-    const v = e.target.value, p = document.getElementById("pricing"), btn = document.getElementById("quoteBtn");
-    btn.style.display = v ? "inline-block" : "none";
-    if (v === "diagnostics") p.innerHTML = `<span class="price">£${PRICES.diagnosticsFlat}</span> (labour flat)`;
-    else if (v === "oil") p.innerHTML = `Labour <span class="price">from £${PRICES.oilFrom}</span> + parts at cost`;
-    else if (v === "brakes_front") p.innerHTML = `Labour <span class="price">from £${PRICES.brakesFrontFrom}</span> + pads/discs priced to your reg`;
-    else if (v === "battery") p.innerHTML = `Labour <span class="price">from £${PRICES.batteryFrom}</span> + battery priced to your reg`;
-    else if (v === "inspection") p.innerHTML = `Labour <span class="price">£${PRICES.labourHourly}/hr</span> + parts if needed`;
-    else p.textContent = "";
-  });
+      .brand span {
+        font-size: 0.95rem;
+        color: var(--silver);
+      }
 
-  document.getElementById("quoteBtn").addEventListener("click", () => {
-    const vrm = document.getElementById("vrm").value.trim().toUpperCase();
-    const svc = document.getElementById("service").value;
-    const url = `mailto:bookings@mitchautoservices.co.uk?subject=Quote%20request%20${vrm}&body=VRM:%20${vrm}%0AService:%20${svc}`;
-    window.location.href = url;
-  });
-</script>
+      .map-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 16px;
+        border-radius: 999px;
+        border: 1px solid var(--orange);
+        background: transparent;
+        color: var(--white);
+        font-weight: 600;
+        text-decoration: none;
+        transition: background 0.2s ease, transform 0.2s ease;
+      }
+
+      .map-link:hover,
+      .map-link:focus {
+        background: rgba(255, 111, 61, 0.15);
+        transform: translateY(-1px);
+      }
+
+      main {
+        max-width: 1080px;
+        margin: 0 auto;
+        padding: 32px 24px 64px;
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+      }
+
+      .banner {
+        background: rgba(176, 0, 32, 0.9);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 12px;
+        padding: 18px 20px;
+        font-weight: 600;
+        text-align: center;
+      }
+
+      .intro {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 24px;
+      }
+
+      .intro-card {
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: 16px;
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        box-shadow: 0 18px 30px rgba(0, 0, 0, 0.25);
+      }
+
+      .intro-card h2 {
+        margin: 0;
+        font-size: 1.4rem;
+        color: var(--silver);
+      }
+
+      .intro-card ul {
+        margin: 0;
+        padding-left: 18px;
+        color: rgba(255, 255, 255, 0.85);
+      }
+
+      .status-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 18px;
+      }
+
+      .status-card {
+        border-radius: 16px;
+        padding: 20px;
+        border: 1px solid var(--card-border);
+        background: var(--card-bg);
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+      }
+
+      .status-card h3 {
+        margin: 0;
+        font-size: 1.2rem;
+        color: var(--orange);
+      }
+
+      .status-card.disabled {
+        background: linear-gradient(140deg, rgba(90, 90, 90, 0.25), rgba(40, 40, 40, 0.4));
+        border-color: rgba(255, 255, 255, 0.06);
+        color: rgba(255, 255, 255, 0.65);
+      }
+
+      .status-card.disabled h3 {
+        color: rgba(255, 255, 255, 0.6);
+      }
+
+      .card {
+        border-radius: 16px;
+        padding: 28px;
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        box-shadow: 0 18px 36px rgba(0, 0, 0, 0.25);
+      }
+
+      .card h2 {
+        margin-top: 0;
+        color: var(--silver);
+        letter-spacing: 0.02em;
+      }
+
+      label {
+        display: block;
+        font-weight: 600;
+        margin-bottom: 8px;
+        letter-spacing: 0.03em;
+      }
+
+      input,
+      select,
+      button {
+        width: 100%;
+        padding: 14px 16px;
+        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        background: rgba(8, 8, 9, 0.6);
+        color: var(--white);
+        font-size: 1rem;
+      }
+
+      input:focus,
+      select:focus,
+      button:focus {
+        outline: 2px solid var(--orange);
+        outline-offset: 2px;
+      }
+
+      button {
+        cursor: pointer;
+        border: none;
+        background: linear-gradient(135deg, var(--orange), #ff874f);
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 10px 18px rgba(255, 111, 61, 0.35);
+      }
+
+      .form-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+
+      .form-row > * {
+        flex: 1 1 220px;
+      }
+
+      .vehicle-card {
+        margin-top: 18px;
+        padding: 18px;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        display: none;
+      }
+
+      .vehicle-card strong {
+        font-size: 1.2rem;
+      }
+
+      .hint {
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 0.95rem;
+      }
+
+      .services-section {
+        display: none;
+        margin-top: 24px;
+      }
+
+      .services-section select {
+        background: rgba(255, 255, 255, 0.04);
+      }
+
+      .pricing-output {
+        margin-top: 16px;
+        font-size: 1.05rem;
+        font-weight: 600;
+        color: var(--silver);
+      }
+
+      .price {
+        color: var(--orange);
+      }
+
+      .quote-btn {
+        margin-top: 18px;
+      }
+
+      footer {
+        text-align: center;
+        padding: 32px 16px 64px;
+        color: rgba(255, 255, 255, 0.55);
+        font-size: 0.9rem;
+      }
+
+      @media (max-width: 720px) {
+        .header-inner {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        .map-link {
+          align-self: flex-end;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="header-inner">
+        <div class="brand">
+          <h1>Mitchs Auto Services</h1>
+          <span>Professional garage care • Mobile support returning soon</span>
+        </div>
+        <a
+          class="map-link"
+          href="https://www.google.com/maps/search/?api=1&query=Unit+5%2C+Wingate+Grange+Industrial+Estate%2C+TS28+5AH"
+          target="_blank"
+          rel="noopener"
+        >
+          <span aria-hidden="true">📍</span>
+          Find us on Google Maps
+        </a>
+      </div>
+    </header>
+
+    <main>
+      <div class="banner" role="status" aria-live="polite">
+        Mobile service temporarily unavailable – we’ll be back on the road soon. Garage bookings remain open at Unit 5, Wingate Grange Industrial Estate, TS28 5AH.
+      </div>
+
+      <section class="intro">
+        <div class="intro-card">
+          <h2>Why book with Mitchs Auto Services?</h2>
+          <ul>
+            <li>Trusted local mechanics with transparent pricing.</li>
+            <li>Specialist pit access in our Wingate Grange workshop.</li>
+            <li>OEM-quality parts and manufacturer-approved fluids.</li>
+            <li>Clear communication from booking to handover.</li>
+          </ul>
+        </div>
+        <div class="intro-card">
+          <h2>How to get started</h2>
+          <ul>
+            <li>Enter your registration below to identify your vehicle.</li>
+            <li>Choose the service you need or request a tailored quote.</li>
+            <li>We’ll confirm availability and pricing before any work starts.</li>
+            <li>Need directions? Tap the map button to open Google Maps.</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="status-grid" aria-label="Service availability">
+        <article class="status-card disabled" aria-disabled="true">
+          <h3>Mobile Service</h3>
+          <p>Currently unavailable while our van is off the road. We’ll update you as soon as mobile bookings reopen.</p>
+        </article>
+        <article class="status-card">
+          <h3>Garage Service</h3>
+          <p>Book your vehicle into our Unit 5 workshop for full diagnostics, servicing, repairs, MOT preparation, and more.</p>
+        </article>
+      </section>
+
+      <section class="card">
+        <h2>Book a Service</h2>
+        <form id="vrmForm" novalidate>
+          <label for="vrm">Registration (VRM)</label>
+          <div class="form-row">
+            <input
+              id="vrm"
+              name="vrm"
+              placeholder="e.g. AB12 CDE"
+              minlength="3"
+              required
+              autocomplete="off"
+              spellcheck="false"
+              aria-describedby="vrmHelp"
+            />
+            <button type="submit">Look up vehicle</button>
+          </div>
+          <p class="hint" id="vrmHelp">We verify details directly with the DVLA for accurate servicing information.</p>
+        </form>
+
+        <div id="vehicle" class="vehicle-card" aria-live="polite"></div>
+
+        <div id="services" class="services-section" aria-live="polite">
+          <label for="service">Select a service</label>
+          <select id="service">
+            <option value="">— choose a service —</option>
+            <option value="diagnostics">Diagnostic / fault-finding assessment</option>
+            <option value="oil">Engine oil & filter change</option>
+            <option value="brakes_front">Front brake pads replacement</option>
+            <option value="battery">Battery test & replacement</option>
+            <option value="inspection">Comprehensive inspection (per hour)</option>
+          </select>
+          <div id="pricing" class="pricing-output"></div>
+          <button id="quoteBtn" class="quote-btn" type="button" style="display:none">Request booking confirmation</button>
+          <p class="hint">We’ll email you a tailored estimate that includes labour and any parts specific to your registration.</p>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      © <span id="year"></span> Mitchs Auto Services — Unit 5, Wingate Grange Industrial Estate, TS28 5AH
+    </footer>
+
+    <script>
+      const PRICES = {
+        labourHourly: 55,
+        diagnosticsFlat: 50,
+        oilFrom: 80,
+        brakesFrontFrom: 120,
+        batteryFrom: 200
+      };
+
+      const API_URL = '/api/vrm';
+      const vrmInput = document.getElementById('vrm');
+      const vehicleCard = document.getElementById('vehicle');
+      const servicesSection = document.getElementById('services');
+      const pricingOutput = document.getElementById('pricing');
+      const quoteBtn = document.getElementById('quoteBtn');
+
+      vrmInput.addEventListener('input', () => {
+        vrmInput.value = vrmInput.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+      });
+
+      document.getElementById('vrmForm').addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const vrm = vrmInput.value.trim();
+        if (!vrm) return;
+
+        vehicleCard.style.display = 'block';
+        vehicleCard.textContent = 'Looking up vehicle…';
+        servicesSection.style.display = 'none';
+        pricingOutput.textContent = '';
+        quoteBtn.style.display = 'none';
+        document.getElementById('service').value = '';
+
+        try {
+          const response = await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ vrm })
+          });
+
+          const data = await response.json();
+          if (!response.ok) {
+            throw new Error(data && (data.message || data.error) || 'Lookup failed');
+          }
+
+          const make = data.make ? data.make.trim() : '';
+          const model = data.model ? data.model.trim() : '';
+          const detailLine = [
+            data.fuelType ? data.fuelType : null,
+            data.engineCapacity ? (Number(data.engineCapacity) / 1000).toFixed(1).replace(/\.0$/, '') + 'L' : null,
+            data.colour ? data.colour : null
+          ].filter(Boolean).join(' • ');
+
+          vehicleCard.innerHTML = `
+            <strong>${make || model ? `${make} ${model}`.trim() : 'Vehicle found'}</strong>
+            <div>${detailLine || 'DVLA details confirmed.'}</div>
+            <div class="hint">Registration: ${vrm}</div>
+          `;
+
+          servicesSection.style.display = 'block';
+        } catch (error) {
+          vehicleCard.textContent = error.message || 'We could not find that vehicle. Please double-check the registration.';
+        }
+      });
+
+      document.getElementById('service').addEventListener('change', (event) => {
+        const value = event.target.value;
+        quoteBtn.style.display = value ? 'inline-flex' : 'none';
+
+        if (!value) {
+          pricingOutput.textContent = '';
+          return;
+        }
+
+        if (value === 'diagnostics') {
+          pricingOutput.innerHTML = `<span class="price">£${PRICES.diagnosticsFlat}</span> diagnostic session with full report.`;
+        } else if (value === 'oil') {
+          pricingOutput.innerHTML = `From <span class="price">£${PRICES.oilFrom}</span> including premium oil and filter.`;
+        } else if (value === 'brakes_front') {
+          pricingOutput.innerHTML = `From <span class="price">£${PRICES.brakesFrontFrom}</span> including both front pads (discs assessed).`;
+        } else if (value === 'battery') {
+          pricingOutput.innerHTML = `From <span class="price">£${PRICES.batteryFrom}</span> including fitting and coding where required.`;
+        } else if (value === 'inspection') {
+          pricingOutput.innerHTML = `<span class="price">£${PRICES.labourHourly}/hr</span> workshop inspection & diagnostic time.`;
+        } else {
+          pricingOutput.textContent = '';
+        }
+      });
+
+      quoteBtn.addEventListener('click', () => {
+        const vrm = vrmInput.value.trim();
+        if (!vrm) return;
+        const serviceValue = document.getElementById('service').value;
+        if (!serviceValue) return;
+
+        const serviceLabels = {
+          diagnostics: 'Diagnostic / fault-finding assessment',
+          oil: 'Engine oil & filter change',
+          brakes_front: 'Front brake pads replacement',
+          battery: 'Battery test & replacement',
+          inspection: 'Comprehensive inspection (per hour)'
+        };
+
+        const subject = encodeURIComponent(`Service booking request for ${vrm}`);
+        const body = encodeURIComponent(
+          `Registration: ${vrm}\nRequested service: ${serviceLabels[serviceValue] || serviceValue}\nPlease confirm availability and a full estimate.\n\nThank you, Mitchs Auto Services.`
+        );
+
+        window.location.href = `mailto:support@mitchsautoservices.co.uk?subject=${subject}&body=${body}`;
+      });
+
+      document.getElementById('year').textContent = new Date().getFullYear();
+    </script>
+  </body>
 </html>

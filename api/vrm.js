@@ -1,3 +1,5 @@
+const API_KEY = process.env.DVLA_API_KEY || 'ZQHFV22Ym6ao1CfyyqEol2oxzpoWQM2w59rAkPro';
+
 export default async function handler(req, res) {
   // Allow preflight for safety (CORS)
   if (req.method === 'OPTIONS') {
@@ -18,7 +20,7 @@ export default async function handler(req, res) {
       {
         method: 'POST',
         headers: {
-          'x-api-key': process.env.DVLA_API_KEY, // set this in Vercel later
+          'x-api-key': API_KEY,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({ registrationNumber: vrm.replace(/\s/g, '') })

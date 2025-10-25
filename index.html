@@ -588,45 +588,192 @@
       const SERVICES = [
         {
           id: 'diagnostic',
-          name: 'Diagnostic / I Don\'t Know',
+          name: "Diagnostic / I Don't Know",
           price: 50,
           description:
-            'Complete diagnostic check with a full fault report sent to your email so you can see what needs attention. Perfect if you\'re unsure about an issue.'
+            'Full-system diagnostic with a report emailed to you. Ideal if you are unsure about the fault—book this and we will get to the bottom of the issue.'
+        },
+        {
+          id: 'air_filter',
+          name: 'Air Filter Replacement',
+          price: 80,
+          description:
+            'Fit a fresh air filter so the engine breathes properly again. Helps restore performance, smooth idle, and fuel economy when the filter is clogged.'
         },
         {
           id: 'basic_service',
           name: 'Basic Service Package',
           price: 100,
           description:
-            'Engine oil, oil filter, air filter, dust/pollen filter, coolant top-up plus tyre, light, and battery health checks to keep your vehicle running smoothly.'
+            'Engine oil replacement, oil filter, air filter, dust/pollen filter, coolant replacement, tyre pressure & tread inspection, headlights/rear lights inspection, and a full battery health check.'
+        },
+        {
+          id: 'battery_replacement',
+          name: 'Battery Replacement (includes recoding)',
+          price: 200,
+          description:
+            'Install a quality battery and recode it to the ECU where required. Perfect for slow cranks, flat batteries, and random electrical issues.'
+        },
+        {
+          id: 'brake_change',
+          name: 'Brake Change',
+          price: 100,
+          description:
+            'Replace brake pads and inspect discs on both sides of the axle, ensuring solid stopping power and improved safety under braking.'
+        },
+        {
+          id: 'brake_fluid',
+          name: 'Brake Fluid Flush',
+          price: 70,
+          description:
+            'Flush out old, contaminated brake fluid to restore pedal feel and braking performance, reducing the risk of fade or ABS warnings.'
+        },
+        {
+          id: 'battery_recharge',
+          name: 'Car Battery Recharge (overnight)',
+          price: 80,
+          description:
+            'Overnight slow-charge service to recover tired batteries after repeated jump starts or short journeys, ready for refitting the next morning.'
+        },
+        {
+          id: 'diagnostic_check',
+          name: 'Car Diagnostic Check',
+          price: 50,
+          description:
+            'Comprehensive scan with professional tooling. We email you the findings so you can see exactly what needs attention.'
+        },
+        {
+          id: 'car_refresh',
+          name: 'Car Refresh Service Package',
+          price: 600,
+          description:
+            'Engine oil, oil filter, air filter, dust/pollen filter, coolant change, spark plugs if needed, full brake check with pads/discs replaced if required, tyre inspections, lights, full battery test, battery replacement, and exterior lighting replacements.'
+        },
+        {
+          id: 'coolant',
+          name: 'Coolant Change',
+          price: 80,
+          description:
+            'Drain and refill with the correct coolant to protect the engine from overheating, corrosion, and internal leaks.'
+        },
+        {
+          id: 'pollen_filter',
+          name: 'Dust/Pollen Filter Replacement',
+          price: 80,
+          description:
+            'Improve cabin air quality and demisting by replacing the interior pollen filter, reducing smells and allergy triggers.'
         },
         {
           id: 'engine_oil',
           name: 'Engine Oil & Filter Change',
           price: 60,
           description:
-            'Fresh premium oil and a new filter to protect the engine, improve efficiency, and quieten noisy running.'
+            'Fresh engine oil and a new filter to protect against wear, keep the engine running smoothly, and reduce start-up noise.'
         },
         {
-          id: 'brake_refresh',
-          name: 'Brake Pads & Discs',
-          price: 100,
+          id: 'fuel_filter',
+          name: 'Fuel Filter Replacement',
+          price: 50,
           description:
-            'Front axle brake pads with disc inspection and replacement if required. Keeps stopping distances short and confidence high.'
+            'Swap the fuel filter to prevent debris from entering the fuel system, curing hesitation, hard starting, or poor MPG.'
         },
         {
-          id: 'battery',
-          name: 'Battery Replacement & Coding',
-          price: 200,
+          id: 'lights',
+          name: 'Headlights & Rear Lights Replacement',
+          price: 60,
           description:
-            'Supply and fit a quality battery, including ECU coding for modern vehicles that need it. Includes disposal of the old unit.'
+            'Supply and fit fresh bulbs to keep you legal and safe at night, clearing dash warnings and improving visibility.'
         },
         {
           id: 'major_service',
           name: 'Major Service Package',
           price: 350,
           description:
-            'Comprehensive fluids, filters, spark or glow plugs where required, plus full brake inspection and replacement recommendations.'
+            'Engine oil, oil filter, air filter, dust/pollen filter, coolant change, brake fluid replacement, spark plugs if needed, and full brake replacement where required.'
+        },
+        {
+          id: 'minor_service',
+          name: 'Minor Service Package',
+          price: 110,
+          description:
+            'Engine oil, oil filter, air filter, dust/pollen filter, and coolant replacement—ideal between major services.'
+        },
+        {
+          id: 'premium_service',
+          name: 'Premium Service Package',
+          price: 300,
+          description:
+            'Engine oil, oil filter, air filter, dust/pollen filter, coolant replacement, spark plugs if needed, plus brake, tyre, light, and battery health checks.'
+        },
+        {
+          id: 'pre_mot',
+          name: 'Pre-MOT Diagnosis & Repair Plan',
+          price: 150,
+          description:
+            'Full MOT-style inspection with a repair plan so you can fix issues before the test and avoid costly retests.'
+        },
+        {
+          id: 'seasonal',
+          name: 'Seasonal Maintenance Package',
+          price: 150,
+          description:
+            'Battery health check, brake inspection, tyre inspection and pressure adjustment, cooling system check, and lights inspection to prepare for the season ahead.'
+        },
+        {
+          id: 'tyre_health',
+          name: 'Tyre Health Check',
+          price: 35,
+          description:
+            'Inspect tread depth, wear pattern, pressures, valves, and sidewalls to keep your tyres legal and safe.'
+        },
+        {
+          id: 'wiper_motor',
+          name: 'Window Wiper Motor Replacement',
+          price: 50,
+          description:
+            'Replace sluggish or failed wiper motors so you regain smooth, reliable wiper action for clear visibility in the rain.'
+        },
+        {
+          id: 'air_con',
+          name: 'Air Conditioning Top-Up/Recharge',
+          price: 85,
+          description:
+            'Regas the air conditioning system, check for obvious leaks, and restore fast demisting and cold airflow.'
+        },
+        {
+          id: 'fuel_injector',
+          name: 'Fuel Injector Replacement (includes Recoding)',
+          price: 150,
+          description:
+            'Fit and recode replacement injectors to cure misfires, fuel smells, hard starting, or loss of power.'
+        },
+        {
+          id: 'glow_plug',
+          name: 'Glow Plug Replacement',
+          price: 50,
+          description:
+            'Swap faulty glow plugs on diesel engines to improve cold starting, reduce white smoke, and smooth running from cold.'
+        },
+        {
+          id: 'spark_plug',
+          name: 'Spark Plug Replacement',
+          price: 50,
+          description:
+            'Install fresh spark plugs on petrol engines for smoother idle, better acceleration, and improved fuel economy.'
+        },
+        {
+          id: 'ignition',
+          name: 'Ignition Coils / Leads Replacement',
+          price: 80,
+          description:
+            'Replace failing coils or leads to cure misfires, jerky acceleration, and check-engine-light warnings.'
+        },
+        {
+          id: 'handbrake',
+          name: 'Handbrake Adjustment',
+          price: 150,
+          description:
+            'Adjust and balance the handbrake so it holds securely on hills and passes MOT tests confidently.'
         }
       ];
 

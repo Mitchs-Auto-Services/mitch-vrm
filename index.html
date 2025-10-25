@@ -538,6 +538,13 @@
         background: rgba(10, 10, 12, 0.75);
         box-shadow: 0 22px 40px rgba(0, 0, 0, 0.35);
         overflow: hidden;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+      }
+
+      .quote-panel.active {
+        border-color: rgba(255, 111, 61, 0.55);
+        box-shadow: 0 26px 48px rgba(0, 0, 0, 0.45);
+        transform: translateY(-4px);
       }
 
       .quote-panel summary {
@@ -1227,6 +1234,27 @@
         email: document.getElementById('email'),
         phone: document.getElementById('phone')
       };
+
+      const quotePanels = Array.from(document.querySelectorAll('.quote-panel'));
+
+      quotePanels.forEach((panel) => {
+        panel.addEventListener('toggle', () => {
+          if (!panel.open) {
+            panel.classList.remove('active');
+            return;
+          }
+
+          panel.classList.add('active');
+          quotePanels.forEach((other) => {
+            if (other !== panel && other.open) {
+              other.open = false;
+            }
+            if (other !== panel) {
+              other.classList.remove('active');
+            }
+          });
+        });
+      });
 
       mobileRadio.disabled = true;
       mobileCard.classList.add('disabled');

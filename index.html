@@ -1103,10 +1103,6 @@
           <input id="vrm" name="vrm" placeholder="Enter your registration" maxlength="8" autocomplete="off" required>
           <div class="hint">We don’t do electric cars right now.</div>
         </div>
-        <div>
-          <label for="vrmMileage">Vehicle mileage</label>
-          <input id="vrmMileage" name="vrmMileage" type="number" min="0" step="100" inputmode="numeric" placeholder="Current mileage">
-        </div>
         <div style="align-self: end;">
           <button id="lookupBtn" type="submit">Look up</button>
         </div>
@@ -1443,7 +1439,6 @@
       .map(card => card.toggle)
       .filter(Boolean);
     const VRM_INPUT = document.getElementById('vrm');
-    const VRM_MILEAGE_INPUT = document.getElementById('vrmMileage');
     const SERVICES_CARD = document.getElementById('servicesCard');
     const SERVICES_MESSAGE = document.getElementById('servicesMessage');
     const SERVICE_SEARCH_WRAPPER = document.getElementById('serviceSearchWrapper');
@@ -3551,16 +3546,6 @@
       const colour = vehicleDetails.colour || vehicleDetails.primaryColour || '';
       const motSummary = formatMotSummary(vehicleDetails);
       const taxSummary = formatTaxSummary(vehicleDetails);
-      const mileageInputValue = VRM_MILEAGE_INPUT ? VRM_MILEAGE_INPUT.value.trim() : '';
-      let vehicleMileageLine = '';
-      if (mileageInputValue) {
-        const numericMileage = Number(mileageInputValue.replace(/[^0-9]/g, ''));
-        if (Number.isFinite(numericMileage) && numericMileage > 0) {
-          vehicleMileageLine = `Mileage: ${Math.round(numericMileage).toLocaleString('en-GB')} miles`;
-        } else {
-          vehicleMileageLine = `Mileage: ${mileageInputValue}`;
-        }
-      }
       const serviceTitle = serviceInput.dataset.title || serviceInput.value || 'Selected service';
       const servicePrice = serviceInput.dataset.price || 'Price on request';
       const warrantyChoice = warrantyInput ? warrantyInput.value : '';
@@ -3583,8 +3568,7 @@
         engineDisplay ? `Engine size: ${engineDisplay}` : '',
         colour ? `Colour: ${colour}` : '',
         motSummary ? `MOT: ${motSummary}` : '',
-        taxSummary ? `Tax: ${taxSummary}` : '',
-        vehicleMileageLine
+        taxSummary ? `Tax: ${taxSummary}` : ''
       ].filter(Boolean);
 
       const bookingLines = [

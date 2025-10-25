@@ -1442,6 +1442,7 @@
     const QUOTE_TOGGLES = Object.values(QUOTE_CARDS)
       .map(card => card.toggle)
       .filter(Boolean);
+    const VRM_INPUT = document.getElementById('vrm');
     const VRM_MILEAGE_INPUT = document.getElementById('vrmMileage');
     const SERVICES_CARD = document.getElementById('servicesCard');
     const SERVICES_MESSAGE = document.getElementById('servicesMessage');
@@ -1469,6 +1470,12 @@
 
     function normaliseQuoteReg(value = '') {
       return (value || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+    }
+
+    if (VRM_INPUT) {
+      VRM_INPUT.addEventListener('input', () => {
+        VRM_INPUT.value = normaliseQuoteReg(VRM_INPUT.value);
+      });
     }
 
     function isQuoteRegValid(value) {

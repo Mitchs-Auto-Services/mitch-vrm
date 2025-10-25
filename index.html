@@ -154,16 +154,6 @@
         color: var(--orange);
       }
 
-      .status-card.disabled {
-        background: linear-gradient(140deg, rgba(90, 90, 90, 0.25), rgba(40, 40, 40, 0.4));
-        border-color: rgba(255, 255, 255, 0.06);
-        color: rgba(255, 255, 255, 0.65);
-      }
-
-      .status-card.disabled h3 {
-        color: rgba(255, 255, 255, 0.6);
-      }
-
       .card {
         border-radius: 16px;
         padding: 28px;
@@ -187,7 +177,8 @@
 
       input,
       select,
-      button {
+      button,
+      textarea {
         width: 100%;
         padding: 14px 16px;
         border-radius: 10px;
@@ -199,7 +190,8 @@
 
       input:focus,
       select:focus,
-      button:focus {
+      button:focus,
+      textarea:focus {
         outline: 2px solid var(--orange);
         outline-offset: 2px;
       }
@@ -217,6 +209,12 @@
       button:hover {
         transform: translateY(-1px);
         box-shadow: 0 10px 18px rgba(255, 111, 61, 0.35);
+      }
+
+      button:disabled {
+        cursor: not-allowed;
+        opacity: 0.65;
+        box-shadow: none;
       }
 
       .form-row {
@@ -247,28 +245,160 @@
         font-size: 0.95rem;
       }
 
-      .services-section {
-        display: none;
+      .flow-panel {
         margin-top: 24px;
-      }
-
-      .services-section select {
+        border-radius: 14px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
         background: rgba(255, 255, 255, 0.04);
+        overflow: hidden;
       }
 
-      .pricing-output {
-        margin-top: 16px;
-        font-size: 1.05rem;
-        font-weight: 600;
-        color: var(--silver);
+      .flow-panel[hidden] {
+        display: none;
       }
 
-      .price {
+      .flow-panel summary {
+        cursor: pointer;
+        list-style: none;
+        padding: 18px 22px;
+        margin: 0;
+        font-weight: 700;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+        background: rgba(0, 0, 0, 0.35);
+        position: relative;
+      }
+
+      .flow-panel summary::-webkit-details-marker {
+        display: none;
+      }
+
+      .flow-panel summary::after {
+        content: '\25BC';
+        position: absolute;
+        right: 20px;
+        top: 50%;
+        transform: translateY(-50%) rotate(0deg);
+        transition: transform 0.2s ease;
+      }
+
+      .flow-panel[open] summary::after {
+        transform: translateY(-50%) rotate(180deg);
+      }
+
+      .panel-body {
+        padding: 22px;
+        display: grid;
+        gap: 18px;
+      }
+
+      .services-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 18px;
+      }
+
+      .service-card {
+        text-align: left;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(14, 15, 18, 0.8);
+        border-radius: 14px;
+        padding: 18px;
+        display: grid;
+        gap: 10px;
+        transition: border 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      .service-card:hover,
+      .service-card:focus {
+        border-color: var(--orange);
+        transform: translateY(-2px);
+        box-shadow: 0 14px 24px rgba(255, 111, 61, 0.15);
+      }
+
+      .service-card.active {
+        border-color: var(--orange);
+        box-shadow: 0 12px 22px rgba(255, 111, 61, 0.25);
+      }
+
+      .service-card .service-name {
+        font-weight: 700;
+        letter-spacing: 0.02em;
+      }
+
+      .service-card .service-price {
         color: var(--orange);
+        font-weight: 700;
       }
 
-      .quote-btn {
-        margin-top: 18px;
+      .selection-summary {
+        background: rgba(0, 0, 0, 0.35);
+        border-radius: 12px;
+        padding: 16px 18px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+      }
+
+      .selection-summary[hidden] {
+        display: none;
+      }
+
+      .mode-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 16px;
+      }
+
+      .mode-card {
+        position: relative;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 14px;
+        padding: 18px;
+        background: rgba(12, 13, 16, 0.85);
+        display: grid;
+        gap: 10px;
+        cursor: pointer;
+        transition: border 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      .mode-card:hover {
+        border-color: var(--orange);
+        transform: translateY(-2px);
+      }
+
+      .mode-card.active {
+        border-color: var(--orange);
+        box-shadow: 0 12px 22px rgba(255, 111, 61, 0.2);
+      }
+
+      .mode-card:focus-within {
+        border-color: var(--orange);
+        box-shadow: 0 12px 22px rgba(255, 111, 61, 0.2);
+      }
+
+      .mode-card input {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        cursor: pointer;
+      }
+
+      .mode-card .mode-status {
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.7);
+      }
+
+      .address-note {
+        font-size: 0.95rem;
+        color: rgba(255, 255, 255, 0.75);
+      }
+
+      .readonly {
+        background: rgba(255, 255, 255, 0.12);
+      }
+
+      .submit-row {
+        display: flex;
+        justify-content: flex-end;
       }
 
       footer {
@@ -311,7 +441,8 @@
 
     <main>
       <div class="banner" role="status" aria-live="polite">
-        Mobile service temporarily unavailable – we’ll be back on the road soon. Garage bookings remain open at Unit 5, Wingate Grange Industrial Estate, TS28 5AH.
+        Mobile service temporarily unavailable – we’ll be back on the road soon. Garage bookings remain open at Unit 5, Wingate
+        Grange Industrial Estate, TS28 5AH.
       </div>
 
       <section class="intro">
@@ -328,17 +459,17 @@
           <h2>How to get started</h2>
           <ul>
             <li>Enter your registration below to identify your vehicle.</li>
-            <li>Choose the service you need or request a tailored quote.</li>
-            <li>We’ll confirm availability and pricing before any work starts.</li>
-            <li>Need directions? Tap the map button to open Google Maps.</li>
+            <li>Review our service list and choose the job you need.</li>
+            <li>Select mobile or garage fulfilment, then share your details.</li>
+            <li>We’ll confirm availability and pricing before work begins.</li>
           </ul>
         </div>
       </section>
 
       <section class="status-grid" aria-label="Service availability">
-        <article class="status-card disabled" aria-disabled="true">
+        <article class="status-card">
           <h3>Mobile Service</h3>
-          <p>Currently unavailable while our van is off the road. We’ll update you as soon as mobile bookings reopen.</p>
+          <p>Currently unavailable while our van is off the road. You can still register interest and we’ll update you when we’re back.</p>
         </article>
         <article class="status-card">
           <h3>Garage Service</h3>
@@ -368,20 +499,84 @@
 
         <div id="vehicle" class="vehicle-card" aria-live="polite"></div>
 
-        <div id="services" class="services-section" aria-live="polite">
-          <label for="service">Select a service</label>
-          <select id="service">
-            <option value="">— choose a service —</option>
-            <option value="diagnostics">Diagnostic / fault-finding assessment</option>
-            <option value="oil">Engine oil & filter change</option>
-            <option value="brakes_front">Front brake pads replacement</option>
-            <option value="battery">Battery test & replacement</option>
-            <option value="inspection">Comprehensive inspection (per hour)</option>
-          </select>
-          <div id="pricing" class="pricing-output"></div>
-          <button id="quoteBtn" class="quote-btn" type="button" style="display:none">Request booking confirmation</button>
-          <p class="hint">We’ll email you a tailored estimate that includes labour and any parts specific to your registration.</p>
-        </div>
+        <details id="services" class="flow-panel" hidden>
+          <summary>Select a service</summary>
+          <div class="panel-body">
+            <div id="serviceGrid" class="services-grid" role="list"></div>
+            <div id="selectedService" class="selection-summary" hidden></div>
+          </div>
+        </details>
+
+        <details id="modeDetails" class="flow-panel" hidden>
+          <summary>Choose how we help</summary>
+          <div class="panel-body">
+            <div class="mode-grid">
+              <label class="mode-card" id="mobileCard">
+                <input type="radio" name="fulfilment" value="mobile" />
+                <span class="service-name">Mobile service</span>
+                <span class="mode-status">We come to you. Ideal if you prefer work at home or can’t drive the vehicle.</span>
+                <span class="hint">Currently unavailable – we’ll confirm when bookings resume.</span>
+              </label>
+              <label class="mode-card" id="garageCard">
+                <input type="radio" name="fulfilment" value="garage" />
+                <span class="service-name">Garage service</span>
+                <span class="mode-status">Bring the vehicle to our Wingate Grange workshop for pit access and full tooling.</span>
+              </label>
+            </div>
+          </div>
+        </details>
+
+        <details id="customerDetails" class="flow-panel" hidden>
+          <summary>Provide your details</summary>
+          <div class="panel-body">
+            <form id="customerForm" novalidate>
+              <div class="form-row">
+                <div>
+                  <label for="firstName">First name</label>
+                  <input id="firstName" name="firstName" required autocomplete="given-name" />
+                </div>
+                <div>
+                  <label for="lastName">Last name</label>
+                  <input id="lastName" name="lastName" required autocomplete="family-name" />
+                </div>
+              </div>
+              <div class="form-row">
+                <div>
+                  <label for="email">Email address</label>
+                  <input id="email" name="email" type="email" required autocomplete="email" />
+                </div>
+                <div>
+                  <label for="phone">Phone number</label>
+                  <input id="phone" name="phone" type="tel" required autocomplete="tel" />
+                </div>
+              </div>
+              <div class="form-row">
+                <div>
+                  <label for="doorNumber">Door number / Unit</label>
+                  <input id="doorNumber" name="doorNumber" required />
+                </div>
+                <div>
+                  <label for="street">Street name</label>
+                  <input id="street" name="street" required />
+                </div>
+              </div>
+              <div class="form-row">
+                <div>
+                  <label for="county">County</label>
+                  <input id="county" name="county" required />
+                </div>
+                <div>
+                  <label for="postcode">Postcode</label>
+                  <input id="postcode" name="postcode" required />
+                </div>
+              </div>
+              <div class="address-note" id="addressNote"></div>
+              <div class="submit-row">
+                <button type="submit">Send booking request</button>
+              </div>
+            </form>
+          </div>
+        </details>
       </section>
     </main>
 
@@ -390,20 +585,189 @@
     </footer>
 
     <script>
-      const PRICES = {
-        labourHourly: 55,
-        diagnosticsFlat: 50,
-        oilFrom: 80,
-        brakesFrontFrom: 120,
-        batteryFrom: 200
-      };
+      const SERVICES = [
+        {
+          id: 'diagnostic',
+          name: 'Diagnostic / I Don\'t Know',
+          price: 50,
+          description:
+            'Complete diagnostic check with a full fault report sent to your email so you can see what needs attention. Perfect if you\'re unsure about an issue.'
+        },
+        {
+          id: 'basic_service',
+          name: 'Basic Service Package',
+          price: 100,
+          description:
+            'Engine oil, oil filter, air filter, dust/pollen filter, coolant top-up plus tyre, light, and battery health checks to keep your vehicle running smoothly.'
+        },
+        {
+          id: 'engine_oil',
+          name: 'Engine Oil & Filter Change',
+          price: 60,
+          description:
+            'Fresh premium oil and a new filter to protect the engine, improve efficiency, and quieten noisy running.'
+        },
+        {
+          id: 'brake_refresh',
+          name: 'Brake Pads & Discs',
+          price: 100,
+          description:
+            'Front axle brake pads with disc inspection and replacement if required. Keeps stopping distances short and confidence high.'
+        },
+        {
+          id: 'battery',
+          name: 'Battery Replacement & Coding',
+          price: 200,
+          description:
+            'Supply and fit a quality battery, including ECU coding for modern vehicles that need it. Includes disposal of the old unit.'
+        },
+        {
+          id: 'major_service',
+          name: 'Major Service Package',
+          price: 350,
+          description:
+            'Comprehensive fluids, filters, spark or glow plugs where required, plus full brake inspection and replacement recommendations.'
+        }
+      ];
 
       const API_URL = '/api/vrm';
       const vrmInput = document.getElementById('vrm');
       const vehicleCard = document.getElementById('vehicle');
-      const servicesSection = document.getElementById('services');
-      const pricingOutput = document.getElementById('pricing');
-      const quoteBtn = document.getElementById('quoteBtn');
+      const servicesDetails = document.getElementById('services');
+      const serviceGrid = document.getElementById('serviceGrid');
+      const selectedServiceSummary = document.getElementById('selectedService');
+      const modeDetails = document.getElementById('modeDetails');
+      const fulfilmentRadios = Array.from(document.querySelectorAll('input[name="fulfilment"]'));
+      const customerDetails = document.getElementById('customerDetails');
+      const customerForm = document.getElementById('customerForm');
+      const addressNote = document.getElementById('addressNote');
+
+      const addressInputs = {
+        door: document.getElementById('doorNumber'),
+        street: document.getElementById('street'),
+        county: document.getElementById('county'),
+        postcode: document.getElementById('postcode')
+      };
+
+      addressInputs.postcode.addEventListener('input', () => {
+        addressInputs.postcode.value = addressInputs.postcode.value
+          .toUpperCase()
+          .replace(/[^A-Z0-9]/g, '')
+          .replace(/([0-9][A-Z0-9]{2})$/, ' $1')
+          .trim();
+      });
+
+      Object.entries(addressInputs).forEach(([key, input]) => {
+        input.addEventListener('input', () => {
+          if (selectedMode === 'mobile') {
+            lastMobileAddress[key] = input.value;
+          }
+        });
+      });
+
+      const contactInputs = {
+        firstName: document.getElementById('firstName'),
+        lastName: document.getElementById('lastName'),
+        email: document.getElementById('email'),
+        phone: document.getElementById('phone')
+      };
+
+      const GARAGE_ADDRESS = {
+        door: 'Unit 5',
+        street: 'Wingate Grange Industrial Estate',
+        county: 'County Durham',
+        postcode: 'TS28 5AH'
+      };
+
+      let vehicleData = null;
+      let selectedService = null;
+      let selectedMode = '';
+      let lastMobileAddress = { door: '', street: '', county: '', postcode: '' };
+
+      // Populate services grid
+      SERVICES.forEach((service) => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'service-card';
+        button.dataset.serviceId = service.id;
+        button.dataset.price = service.price;
+        button.setAttribute('aria-pressed', 'false');
+        button.innerHTML = `
+          <span class="service-name">${service.name}</span>
+          <span class="service-price">From £${service.price}</span>
+          <span class="hint">${service.description}</span>
+        `;
+        serviceGrid.appendChild(button);
+      });
+
+      function resetFlowAfterLookup() {
+        selectedService = null;
+        selectedMode = '';
+        lastMobileAddress = { door: '', street: '', county: '', postcode: '' };
+        selectedServiceSummary.hidden = true;
+        selectedServiceSummary.innerHTML = '';
+        servicesDetails.hidden = false;
+        servicesDetails.open = true;
+
+        document.querySelectorAll('.service-card').forEach((card) => {
+          card.classList.remove('active');
+        });
+
+        fulfilmentRadios.forEach((radio) => {
+          radio.checked = false;
+          radio.parentElement.classList.remove('active');
+        });
+
+        modeDetails.hidden = true;
+        modeDetails.open = false;
+        customerDetails.hidden = true;
+        customerDetails.open = false;
+        customerForm.reset();
+        addressNote.textContent = '';
+        Object.values(addressInputs).forEach((input) => {
+          input.value = '';
+          input.readOnly = false;
+          input.required = false;
+          input.classList.remove('readonly');
+        });
+      }
+
+      function applyFulfilmentState(mode, previousMode) {
+        if (mode === 'mobile') {
+          if (previousMode === 'mobile') {
+            Object.entries(addressInputs).forEach(([key, input]) => {
+              input.readOnly = false;
+              input.required = true;
+              input.classList.remove('readonly');
+              input.value = lastMobileAddress[key] || input.value;
+            });
+          } else {
+            Object.entries(addressInputs).forEach(([key, input]) => {
+              input.readOnly = false;
+              input.required = true;
+              input.classList.remove('readonly');
+              input.value = lastMobileAddress[key] || '';
+            });
+          }
+          addressNote.textContent = 'Enter the address where the vehicle will be located for the mobile visit.';
+        } else if (mode === 'garage') {
+          if (previousMode === 'mobile') {
+            Object.entries(addressInputs).forEach(([key, input]) => {
+              lastMobileAddress[key] = input.value.trim();
+            });
+          }
+          addressInputs.door.value = GARAGE_ADDRESS.door;
+          addressInputs.street.value = GARAGE_ADDRESS.street;
+          addressInputs.county.value = GARAGE_ADDRESS.county;
+          addressInputs.postcode.value = GARAGE_ADDRESS.postcode;
+          Object.values(addressInputs).forEach((input) => {
+            input.readOnly = true;
+            input.required = true;
+            input.classList.add('readonly');
+          });
+          addressNote.textContent = 'Garage drop-off address automatically filled. Please arrive at Unit 5, Wingate Grange Industrial Estate, TS28 5AH.';
+        }
+      }
 
       vrmInput.addEventListener('input', () => {
         vrmInput.value = vrmInput.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
@@ -414,12 +778,12 @@
         const vrm = vrmInput.value.trim();
         if (!vrm) return;
 
+        vehicleData = null;
         vehicleCard.style.display = 'block';
         vehicleCard.textContent = 'Looking up vehicle…';
-        servicesSection.style.display = 'none';
-        pricingOutput.textContent = '';
-        quoteBtn.style.display = 'none';
-        document.getElementById('service').value = '';
+        servicesDetails.hidden = true;
+        modeDetails.hidden = true;
+        customerDetails.hidden = true;
 
         try {
           const response = await fetch(API_URL, {
@@ -430,71 +794,190 @@
 
           const data = await response.json();
           if (!response.ok) {
-            throw new Error(data && (data.message || data.error) || 'Lookup failed');
+            throw new Error((data && (data.message || data.error)) || 'Lookup failed');
           }
 
+          vehicleData = data;
           const make = data.make ? data.make.trim() : '';
           const model = data.model ? data.model.trim() : '';
+          const colour = data.colour ? data.colour : '';
+          const engine = data.engineCapacity
+            ? `${(Number(data.engineCapacity) / 1000).toFixed(1).replace(/\.0$/, '')}L`
+            : '';
           const detailLine = [
-            data.fuelType ? data.fuelType : null,
-            data.engineCapacity ? (Number(data.engineCapacity) / 1000).toFixed(1).replace(/\.0$/, '') + 'L' : null,
-            data.colour ? data.colour : null
-          ].filter(Boolean).join(' • ');
+            data.fuelType || null,
+            engine || null,
+            colour || null
+          ]
+            .filter(Boolean)
+            .join(' • ');
 
+          const vehicleName = `${make} ${model}`.trim() || 'Vehicle found';
           vehicleCard.innerHTML = `
-            <strong>${make || model ? `${make} ${model}`.trim() : 'Vehicle found'}</strong>
+            <strong>${vehicleName}</strong>
             <div>${detailLine || 'DVLA details confirmed.'}</div>
             <div class="hint">Registration: ${vrm}</div>
           `;
 
-          servicesSection.style.display = 'block';
+          resetFlowAfterLookup();
         } catch (error) {
-          vehicleCard.textContent = error.message || 'We could not find that vehicle. Please double-check the registration.';
+          vehicleCard.innerHTML = `
+            <strong>We couldn\'t confirm that vehicle.</strong>
+            <div class="hint">${error.message || 'Please check the registration and try again.'}</div>
+          `;
         }
       });
 
-      document.getElementById('service').addEventListener('change', (event) => {
-        const value = event.target.value;
-        quoteBtn.style.display = value ? 'inline-flex' : 'none';
-
-        if (!value) {
-          pricingOutput.textContent = '';
+      serviceGrid.addEventListener('click', (event) => {
+        const button = event.target.closest('.service-card');
+        if (!button) return;
+        if (!vehicleData) {
+          alert('Please look up a vehicle first.');
           return;
         }
 
-        if (value === 'diagnostics') {
-          pricingOutput.innerHTML = `<span class="price">£${PRICES.diagnosticsFlat}</span> diagnostic session with full report.`;
-        } else if (value === 'oil') {
-          pricingOutput.innerHTML = `From <span class="price">£${PRICES.oilFrom}</span> including premium oil and filter.`;
-        } else if (value === 'brakes_front') {
-          pricingOutput.innerHTML = `From <span class="price">£${PRICES.brakesFrontFrom}</span> including both front pads (discs assessed).`;
-        } else if (value === 'battery') {
-          pricingOutput.innerHTML = `From <span class="price">£${PRICES.batteryFrom}</span> including fitting and coding where required.`;
-        } else if (value === 'inspection') {
-          pricingOutput.innerHTML = `<span class="price">£${PRICES.labourHourly}/hr</span> workshop inspection & diagnostic time.`;
-        } else {
-          pricingOutput.textContent = '';
-        }
+        const serviceId = button.dataset.serviceId;
+        const service = SERVICES.find((item) => item.id === serviceId);
+        if (!service) return;
+
+        document.querySelectorAll('.service-card').forEach((card) => {
+          const isActive = card === button;
+          card.classList.toggle('active', isActive);
+          card.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+        });
+
+        selectedService = service;
+        selectedServiceSummary.hidden = false;
+        selectedServiceSummary.innerHTML = `
+          <strong>${service.name}</strong>
+          <div>Guide price: From £${service.price}</div>
+          <div class="hint">${service.description}</div>
+        `;
+
+        modeDetails.hidden = false;
+        modeDetails.open = true;
+        customerDetails.hidden = true;
+        customerDetails.open = false;
+        customerForm.reset();
+        addressNote.textContent = '';
+        Object.values(addressInputs).forEach((input) => {
+          input.value = '';
+          input.readOnly = false;
+          input.classList.remove('readonly');
+          input.required = false;
+        });
+        lastMobileAddress = { door: '', street: '', county: '', postcode: '' };
+
+        fulfilmentRadios.forEach((radio) => {
+          radio.checked = false;
+          radio.parentElement.classList.remove('active');
+        });
+
       });
 
-      quoteBtn.addEventListener('click', () => {
-        const vrm = vrmInput.value.trim();
-        if (!vrm) return;
-        const serviceValue = document.getElementById('service').value;
-        if (!serviceValue) return;
+      fulfilmentRadios.forEach((radio) => {
+        radio.addEventListener('change', () => {
+          if (!selectedService) {
+            radio.checked = false;
+            alert('Please choose a service first.');
+            return;
+          }
 
-        const serviceLabels = {
-          diagnostics: 'Diagnostic / fault-finding assessment',
-          oil: 'Engine oil & filter change',
-          brakes_front: 'Front brake pads replacement',
-          battery: 'Battery test & replacement',
-          inspection: 'Comprehensive inspection (per hour)'
+          fulfilmentRadios.forEach((input) => {
+            input.parentElement.classList.toggle('active', input.checked);
+          });
+
+          const previousMode = selectedMode;
+          selectedMode = radio.value;
+          applyFulfilmentState(selectedMode, previousMode);
+          customerDetails.hidden = false;
+          customerDetails.open = true;
+        });
+      });
+
+      customerForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const vrm = vrmInput.value.trim();
+        if (!vehicleData || !vrm) {
+          alert('Please look up your vehicle first.');
+          return;
+        }
+        if (!selectedService) {
+          alert('Please choose a service from the list.');
+          return;
+        }
+        if (!selectedMode) {
+          alert('Please choose mobile or garage service.');
+          return;
+        }
+
+        if (!customerForm.reportValidity()) {
+          return;
+        }
+
+        const firstName = contactInputs.firstName.value.trim();
+        const lastName = contactInputs.lastName.value.trim();
+        const email = contactInputs.email.value.trim();
+        const phone = contactInputs.phone.value.trim();
+
+        const address = {
+          door: addressInputs.door.value.trim(),
+          street: addressInputs.street.value.trim(),
+          county: addressInputs.county.value.trim(),
+          postcode: addressInputs.postcode.value.trim()
         };
 
-        const subject = encodeURIComponent(`Service booking request for ${vrm}`);
-        const body = encodeURIComponent(
-          `Registration: ${vrm}\nRequested service: ${serviceLabels[serviceValue] || serviceValue}\nPlease confirm availability and a full estimate.\n\nThank you, Mitchs Auto Services.`
+        const engine = vehicleData.engineCapacity
+          ? `${(Number(vehicleData.engineCapacity) / 1000).toFixed(1).replace(/\.0$/, '')}L`
+          : 'N/A';
+        const vehicleName = `${vehicleData.make || ''} ${vehicleData.model || ''}`.trim() || 'Vehicle details available';
+        const year = vehicleData.yearOfManufacture ? `Year: ${vehicleData.yearOfManufacture}` : null;
+        const fuel = vehicleData.fuelType ? `Fuel: ${vehicleData.fuelType}` : null;
+
+        const lines = [
+          'Website booking request for Mitchs Auto Services',
+          '',
+          `Registration: ${vrm}`,
+          `Vehicle: ${vehicleName}`,
+          year || null,
+          fuel || null,
+          `Engine: ${engine}`,
+          '',
+          `Selected service: ${selectedService.name}`,
+          `Guide price: From £${selectedService.price}`,
+          `Service summary: ${selectedService.description}`,
+          '',
+          `Preferred fulfilment: ${selectedMode === 'mobile' ? 'Mobile service (customer location)' : 'Garage service (drop-off at Unit 5)'}`,
+        ].filter(Boolean);
+
+        if (selectedMode === 'mobile') {
+          lines.push(
+            'Customer address for visit:',
+            `${address.door} ${address.street}`.trim(),
+            address.county,
+            address.postcode
+          );
+        } else {
+          lines.push(
+            'Garage drop-off address:',
+            `${GARAGE_ADDRESS.door}, ${GARAGE_ADDRESS.street}`,
+            GARAGE_ADDRESS.county,
+            GARAGE_ADDRESS.postcode
+          );
+        }
+
+        lines.push(
+          '',
+          'Customer contact details:',
+          `Name: ${firstName} ${lastName}`.trim(),
+          `Email: ${email}`,
+          `Phone: ${phone}`,
+          '',
+          'Please reply to confirm availability and pricing.'
         );
+
+        const subject = encodeURIComponent(`Service booking request – ${vrm} (${selectedMode === 'mobile' ? 'Mobile' : 'Garage'})`);
+        const body = encodeURIComponent(lines.join('\n'));
 
         window.location.href = `mailto:support@mitchsautoservices.co.uk?subject=${subject}&body=${body}`;
       });

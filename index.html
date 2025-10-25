@@ -463,6 +463,17 @@
       grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
       gap: 24px;
     }
+    .quotes-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 32px;
+      align-items: start;
+    }
+    @media (max-width: 1024px) {
+      .quotes-grid {
+        grid-template-columns: 1fr;
+      }
+    }
     .mode-card {
       background: linear-gradient(160deg, rgba(255, 255, 255, 0.08), rgba(11, 15, 21, 0.92));
       border: 1px solid rgba(255, 255, 255, 0.14);
@@ -1071,7 +1082,14 @@
   </section>
 
   <main class="container main-content">
-<div class="mode-card">
+    <div class="modes-grid">
+      <div class="mode-card mode-card--disabled" aria-disabled="true">
+        <h3>Mobile service</h3>
+        <p>Our fully equipped van brings the workshop to your driveway or workplace for servicing, diagnostics, battery work and brake repairs without the travel hassle. This is useful if you are worried about driving your car so you don’t damage it even more.</p>
+        <span class="mode-card__status">Currently unavailable</span>
+        <p class="mode-card__note">Our van is off the road for repairs so mobile visits are paused until further notice. Book a garage appointment below and we’ll let you know as soon as mobile service returns.</p>
+      </div>
+      <div class="mode-card">
         <h3>Garage service</h3>
         <p>Drop the car with us at Unit 5 for pit access, larger repairs and longer jobs. This is when you want to drop it off with us and let us do our thing with better tools and better equipment. We keep you updated throughout and get you back on the road quickly.</p>
       </div>
@@ -1272,23 +1290,11 @@
       </div>
     </section>
 
-    <div class="modes-grid">
-      <div class="mode-card mode-card--disabled" aria-disabled="true">
-        <h3>Mobile service</h3>
-        <p>Our fully equipped van brings the workshop to your driveway or workplace for servicing, diagnostics, battery work and brake repairs without the travel hassle. This is useful if you are worried about driving your car so you don’t damage it even more.</p>
-        <span class="mode-card__status">Currently unavailable</span>
-        <p class="mode-card__note">Our van is off the road for repairs so mobile visits are paused until further notice. Book a garage appointment below and we’ll let you know as soon as mobile service returns.</p>
-      </div>
-      <div class="mode-card">
-        <h3>Garage service</h3>
-        <p>Drop the car with us at Unit 5 for pit access, larger repairs and longer jobs. This is when you want to drop it off with us and let us do our thing with better tools and better equipment. We keep you updated throughout and get you back on the road quickly.</p>
-      </div>
-    </div>
-
-    <section id="scrapCard" class="card quote-card">
-      <div class="quote-card__header">
-        <h2>Scrap my car – instant estimate</h2>
-        <p class="quote-card__lead">Enter the vehicle details to see today’s guide scrap offer. This is an estimate only – we’ll confirm the final price once we inspect the vehicle in person.</p>
+    <div class="quotes-grid">
+      <section id="scrapCard" class="card quote-card">
+        <div class="quote-card__header">
+          <h2>Scrap my car – instant estimate</h2>
+          <p class="quote-card__lead">Enter the vehicle details to see today’s guide scrap offer. This is an estimate only – we’ll confirm the final price once we inspect the vehicle in person.</p>
       </div>
       <form id="scrapForm" class="quote-inline-form" novalidate>
         <div>
@@ -1308,7 +1314,7 @@
           <span>Estimated scrap offer</span>
           <strong id="scrapPriceValue">£—</strong>
         </div>
-        <p class="quote-disclaimer">Estimates use live scrap rates and parts buffers – final prices are confirmed after inspection.</p>
+          <p class="quote-disclaimer">Guide estimate using today’s scrap rates and parts buffers – the confirmed price follows an in-person inspection.</p>
         <div class="quote-actions">
           <button type="button" class="quote-cta" id="scrapConfirmButton" disabled>Scrap my car</button>
           <button type="button" class="quote-toggle" id="scrapToggle" aria-expanded="false" aria-controls="scrapBreakdown" disabled>View breakdown</button>
@@ -1326,12 +1332,12 @@
         </div>
         <p id="scrapMessage" class="quote-message hidden"></p>
       </div>
-    </section>
+      </section>
 
-    <section id="retailCard" class="card quote-card">
-      <div class="quote-card__header">
-        <h2>Sell my car – instant estimate</h2>
-        <p class="quote-card__lead">See what we can offer to buy your car. This guide price keeps a healthy prep margin – the confirmed offer follows an in-person appraisal.</p>
+      <section id="retailCard" class="card quote-card">
+        <div class="quote-card__header">
+          <h2>Sell my car – instant estimate</h2>
+          <p class="quote-card__lead">See what we can offer to buy your car. This is an estimate only – we keep a healthy prep margin and confirm the final offer after an in-person appraisal.</p>
       </div>
       <form id="retailForm" class="quote-inline-form" novalidate>
         <div>
@@ -1347,11 +1353,11 @@
         </div>
       </form>
       <div class="quote-display">
-        <div class="quote-value">
-          <span>Estimated buy-in offer</span>
-          <strong id="retailPriceValue">£—</strong>
-        </div>
-        <p class="quote-disclaimer">Estimates factor in mileage, prep time and minimum margins – final offers are confirmed after we see the vehicle.</p>
+          <div class="quote-value">
+            <span>Estimated sell-to-us offer</span>
+            <strong id="retailPriceValue">£—</strong>
+          </div>
+          <p class="quote-disclaimer">Guide estimate factoring in mileage, prep time and margins – we confirm the final offer once we’ve seen the vehicle.</p>
         <div class="quote-actions">
           <button type="button" class="quote-cta" id="retailConfirmButton" disabled>Sell my car</button>
           <button type="button" class="quote-toggle" id="retailToggle" aria-expanded="false" aria-controls="retailBreakdown" disabled>View breakdown</button>
@@ -1370,7 +1376,8 @@
         </div>
         <p id="retailMessage" class="quote-message hidden"></p>
       </div>
-    </section>
+      </section>
+    </div>
   </main>
 
   <script>

@@ -1865,9 +1865,7 @@
       const generatedAt = new Date().toLocaleString('en-GB', { timeZone: 'Europe/London' });
       sections.push(`Generated via online quote tool on ${generatedAt}.`);
       const subject = encodeURIComponent(`${isScrap ? 'Scrap' : 'Sell'} quote request – ${reg || 'vehicle'}`);
-      const body = encodeURIComponent(sections.join('
-
-'));
+      const body = encodeURIComponent(sections.join('\n\n'));
       window.location.href = `mailto:support@mitchsautoservices.co.uk?subject=${subject}&body=${body}`;
     }
 

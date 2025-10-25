@@ -30,6 +30,27 @@
         color: inherit;
       }
 
+      .top-banner {
+        background: linear-gradient(135deg, rgba(255, 111, 61, 0.85), rgba(197, 199, 206, 0.35));
+        color: var(--white);
+        text-align: center;
+        padding: 12px 18px;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        font-size: clamp(0.9rem, 2vw, 1rem);
+        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+      }
+
+      .top-banner strong {
+        color: var(--black);
+        background: var(--silver);
+        padding: 2px 8px;
+        border-radius: 999px;
+        margin: 0 6px;
+        display: inline-block;
+      }
+
       header {
         background: var(--black);
         border-bottom: 1px solid rgba(255, 255, 255, 0.08);
@@ -101,22 +122,10 @@
         text-transform: uppercase;
         letter-spacing: 0.04em;
         display: flex;
-        flex-direction: column;
-        gap: 6px;
         align-items: center;
+        justify-content: center;
         text-align: center;
         box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
-      }
-
-      .badge-strip span {
-        font-size: 0.95rem;
-        font-weight: 600;
-        text-transform: none;
-        letter-spacing: 0;
-      }
-
-      .badge-strip span strong {
-        text-transform: uppercase;
       }
 
       .banner {
@@ -524,14 +533,49 @@
       }
 
       .quote-panel {
-        border-radius: 16px;
-        border: 1px solid rgba(255, 255, 255, 0.12);
-        background: rgba(255, 255, 255, 0.04);
-        box-shadow: 0 18px 36px rgba(0, 0, 0, 0.25);
+        border-radius: 18px;
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        background: rgba(10, 10, 12, 0.75);
+        box-shadow: 0 22px 40px rgba(0, 0, 0, 0.35);
+        overflow: hidden;
       }
 
       .quote-panel summary {
-        background: rgba(8, 8, 9, 0.55);
+        background: rgba(8, 8, 9, 0.7);
+        padding: 24px 28px;
+        font-size: 1.25rem;
+        font-weight: 800;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        cursor: pointer;
+        list-style: none;
+      }
+
+      .quote-panel summary::-webkit-details-marker {
+        display: none;
+      }
+
+      .quote-panel summary::after {
+        content: '\25BC';
+        font-size: 1rem;
+        transition: transform 0.2s ease;
+      }
+
+      .quote-panel[open] summary::after {
+        transform: rotate(180deg);
+      }
+
+      .quote-panel[open] summary {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+      }
+
+      .quote-panel .panel-body {
+        padding: 28px;
+        gap: 20px;
       }
 
       .quote-hint {
@@ -582,6 +626,9 @@
     </style>
   </head>
   <body>
+    <div class="top-banner" role="banner">
+      Limited time offer: use code <strong>MASservices</strong> for 10% off when you book a garage visit at Wingate Grange.
+    </div>
     <header>
       <div class="header-inner">
         <div class="brand">
@@ -601,10 +648,7 @@
     </header>
 
     <main>
-      <div class="badge-strip" role="note">
-        <div>⭐ 5 Stars • Sponsored by Yell.com</div>
-        <span>Limited time: quote <strong>MASservices</strong> when you drop off at our Wingate Grange garage for 10% off labour.</span>
-      </div>
+      <div class="badge-strip" role="note">⭐ 5 Stars • Sponsored by Yell.com</div>
 
       <div class="banner" role="status" aria-live="polite">
         Mobile service temporarily unavailable – we’ll be back on the road soon. Garage bookings remain open at Unit 5, Wingate
@@ -1340,15 +1384,15 @@
           if (config.garageNote) config.garageNote.hidden = false;
           if (config.addressRows) {
             config.addressRows.forEach((row) => {
-              if (row) row.hidden = true;
+              if (row) row.hidden = false;
             });
           }
-          Object.entries(config.addressInputs).forEach(([, input]) => {
+          Object.entries(config.addressInputs).forEach(([key, input]) => {
             if (!input) return;
-            input.required = false;
-            input.value = '';
+            input.required = true;
             input.readOnly = true;
             input.classList.add('readonly');
+            input.value = GARAGE_ADDRESS[key] || '';
           });
         } else {
           if (config.garageNote) config.garageNote.hidden = true;

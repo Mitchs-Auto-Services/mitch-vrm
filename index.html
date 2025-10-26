@@ -1242,6 +1242,7 @@
 
 
       const API_URL = '/api/vrm';
+      const SUPPORT_EMAIL = 'support@mitchsautoservices.co.uk';
       const vrmInput = document.getElementById('vrm');
       const vehicleCard = document.getElementById('vehicle');
       const servicesDetails = document.getElementById('services');
@@ -1910,7 +1911,7 @@
           `${config.type === 'scrap' ? 'Scrap enquiry' : 'Vehicle sale enquiry'} – ${vrm}`
         );
         const body = encodeURIComponent(lines.join('\n'));
-        window.location.href = `mailto:support@mitchsautoservices.co.uk?subject=${subject}&body=${body}`;
+        window.location.href = `mailto:${SUPPORT_EMAIL}?subject=${subject}&body=${body}`;
       }
 
       let vehicleData = null;
@@ -2338,7 +2339,7 @@
         const subject = encodeURIComponent(`Service booking request – ${vrm} (${selectedMode === 'mobile' ? 'Mobile' : 'Garage'})`);
         const body = encodeURIComponent(lines.join('\n'));
 
-        window.location.href = `mailto:support@mitchsautoservices.co.uk?subject=${subject}&body=${body}`;
+        window.location.href = `mailto:${SUPPORT_EMAIL}?subject=${subject}&body=${body}`;
       });
 
       document.getElementById('year').textContent = new Date().getFullYear();

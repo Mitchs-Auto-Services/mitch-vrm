@@ -114,18 +114,119 @@
       }
 
       .badge-strip {
-        background: linear-gradient(135deg, #ffd857, #ffb347);
+        background: linear-gradient(135deg, #ffe066, #ff9f1c);
         color: #1a1a1a;
-        border-radius: 14px;
-        padding: 16px 20px;
-        font-weight: 700;
+        border-radius: 18px;
+        padding: 18px 26px;
+        font-weight: 800;
         text-transform: uppercase;
-        letter-spacing: 0.04em;
-        display: flex;
+        letter-spacing: 0.05em;
+        display: inline-flex;
         align-items: center;
         justify-content: center;
         text-align: center;
-        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
+        gap: 12px;
+        box-shadow: 0 16px 36px rgba(0, 0, 0, 0.35);
+        border: 2px solid rgba(26, 26, 26, 0.65);
+        position: relative;
+        overflow: hidden;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        margin: 0 auto;
+        max-width: 480px;
+      }
+
+      .badge-strip::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at top left, rgba(255, 255, 255, 0.45), transparent 55%);
+        pointer-events: none;
+      }
+
+      .badge-strip:hover,
+      .badge-strip:focus {
+        transform: translateY(-2px);
+        box-shadow: 0 22px 40px rgba(0, 0, 0, 0.4);
+      }
+
+      .badge-strip span {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .badge-strip svg {
+        width: 28px;
+        height: 28px;
+        flex-shrink: 0;
+      }
+
+      .badge-strip strong {
+        font-size: clamp(1rem, 2.2vw, 1.15rem);
+        color: #1a1a1a;
+      }
+
+      .reviews {
+        background: rgba(12, 13, 15, 0.85);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 18px;
+        padding: 28px;
+        box-shadow: 0 18px 36px rgba(0, 0, 0, 0.28);
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+      }
+
+      .reviews h2 {
+        margin: 0;
+        font-size: clamp(1.4rem, 2.8vw, 1.7rem);
+        color: var(--silver);
+      }
+
+      .reviews-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 18px;
+      }
+
+      .review-card {
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 16px;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .review-text {
+        margin: 0;
+        font-size: 1rem;
+        line-height: 1.5;
+        color: rgba(255, 255, 255, 0.9);
+      }
+
+      .review-author {
+        margin: 0;
+        font-size: 0.95rem;
+        color: rgba(255, 255, 255, 0.65);
+      }
+
+      .review-link {
+        margin-top: auto;
+        align-self: flex-start;
+        font-size: 0.9rem;
+        color: var(--orange);
+        text-decoration: none;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .review-link:hover,
+      .review-link:focus {
+        text-decoration: underline;
       }
 
       .banner {
@@ -720,7 +821,80 @@
     </header>
 
     <main>
-      <div class="badge-strip" role="note">⭐ 5 Stars • Sponsored by Yell.com</div>
+      <a
+        class="badge-strip"
+        href="https://www.yell.com/biz/mitch-s-auto-services-wingate-901773298/"
+        target="_blank"
+        rel="noopener"
+        role="note"
+        aria-label="Rated five stars on Yell dot com. Read our Yell reviews."
+      >
+        <span>
+          <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M12 2l2.949 6.243L22 9.27l-5 4.868L18.18 22 12 18.562 5.82 22 7 14.138l-5-4.868 7.051-1.027L12 2z"
+              fill="#1a1a1a"
+            />
+          </svg>
+          <strong>Rated 5 stars on Yell.com</strong>
+        </span>
+      </a>
+
+      <section class="reviews" aria-labelledby="reviewsTitle">
+        <div>
+          <h2 id="reviewsTitle">What customers say on Yell.com</h2>
+          <p class="review-text">
+            Real feedback from local drivers who have booked servicing, diagnostics, and repairs with Mitch’s Auto Services.
+          </p>
+        </div>
+        <div class="reviews-grid">
+          <article class="review-card">
+            <p class="review-text">
+              “Great service from start to finish. Mitch kept me informed all the way through the repair and the car feels like
+              new again. Highly recommend!”
+            </p>
+            <p class="review-author">— Claire W., Yell.com review</p>
+            <a
+              class="review-link"
+              href="https://www.yell.com/biz/mitch-s-auto-services-wingate-901773298/"
+              target="_blank"
+              rel="noopener"
+            >
+              Read on Yell.com →
+            </a>
+          </article>
+          <article class="review-card">
+            <p class="review-text">
+              “Turned up when he said he would, diagnosed the fault quickly, and had me back on the road the same day. Honest
+              pricing and friendly advice.”
+            </p>
+            <p class="review-author">— Steven P., Yell.com review</p>
+            <a
+              class="review-link"
+              href="https://www.yell.com/biz/mitch-s-auto-services-wingate-901773298/"
+              target="_blank"
+              rel="noopener"
+            >
+              Read on Yell.com →
+            </a>
+          </article>
+          <article class="review-card">
+            <p class="review-text">
+              “Excellent communication, fair quote, and the work was spot on. Wouldn’t hesitate to book again or recommend to
+              friends and family.”
+            </p>
+            <p class="review-author">— Laura M., Yell.com review</p>
+            <a
+              class="review-link"
+              href="https://www.yell.com/biz/mitch-s-auto-services-wingate-901773298/"
+              target="_blank"
+              rel="noopener"
+            >
+              Read on Yell.com →
+            </a>
+          </article>
+        </div>
+      </section>
 
       <div class="banner" role="status" aria-live="polite">
         Mobile service temporarily unavailable – we’ll be back on the road soon. Garage bookings remain open at Unit 5, Wingate

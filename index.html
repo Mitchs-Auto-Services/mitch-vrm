@@ -758,6 +758,24 @@
         gap: 12px;
       }
 
+      .shell-toggle {
+        margin: 12px 0 4px;
+      }
+
+      .shell-toggle label {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.85);
+      }
+
+      .shell-toggle input[type='checkbox'] {
+        width: 18px;
+        height: 18px;
+        accent-color: var(--orange);
+      }
+
       .feature-options {
         display: grid;
         gap: 10px;
@@ -956,7 +974,14 @@
                 required
               ></textarea>
 
-              <fieldset>
+              <div class="shell-toggle">
+                <label for="scrapShell">
+                  <input type="checkbox" id="scrapShell" name="scrapShell" />
+                  <span>It’s a stripped shell (no interior or major components)</span>
+                </label>
+              </div>
+
+              <fieldset id="scrapCompleteness">
                 <legend>Vehicle completeness</legend>
                 <div class="feature-options">
                   <label for="scrapCatalyst">
@@ -1069,7 +1094,14 @@
                 required
               ></textarea>
 
-              <fieldset>
+              <div class="shell-toggle">
+                <label for="sellShell">
+                  <input type="checkbox" id="sellShell" name="sellShell" />
+                  <span>It’s a stripped shell (no interior or major components)</span>
+                </label>
+              </div>
+
+              <fieldset id="sellCompleteness">
                 <legend>Vehicle completeness</legend>
                 <div class="feature-options">
                   <label for="sellCatalyst">
@@ -1606,7 +1638,9 @@
             county: document.getElementById('scrapCounty'),
             postcode: document.getElementById('scrapPostcode')
           },
+          featuresFieldset: document.getElementById('scrapCompleteness'),
           features: {
+            shell: document.getElementById('scrapShell'),
             catalyst: document.getElementById('scrapCatalyst'),
             wheels: document.getElementById('scrapWheels'),
             alloys: document.getElementById('scrapAlloys')
@@ -1639,7 +1673,9 @@
             county: document.getElementById('sellCounty'),
             postcode: document.getElementById('sellPostcode')
           },
+          featuresFieldset: document.getElementById('sellCompleteness'),
           features: {
+            shell: document.getElementById('sellShell'),
             catalyst: document.getElementById('sellCatalyst'),
             wheels: document.getElementById('sellWheels'),
             alloys: document.getElementById('sellAlloys')
@@ -1676,6 +1712,16 @@
             });
           });
         }
+        if (config.features && config.features.wheels && config.features.alloys) {
+          config.features.wheels.addEventListener('change', () => {
+            syncAlloyState(config);
+          });
+        }
+        if (config.features && config.features.shell) {
+          config.features.shell.addEventListener('change', () => {
+            updateShellState(config);
+          });
+        }
         if (config.form) {
           config.form.addEventListener('submit', (event) => event.preventDefault());
         }
@@ -1695,8 +1741,54 @@
             });
           });
         }
+        updateShellState(config);
+        syncAlloyState(config);
         setQuoteFulfilment(config, '');
       });
+
+      function syncAlloyState(config) {
+        if (!config || !config.features) return;
+        const wheels = config.features.wheels;
+        const alloys = config.features.alloys;
+        const shell = config.features.shell;
+        if (!alloys) return;
+
+        const allowAlloys = Boolean(wheels && wheels.checked) && !(shell && shell.checked);
+        alloys.disabled = !allowAlloys;
+        if (!allowAlloys) {
+          alloys.checked = false;
+        }
+      }
+
+      function updateShellState(config) {
+        if (!config || !config.features) return;
+        const shell = config.features.shell;
+        const catalyst = config.features.catalyst;
+        const wheels = config.features.wheels;
+        const alloys = config.features.alloys;
+        const fieldset = config.featuresFieldset;
+        const isShell = Boolean(shell && shell.checked);
+
+        if (fieldset) {
+          fieldset.hidden = isShell;
+        }
+
+        [catalyst, wheels, alloys].forEach((input) => {
+          if (!input) return;
+          if (isShell) {
+            input.checked = false;
+            input.disabled = true;
+          } else if (input === alloys) {
+            input.disabled = !(wheels && wheels.checked);
+          } else {
+            input.disabled = false;
+          }
+        });
+
+        if (!isShell) {
+          syncAlloyState(config);
+        }
+      }
 
       function setQuoteFulfilment(config, mode) {
         if (!config) return;
@@ -1773,166 +1865,91 @@
         return 'other';
       }
 
-      function estimateWeightKg(vehicle = {}) {
+      function determineWeightData(vehicle = {}) {
+        const bucket = getBodyTypeBucket(vehicle.bodyType || vehicle.bodyTypeDescription || '');
+        const clampLimit = bucket === 'van' ? 1500 : 1300;
         const kerbMass = Number(vehicle.massInKg);
+
         if (Number.isFinite(kerbMass) && kerbMass > 0) {
-          return kerbMass;
+          return {
+            bucket,
+            weightKg: Math.min(kerbMass, clampLimit),
+            rawKerbMass: kerbMass,
+            weightSource: 'dvla'
+          };
         }
 
-        const bucket = getBodyTypeBucket(vehicle.bodyType || vehicle.bodyTypeDescription || '');
-        const name = `${vehicle.make || ''} ${vehicle.model || ''}`.toLowerCase();
-        const rawBody = (vehicle.bodyType || vehicle.bodyTypeDescription || '').toLowerCase();
-
-        const fullSizeIndicators = [
-          'long wheelbase',
-          'lwb',
-          'high roof',
-          'luton',
-          'box',
-          'dropside',
-          'sprinter',
-          'transit',
-          'crafter',
-          'master',
-          'relay',
-          'movano',
-          'ducato',
-          'iveco',
-          'daily'
-        ];
-
-        const isFullSizeVan = bucket === 'van' && fullSizeIndicators.some((hint) => rawBody.includes(hint) || name.includes(hint));
-
-        if (bucket === 'hatchback') {
-          const mediumHatchModels = ['civic', 'focus', 'golf', 'astra', 'leon', 'megane', 'octavia', '308', 'i30'];
-          const isMediumHatch = mediumHatchModels.some((term) => name.includes(term));
-          return isMediumHatch ? 1250 : 1100;
-        }
-
-        if (bucket === 'saloon' || bucket === 'estate' || bucket === 'other') {
-          return 1250;
-        }
-
-        if (bucket === 'suv' || bucket === 'mpv' || bucket === '4x4') {
-          return 1500;
-        }
-
-        if (bucket === 'van') {
-          return isFullSizeVan ? 1700 : 1500;
-        }
-
-        return 1250;
-      }
-
-      function estimateShellWeightKg(vehicle = {}, completeWeightKg = 0) {
-        const make = (vehicle.make || '').toLowerCase();
-        const model = (vehicle.model || '').toLowerCase();
-        const knownShells = [
-          { match: ['peugeot', 'partner'], weight: 1000 },
-          { match: ['honda', 'civic'], weight: 850 },
-          { match: ['fiat', 'punto'], weight: 750 }
-        ];
-
-        for (const entry of knownShells) {
-          const matches = entry.match.every((term) => make.includes(term) || model.includes(term));
-          if (matches) return entry.weight;
-        }
-
-        const bucket = getBodyTypeBucket(vehicle.bodyType || vehicle.bodyTypeDescription || '');
-        const name = `${vehicle.make || ''} ${vehicle.model || ''}`.toLowerCase();
-        const rawBody = (vehicle.bodyType || vehicle.bodyTypeDescription || '').toLowerCase();
-
-        const fullSizeIndicators = [
-          'long wheelbase',
-          'lwb',
-          'high roof',
-          'luton',
-          'box',
-          'dropside',
-          'sprinter',
-          'transit',
-          'crafter',
-          'master',
-          'relay',
-          'movano',
-          'ducato',
-          'iveco',
-          'daily'
-        ];
-        const isFullSizeVan = bucket === 'van' && fullSizeIndicators.some((hint) => rawBody.includes(hint) || name.includes(hint));
-
-        const mediumHatchModels = ['civic', 'focus', 'golf', 'astra', 'leon', 'megane', 'octavia', '308', 'i30'];
-        const isMediumHatch = bucket === 'hatchback' && mediumHatchModels.some((term) => name.includes(term));
-
-        const defaults = {
-          hatchback: isMediumHatch ? 850 : 725,
-          saloon: 850,
-          estate: 925,
-          suv: 1000,
-          mpv: 1000,
-          '4x4': 1050,
-          van: isFullSizeVan ? 1150 : 950,
-          other: 800
+        const estimates = {
+          hatchback: 1100,
+          saloon: 1250,
+          estate: 1250,
+          suv: 1500,
+          mpv: 1500,
+          '4x4': 1500,
+          van: 1500,
+          other: 1250
         };
 
-        const fallback = defaults[bucket] || defaults.other;
-        const knownWeight = Number(completeWeightKg);
+        const fallback = estimates[bucket] || estimates.other;
+        return {
+          bucket,
+          weightKg: Math.min(fallback, clampLimit),
+          rawKerbMass: null,
+          weightSource: 'estimate'
+        };
+      }
 
-        if (!Number.isFinite(knownWeight) || knownWeight <= 0) {
-          return fallback;
+      function estimateShellWeightKg(completeWeightKg = 0) {
+        if (!Number.isFinite(completeWeightKg) || completeWeightKg <= 0) {
+          return 700;
         }
 
-        const derived = Math.max(600, knownWeight * 0.65);
-        const upperBound = Math.max(fallback, knownWeight - 250);
-        const candidate = Math.min(Math.max(fallback, derived), upperBound);
-        return Math.max(600, candidate);
-      }
-
-      function roundCurrency(value, step = 25) {
-        const numeric = Number(value);
-        const stepValue = step > 0 ? step : 1;
-        const normalised = Number.isFinite(numeric) ? Math.max(0, numeric) : 0;
-        return Math.max(0, Math.floor(normalised / stepValue) * stepValue);
-      }
-
-      function formatGBP(value) {
-        const numeric = Number(value);
-        const safeValue = Number.isFinite(numeric) ? Math.max(0, Math.floor(numeric)) : 0;
-        return `£${safeValue.toLocaleString('en-GB')}`;
+        const reduced = Math.max(700, completeWeightKg * 0.65);
+        const capped = Math.max(700, completeWeightKg - 250);
+        return Math.max(700, Math.min(reduced, capped, completeWeightKg));
       }
 
       function computeScrapEstimate(vehicle, features = {}) {
-        const weightKg = estimateWeightKg(vehicle);
-        const shellWeightKg = estimateShellWeightKg(vehicle, weightKg);
+        const weightData = determineWeightData(vehicle);
+        const weightKg = weightData.weightKg;
+        const shellWeightKg = estimateShellWeightKg(weightKg);
+        const pricingMode = features.isShell ? 'shell' : 'complete';
         const ratePerTonneComplete = 125;
         const ratePerTonneShell = 50;
         const processingDeduction = 30;
         const collectionCost = 100;
 
-        const hasCatalyst = Boolean(features.hasCatalyst);
-        const hasAllWheels = Boolean(features.hasAllWheels);
-        const hasAlloyWheels = Boolean(features.hasAlloyWheels);
+        const hasCatalyst = pricingMode === 'complete' && Boolean(features.hasCatalyst);
+        const hasAllWheels = pricingMode === 'complete' && Boolean(features.hasAllWheels);
+        const hasAlloyWheels = pricingMode === 'complete' && hasAllWheels && Boolean(features.hasAlloyWheels);
 
         const catalystAddon = hasCatalyst ? 50 : 0;
-        const alloyAddon = hasAllWheels && hasAlloyWheels ? 10 : 0;
-        const wheelsAddon = hasAllWheels ? 25 + alloyAddon : 0;
-        const addonsTotal = catalystAddon + wheelsAddon;
+        const wheelsAddon = hasAllWheels ? 25 : 0;
+        const alloyAddon = hasAlloyWheels ? 10 : 0;
+        const addonsTotal = pricingMode === 'complete' ? catalystAddon + wheelsAddon + alloyAddon : 0;
 
-        const completeRaw = (weightKg / 1000) * ratePerTonneComplete + addonsTotal - processingDeduction;
-        const dropOffOffer = roundCurrency(completeRaw, 25);
-
-        const pickupRaw = completeRaw - collectionCost;
-        const pickupOffer = roundCurrency(pickupRaw, 25);
+        const workingWeightKg = pricingMode === 'shell' ? shellWeightKg : weightKg;
+        const ratePerTonneApplied = pricingMode === 'shell' ? ratePerTonneShell : ratePerTonneComplete;
+        const baseRaw = (workingWeightKg / 1000) * ratePerTonneApplied + addonsTotal - processingDeduction;
+        const dropOffFloor = pricingMode === 'shell' ? 25 : 0;
+        const dropOffOffer = Math.max(dropOffFloor, roundCurrency(baseRaw, 25));
+        const pickupRaw = baseRaw - collectionCost;
+        const pickupFloor = pricingMode === 'shell' ? 25 : 0;
+        const pickupOffer = Math.max(pickupFloor, roundCurrency(pickupRaw, 25));
 
         const shellRaw = (shellWeightKg / 1000) * ratePerTonneShell - processingDeduction;
-        const shellDropOffOffer = roundCurrency(shellRaw, 25);
-        const shellPickupOffer = roundCurrency(shellRaw - collectionCost, 25);
+        const shellDropOffOffer = Math.max(25, roundCurrency(shellRaw, 25));
+        const shellPickupOffer = Math.max(25, roundCurrency(shellRaw - collectionCost, 25));
 
         return {
+          pricingMode,
+          weightData,
           weightKg,
           shellWeightKg,
+          workingWeightKg,
           ratePerTonneComplete,
           ratePerTonneShell,
+          ratePerTonneApplied,
           catalystAddon,
           wheelsAddon,
           alloyAddon,
@@ -1952,14 +1969,14 @@
       function estimateRetailValue(vehicle = {}, mileage = 0) {
         const bucket = getBodyTypeBucket(vehicle.bodyType || vehicle.bodyTypeDescription || '');
         const baseRetail = {
-          hatchback: 6000,
-          saloon: 8000,
-          estate: 8500,
-          suv: 12000,
-          mpv: 9500,
-          '4x4': 11000,
-          van: 9500,
-          other: 6500
+          hatchback: 7200,
+          saloon: 9000,
+          estate: 9500,
+          suv: 13500,
+          mpv: 10500,
+          '4x4': 13000,
+          van: 10000,
+          other: 7000
         };
 
         const currentYear = new Date().getFullYear();
@@ -1967,23 +1984,24 @@
         const referenceYear = Number.isFinite(year) && year > 1900 ? year : currentYear - 12;
         const age = Math.max(0, currentYear - referenceYear);
 
-        let multiplier = 0.18;
-        if (age <= 1) multiplier = 0.62;
-        else if (age <= 3) multiplier = 0.5;
-        else if (age <= 6) multiplier = 0.4;
-        else if (age <= 10) multiplier = 0.28;
+        let multiplier = 0.2;
+        if (age <= 1) multiplier = 0.8;
+        else if (age <= 3) multiplier = 0.64;
+        else if (age <= 5) multiplier = 0.5;
+        else if (age <= 8) multiplier = 0.38;
+        else if (age <= 12) multiplier = 0.26;
 
         let retail = (baseRetail[bucket] || baseRetail.other) * multiplier;
 
         const miles = Number(mileage) || 0;
-        const expectedMiles = Math.max(12000 * Math.max(age, 1), 10000);
+        const expectedMiles = Math.max(12000 * Math.max(age, 1), 12000);
         const delta = miles - expectedMiles;
 
         if (delta > 0) {
           const penaltySteps = Math.ceil(delta / 10000);
-          retail *= Math.max(0.4, 1 - penaltySteps * 0.03);
-        } else if (delta < -5000) {
-          const bonusSteps = Math.min(3, Math.floor(Math.abs(delta) / 10000));
+          retail *= Math.max(0.35, 1 - penaltySteps * 0.03);
+        } else if (delta < 0) {
+          const bonusSteps = Math.min(4, Math.floor(Math.abs(delta) / 10000));
           retail *= 1 + bonusSteps * 0.03;
         }
 
@@ -1998,48 +2016,64 @@
         const mileageValue = Number(mileage) || 0;
         const { retailValue, age, expectedMiles } = estimateRetailValue(vehicle, mileageValue);
 
-        const safeRetail = Math.max(retailValue, scrapEstimate.dropOffOffer);
-
-        const baseRepairAllowance = Math.max(350, age * 60);
-        const mileagePenalty = mileageValue > expectedMiles ? Math.ceil((mileageValue - expectedMiles) / 10000) * 120 : 0;
-        const repairAllowance = baseRepairAllowance + mileagePenalty;
-
-        const serviceItems = 150; // fluids, filters, minor parts
-        const motValet = 130; // MOT prep, valeting, detailing
-        const marketing = 60; // adverts and admin
-        const runningCosts = serviceItems + motValet + marketing;
-        const collectionCost = fulfilment === 'pickup' ? 100 : 0;
-
-        const totalCosts = repairAllowance + runningCosts + collectionCost;
-
-        const profitRequirement = safeRetail < 3000 ? 400 : Math.max(400, safeRetail * 0.15);
-
-        const candidate = safeRetail - (totalCosts + profitRequirement);
+        const resaleValue = retailValue;
         const scrapReference = scrapEstimate.dropOffOffer;
         const scrapForSelection = fulfilment === 'pickup' ? scrapEstimate.pickupOffer : scrapEstimate.dropOffOffer;
+        const minAcceptable = scrapReference + 75;
 
+        const mileagePenalty = mileageValue > expectedMiles ? Math.ceil((mileageValue - expectedMiles) / 10000) * 120 : 0;
+        const repairAllowance = age <= 2 ? 320 : age <= 5 ? 450 : age <= 8 ? 620 : 780;
+        const serviceAndMot = 200;
+        const valeting = 80;
+        const marketing = 60;
+        const runningCosts = serviceAndMot + valeting + marketing;
+        const collectionCost = fulfilment === 'pickup' ? 100 : 0;
+
+        const totalCosts = repairAllowance + mileagePenalty + runningCosts + collectionCost;
+        const profitRequirement = resaleValue < 3000 ? 400 : Math.max(400, resaleValue * 0.15);
+
+        const candidate = resaleValue - (totalCosts + profitRequirement);
         let offer = roundCurrency(candidate, 25);
         let basis = 'retail';
+        let reason = 'Offer based on current resale market data after costs and required profit.';
 
-        if (!Number.isFinite(candidate) || offer <= scrapReference) {
+        if (!Number.isFinite(candidate) || candidate <= 0 || resaleValue <= 0) {
           basis = 'scrap';
+          reason = 'Retail margin not met today – scrap valuation shown.';
           offer = roundCurrency(scrapForSelection, 25);
+        } else if (candidate < minAcceptable) {
+          basis = 'scrap';
+          reason = 'Retail margin not met today – scrap valuation shown.';
+          offer = roundCurrency(scrapForSelection, 25);
+        } else {
+          offer = roundCurrency(candidate, 25);
+          if (offer < minAcceptable) {
+            offer = roundCurrency(minAcceptable, 25);
+          }
+          if (offer < minAcceptable) {
+            basis = 'scrap';
+            reason = 'Retail margin not met today – scrap valuation shown.';
+            offer = roundCurrency(scrapForSelection, 25);
+          } else if (fulfilment === 'pickup') {
+            reason = 'Offer based on current resale market data with £100 collection deduction applied.';
+          }
         }
 
         return {
           age,
           offer,
           basis,
-          retailValue: roundCurrency(safeRetail, 25),
+          resaleValue: roundCurrency(resaleValue, 25),
           repairAllowance: roundCurrency(repairAllowance, 25),
-          runningCosts: roundCurrency(runningCosts, 25),
-          collectionCost,
-          profitRequirement: roundCurrency(profitRequirement, 25),
           mileagePenalty: roundCurrency(mileagePenalty, 25),
-          expectedMiles,
+          runningCosts: roundCurrency(runningCosts, 25),
           totalCosts: roundCurrency(totalCosts, 25),
+          profitRequirement: roundCurrency(profitRequirement, 25),
+          collectionCost,
+          expectedMiles,
           scrapReference,
-          scrapForSelection
+          scrapForSelection,
+          reason
         };
       }
 
@@ -2105,6 +2139,7 @@
 
         const features = config.features
           ? {
+              isShell: Boolean(config.features.shell && config.features.shell.checked),
               hasCatalyst: Boolean(config.features.catalyst && config.features.catalyst.checked),
               hasAllWheels: Boolean(config.features.wheels && config.features.wheels.checked),
               hasAlloyWheels: Boolean(config.features.alloys && config.features.alloys.checked)
@@ -2118,6 +2153,19 @@
             : null;
 
         renderQuoteResult(config, scrapEstimate, sellEstimate);
+
+        await logQuote({
+          action,
+          type: config.type,
+          vrm,
+          mileage: mileageValue,
+          fulfilment: config.selectedFulfilment,
+          conditionNotes,
+          features,
+          scrapEstimate,
+          sellEstimate,
+          vehicle
+        });
 
         if (action === 'email') {
           sendQuoteEmail({
@@ -2138,34 +2186,142 @@
 
         const isPickup = config.selectedFulfilment === 'pickup';
         let price = 0;
+        let label = '';
+        let explanation = '';
+        let footnote = '';
 
         if (config.type === 'scrap') {
           price = isPickup ? scrapEstimate.pickupOffer : scrapEstimate.dropOffOffer;
+          label = 'Estimated scrap offer';
+          const usingShell = scrapEstimate.pricingMode === 'shell';
+          if (usingShell) {
+            explanation = isPickup
+              ? 'Bare shell valuation applied with £100 collection deduction.'
+              : 'Bare shell valuation applied for a stripped shell dropped off at our garage.';
+          } else {
+            explanation = isPickup
+              ? 'Includes £100 collection deduction for transport.'
+              : 'Drop the complete vehicle at Unit 5 for inspection and payment.';
+          }
+          if (isPickup) {
+            footnote = 'Pickup quotes include a £100 deduction for transport (price may vary).';
+          }
         } else if (sellEstimate) {
           price = sellEstimate.offer;
+          label = sellEstimate.basis === 'scrap' ? 'Scrap valuation applied' : 'Estimated purchase offer';
+          explanation =
+            sellEstimate.reason ||
+            (sellEstimate.basis === 'scrap'
+              ? 'Retail margin not met today – scrap valuation shown.'
+              : 'Offer based on current resale market data after costs and required profit.');
+          if (config.selectedFulfilment === 'pickup') {
+            footnote = 'Pickup quotes include a £100 deduction for transport (price may vary).';
+          }
+        } else {
+          label = 'Estimated purchase offer';
         }
 
-        const label =
-          config.type === 'scrap'
-            ? 'Estimated scrap offer'
-            : sellEstimate && sellEstimate.basis === 'scrap'
-            ? 'Offer matches scrap value'
-            : 'Estimated purchase offer';
+        const safePrice = Number.isFinite(price) ? Math.max(0, price) : 0;
+        const parts = [`<div class="quote-value"><span>${label}</span><strong>${formatGBP(safePrice)}</strong></div>`];
 
-        const parts = [`<div class="quote-value">${label}: <strong>${formatGBP(price)}</strong></div>`];
-
-        if (config.type === 'sell' && sellEstimate && sellEstimate.basis === 'scrap') {
-          parts.push(
-            '<div class="quote-note">This vehicle currently qualifies for our scrap valuation only. We\'ll review again if market conditions change.</div>'
-          );
+        if (explanation) {
+          parts.push(`<div class="quote-note">${explanation}</div>`);
         }
 
-        if (isPickup && price > 0) {
-          parts.push('<div class="quote-footnote">Collection fee: £100* (*=price may vary)</div>');
+        if (footnote) {
+          parts.push(`<div class="quote-footnote">${footnote}</div>`);
         }
 
-        config.result.innerHTML = parts.join('');
         config.result.hidden = false;
+        config.result.innerHTML = parts.join('');
+      }
+
+      async function logQuote(details) {
+        if (!details) return;
+        try {
+          const {
+            action = 'quote',
+            type = '',
+            vrm = '',
+            mileage = 0,
+            fulfilment = '',
+            conditionNotes = '',
+            features = {},
+            scrapEstimate = {},
+            sellEstimate = null,
+            vehicle = {}
+          } = details;
+
+          const safeVehicle = vehicle || {};
+          const safeFeatures = features || {};
+          const safeScrap = scrapEstimate || {};
+          const weightData = safeScrap.weightData || {};
+          const safeSell = sellEstimate || null;
+
+          const payload = {
+            action,
+            type,
+            vrm,
+            mileage,
+            fulfilment,
+            conditionNotes,
+            vehicle: {
+              make: safeVehicle.make || '',
+              model: safeVehicle.model || '',
+              yearOfManufacture: safeVehicle.yearOfManufacture || null,
+              bodyType: safeVehicle.bodyType || safeVehicle.bodyTypeDescription || '',
+              fuelType: safeVehicle.fuelType || '',
+              massInKg: safeVehicle.massInKg || null
+            },
+            features: {
+              isShell: Boolean(safeFeatures.isShell),
+              hasCatalyst: Boolean(safeFeatures.hasCatalyst),
+              hasAllWheels: Boolean(safeFeatures.hasAllWheels),
+              hasAlloyWheels: Boolean(safeFeatures.hasAlloyWheels)
+            },
+            scrap: {
+              pricingMode: safeScrap.pricingMode || '',
+              dropOffOffer: Number(safeScrap.dropOffOffer) || 0,
+              pickupOffer: Number(safeScrap.pickupOffer) || 0,
+              shellDropOffOffer: Number(safeScrap.shellDropOffOffer) || 0,
+              shellPickupOffer: Number(safeScrap.shellPickupOffer) || 0,
+              weightKg: Number(safeScrap.weightKg) || null,
+              shellWeightKg: Number(safeScrap.shellWeightKg) || null,
+              workingWeightKg: Number(safeScrap.workingWeightKg) || null,
+              weightSource: weightData.weightSource || '',
+              rawKerbMass: Number(weightData.rawKerbMass) || null,
+              ratePerTonneApplied: Number(safeScrap.ratePerTonneApplied) || null,
+              catalystAddon: Number(safeScrap.catalystAddon) || 0,
+              wheelsAddon: Number(safeScrap.wheelsAddon) || 0,
+              alloyAddon: Number(safeScrap.alloyAddon) || 0,
+              addonsTotal: Number(safeScrap.addonsTotal) || 0,
+              processingDeduction: Number(safeScrap.processingDeduction) || 0,
+              collectionCost: Number(safeScrap.collectionCost) || 0
+            },
+            sell: safeSell
+              ? {
+                  offer: Number(safeSell.offer) || 0,
+                  basis: safeSell.basis || '',
+                  resaleValue: Number(safeSell.resaleValue) || 0,
+                  repairAllowance: Number(safeSell.repairAllowance) || 0,
+                  mileagePenalty: Number(safeSell.mileagePenalty) || 0,
+                  runningCosts: Number(safeSell.runningCosts) || 0,
+                  totalCosts: Number(safeSell.totalCosts) || 0,
+                  profitRequirement: Number(safeSell.profitRequirement) || 0,
+                  collectionCost: Number(safeSell.collectionCost) || 0,
+                  reason: safeSell.reason || ''
+                }
+              : null
+          };
+
+          await fetch('/api/log-quote', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+        } catch (error) {
+          console.warn('Quote log skipped', error);
+        }
       }
 
       function sendQuoteEmail({
@@ -2199,6 +2355,12 @@
           ? `${Math.round(mileageValue).toLocaleString('en-GB')} miles`
           : 'Not provided';
         const fulfilmentText = config.selectedFulfilment === 'pickup' ? 'Have car picked up' : 'Drop off at garage';
+        const featureFlags = {
+          isShell: Boolean(features.isShell),
+          hasCatalyst: Boolean(features.hasCatalyst),
+          hasAllWheels: Boolean(features.hasAllWheels),
+          hasAlloyWheels: Boolean(features.hasAlloyWheels)
+        };
 
         const lines = [
           `${config.type === 'scrap' ? 'Scrap my car' : 'Sell my car'} enquiry from the website`,
@@ -2217,9 +2379,10 @@
         lines.push(
           '',
           'Vehicle completeness checks:',
-          `Catalyst fitted: ${features.hasCatalyst ? 'Yes' : 'No'}`,
-          `All wheels present: ${features.hasAllWheels ? 'Yes' : 'No'}`,
-          `Alloy wheels fitted: ${features.hasAlloyWheels ? 'Yes' : 'No'}`
+          `Stripped shell: ${featureFlags.isShell ? 'Yes' : 'No'}`,
+          `Catalyst fitted: ${featureFlags.hasCatalyst ? 'Yes' : 'No'}`,
+          `All wheels present: ${featureFlags.hasAllWheels ? 'Yes' : 'No'}`,
+          `Alloy wheels fitted: ${featureFlags.hasAlloyWheels ? 'Yes' : 'No'}`
         );
 
         if (config.type === 'scrap') {
@@ -2230,6 +2393,20 @@
             lines.push(`Drop-off comparison: ${dropOffText}`);
           } else {
             lines.push(`Estimated scrap price (drop-off): ${dropOffText}`);
+          }
+          const weightData = scrapEstimate.weightData || {};
+          const weightSourceText = weightData.weightSource === 'dvla' ? 'DVLA mass-in-service' : 'Body-type estimate';
+          lines.push(
+            `Pricing mode: ${scrapEstimate.pricingMode === 'shell' ? 'Stripped shell rate' : 'Complete vehicle rate'}`,
+            `Weight source: ${weightSourceText}`,
+            `Working weight used: ${Math.round(scrapEstimate.workingWeightKg)} kg`
+          );
+          if (
+            weightData.rawKerbMass &&
+            weightData.weightSource === 'dvla' &&
+            Math.round(weightData.rawKerbMass) !== Math.round(scrapEstimate.workingWeightKg)
+          ) {
+            lines.push(`DVLA kerb mass reported: ${Math.round(weightData.rawKerbMass)} kg (clamped for pricing).`);
           }
           lines.push(
             `Catalyst add-on applied: £${scrapEstimate.catalystAddon}`,
@@ -2247,9 +2424,11 @@
           } else {
             lines.push(`Estimated purchase price (drop-off): ${offerText}`);
           }
-          if (sellEstimate.basis === 'scrap') {
-            lines.push('Retail purchase calculation fell below scrap value – using scrap reference for this enquiry.');
-          } else {
+          lines.push(
+            `Valuation basis: ${sellEstimate.basis === 'scrap' ? 'Scrap safeguard' : 'Retail resale'}`,
+            `Reason recorded: ${sellEstimate.reason}`
+          );
+          if (sellEstimate.basis !== 'scrap') {
             lines.push(
               `Retail benchmark value: ${formatGBP(sellEstimate.retailValue)}`,
               `Total preparation costs budgeted: ${formatGBP(sellEstimate.totalCosts)}`,

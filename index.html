@@ -113,6 +113,71 @@
         gap: 24px;
       }
 
+      .hero {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 420px);
+        gap: 24px;
+        align-items: stretch;
+      }
+
+      .hero-copy {
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: 18px;
+        padding: 28px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        box-shadow: 0 18px 36px rgba(0, 0, 0, 0.45);
+      }
+
+      .hero-copy h2 {
+        margin: 0;
+        font-size: clamp(1.4rem, 2.5vw, 1.8rem);
+      }
+
+      .hero-copy p {
+        margin: 0;
+        line-height: 1.6;
+        color: rgba(255, 255, 255, 0.85);
+      }
+
+      .hero-highlights {
+        display: grid;
+        gap: 10px;
+      }
+
+      .hero-highlight {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: rgba(255, 111, 61, 0.08);
+        border: 1px solid rgba(255, 111, 61, 0.25);
+        border-radius: 14px;
+        padding: 12px 14px;
+        color: rgba(255, 255, 255, 0.9);
+        font-weight: 600;
+      }
+
+      .hero-highlight span {
+        font-size: 1.2rem;
+      }
+
+      .hero-map {
+        background: var(--card-bg);
+        border: 1px solid var(--card-border);
+        border-radius: 18px;
+        overflow: hidden;
+        box-shadow: 0 18px 36px rgba(0, 0, 0, 0.45);
+        min-height: 320px;
+      }
+
+      .hero-map iframe {
+        width: 100%;
+        height: 100%;
+        border: 0;
+      }
+
       .badge-strip {
         background: linear-gradient(135deg, #ffe066, #ff9f1c);
         color: #1a1a1a;
@@ -812,6 +877,14 @@
         .map-link {
           align-self: flex-end;
         }
+
+        .hero {
+          grid-template-columns: 1fr;
+        }
+
+        .hero-map {
+          min-height: 260px;
+        }
       }
     </style>
   </head>
@@ -838,6 +911,39 @@
     </header>
 
     <main>
+      <section class="hero" aria-labelledby="heroTitle">
+        <div class="hero-copy">
+          <h2 id="heroTitle">Garage experts in Wingate – ready to help</h2>
+          <p>
+            Visit Mitch’s Auto Services at Unit 5, Wingate Grange Industrial Estate, TS28 5AH for trusted servicing,
+            diagnostics, repairs, and tailored trade valuations. Mobile call-outs are paused while the van is off the road,
+            but the workshop is fully operational with same-day callbacks.
+          </p>
+          <div class="hero-highlights">
+            <div class="hero-highlight">
+              <span aria-hidden="true">🛠️</span>
+              Full garage services, repairs, diagnostics, and MOT preparation
+            </div>
+            <div class="hero-highlight">
+              <span aria-hidden="true">📞</span>
+              Call 07926 725369 or email support@mitchsautoservices.co.uk for quick bookings
+            </div>
+            <div class="hero-highlight">
+              <span aria-hidden="true">📍</span>
+              15-mile coverage radius – drop-offs welcome at our Wingate workshop
+            </div>
+          </div>
+        </div>
+        <div class="hero-map" role="complementary" aria-label="Map showing Mitch's Auto Services location">
+          <iframe
+            title="Map showing Mitchs Auto Services"
+            loading="lazy"
+            allowfullscreen
+            src="https://www.google.com/maps/embed/v1/place?key=AIzaSyA3QmGfcWQUbT5Ri-TN_x6RaEw_Ab_eKY0&amp;q=Unit+5%2C+Wingate+Grange+Industrial+Estate%2C+TS28+5AH"
+          ></iframe>
+        </div>
+      </section>
+
       <a
         class="badge-strip"
         href="https://www.yell.com/biz/mitch-s-auto-services-wingate-901773298/"

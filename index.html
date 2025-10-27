@@ -1522,6 +1522,18 @@
       ];
 
 
+      function roundCurrency(value, step = 25) {
+        if (!Number.isFinite(value)) return 0;
+        const safeStep = step > 0 ? step : 1;
+        const positive = Math.max(0, value);
+        return Math.floor(positive / safeStep) * safeStep;
+      }
+
+      function formatGBP(value) {
+        const amount = Number.isFinite(value) ? value : 0;
+        return `£${Math.max(0, Math.floor(amount)).toLocaleString('en-GB')}`;
+      }
+
       const API_URL = '/api/vrm';
       const SUPPORT_EMAIL = 'support@mitchsautoservices.co.uk';
       const SCRAP_ONLY_MESSAGE = 'This vehicle currently qualifies for our scrap valuation only.';

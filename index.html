@@ -1812,9 +1812,17 @@
       const SUPPORT_EMAIL = 'support@mitchsautoservices.co.uk';
       const SUMUP_DEPOSIT_GBP = 25;
       const sumupWrapper = document.querySelector('.sumup-wrapper');
+      let sumUpVisible = false;
       function setSumUpVisibility(visible) {
         if (!sumupWrapper) return;
         sumupWrapper.hidden = !visible;
+        sumUpVisible = Boolean(visible);
+      }
+
+      function hideSumUpIfShown() {
+        if (sumUpVisible) {
+          setSumUpVisibility(false);
+        }
       }
       setSumUpVisibility(false);
       if (sumupWrapper) {
@@ -3158,8 +3166,14 @@
           applyFulfilmentState(selectedMode, previousMode);
           customerDetails.hidden = false;
           customerDetails.open = true;
+          hideSumUpIfShown();
         });
       });
+
+      if (customerForm) {
+        customerForm.addEventListener('input', hideSumUpIfShown);
+        customerForm.addEventListener('change', hideSumUpIfShown);
+      }
 
       customerForm.addEventListener('submit', (event) => {
         event.preventDefault();

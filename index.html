@@ -1524,6 +1524,7 @@
 
       const API_URL = '/api/vrm';
       const SUPPORT_EMAIL = 'support@mitchsautoservices.co.uk';
+      const SCRAP_ONLY_MESSAGE = 'This vehicle currently qualifies for our scrap valuation only.';
       const vrmInput = document.getElementById('vrm');
       const vehicleCard = document.getElementById('vehicle');
       const servicesDetails = document.getElementById('services');
@@ -2012,7 +2013,7 @@
         };
       }
 
-      function computeSellEstimate(vehicle, mileage, scrapEstimate, fulfilment) {
+      function computeSellEstimate(vehicle, mileage, scrapEstimate, fulfilment, features = {}) {
         const mileageValue = Number(mileage) || 0;
         const { retailValue, age, expectedMiles } = estimateRetailValue(vehicle, mileageValue);
 
@@ -2020,6 +2021,25 @@
         const scrapReference = scrapEstimate.dropOffOffer;
         const scrapForSelection = fulfilment === 'pickup' ? scrapEstimate.pickupOffer : scrapEstimate.dropOffOffer;
         const minAcceptable = scrapReference + 75;
+
+        if (!scrapEstimate || scrapEstimate.pricingMode === 'shell' || features.isShell) {
+          return {
+            age,
+            offer: roundCurrency(scrapForSelection, 25),
+            basis: 'scrap',
+            resaleValue: roundCurrency(resaleValue, 25),
+            repairAllowance: 0,
+            mileagePenalty: 0,
+            runningCosts: 0,
+            totalCosts: 0,
+            profitRequirement: 0,
+            collectionCost: fulfilment === 'pickup' ? 100 : 0,
+            expectedMiles,
+            scrapReference,
+            scrapForSelection,
+            reason: 'Stripped shell valuation only – scrap rate applied.'
+          };
+        }
 
         const mileagePenalty = mileageValue > expectedMiles ? Math.ceil((mileageValue - expectedMiles) / 10000) * 120 : 0;
         const repairAllowance = age <= 2 ? 320 : age <= 5 ? 450 : age <= 8 ? 620 : 780;
@@ -2039,11 +2059,11 @@
 
         if (!Number.isFinite(candidate) || candidate <= 0 || resaleValue <= 0) {
           basis = 'scrap';
-          reason = 'Retail margin not met today – scrap valuation shown.';
+          reason = SCRAP_ONLY_MESSAGE;
           offer = roundCurrency(scrapForSelection, 25);
         } else if (candidate < minAcceptable) {
           basis = 'scrap';
-          reason = 'Retail margin not met today – scrap valuation shown.';
+          reason = SCRAP_ONLY_MESSAGE;
           offer = roundCurrency(scrapForSelection, 25);
         } else {
           offer = roundCurrency(candidate, 25);
@@ -2052,7 +2072,7 @@
           }
           if (offer < minAcceptable) {
             basis = 'scrap';
-            reason = 'Retail margin not met today – scrap valuation shown.';
+            reason = SCRAP_ONLY_MESSAGE;
             offer = roundCurrency(scrapForSelection, 25);
           } else if (fulfilment === 'pickup') {
             reason = 'Offer based on current resale market data with £100 collection deduction applied.';
@@ -2147,10 +2167,13 @@
           : {};
 
         const scrapEstimate = computeScrapEstimate(vehicle, features);
-        const sellEstimate =
-          config.type === 'sell'
-            ? computeSellEstimate(vehicle, mileageValue, scrapEstimate, config.selectedFulfilment)
-            : null;
+        const sellEstimate = computeSellEstimate(
+          vehicle,
+          mileageValue,
+          scrapEstimate,
+          config.selectedFulfilment,
+          features
+        );
 
         renderQuoteResult(config, scrapEstimate, sellEstimate);
 
@@ -2191,20 +2214,33 @@
         let footnote = '';
 
         if (config.type === 'scrap') {
-          price = isPickup ? scrapEstimate.pickupOffer : scrapEstimate.dropOffOffer;
-          label = 'Estimated scrap offer';
-          const usingShell = scrapEstimate.pricingMode === 'shell';
-          if (usingShell) {
-            explanation = isPickup
-              ? 'Bare shell valuation applied with £100 collection deduction.'
-              : 'Bare shell valuation applied for a stripped shell dropped off at our garage.';
+          const hasRetailOffer = sellEstimate && sellEstimate.basis !== 'scrap' && sellEstimate.offer >= scrapEstimate.dropOffOffer + 75;
+          if (hasRetailOffer) {
+            price = sellEstimate.offer;
+            label = 'Estimated purchase offer';
+            explanation =
+              config.selectedFulfilment === 'pickup'
+                ? 'Retail-ready vehicle – showing purchase offer with £100 pickup allowance deducted.'
+                : 'Retail-ready vehicle – showing purchase offer instead of scrap valuation.';
+            if (config.selectedFulfilment === 'pickup') {
+              footnote = 'Pickup quotes include a £100 deduction for transport (price may vary).';
+            }
           } else {
-            explanation = isPickup
-              ? 'Includes £100 collection deduction for transport.'
-              : 'Drop the complete vehicle at Unit 5 for inspection and payment.';
-          }
-          if (isPickup) {
-            footnote = 'Pickup quotes include a £100 deduction for transport (price may vary).';
+            price = isPickup ? scrapEstimate.pickupOffer : scrapEstimate.dropOffOffer;
+            label = 'Estimated scrap offer';
+            const usingShell = scrapEstimate.pricingMode === 'shell';
+            if (usingShell) {
+              explanation = isPickup
+                ? 'Bare shell valuation applied with £100 collection deduction.'
+                : 'Bare shell valuation applied for a stripped shell dropped off at our garage.';
+            } else {
+              explanation = isPickup
+                ? 'Includes £100 collection deduction for transport.'
+                : 'Drop the complete vehicle at Unit 5 for inspection and payment.';
+            }
+            if (isPickup) {
+              footnote = 'Pickup quotes include a £100 deduction for transport (price may vary).';
+            }
           }
         } else if (sellEstimate) {
           price = sellEstimate.offer;
@@ -2212,7 +2248,7 @@
           explanation =
             sellEstimate.reason ||
             (sellEstimate.basis === 'scrap'
-              ? 'Retail margin not met today – scrap valuation shown.'
+              ? SCRAP_ONLY_MESSAGE
               : 'Offer based on current resale market data after costs and required profit.');
           if (config.selectedFulfilment === 'pickup') {
             footnote = 'Pickup quotes include a £100 deduction for transport (price may vary).';
@@ -2387,7 +2423,24 @@
 
         if (config.type === 'scrap') {
           const dropOffText = formatGBP(scrapEstimate.dropOffOffer);
-          if (config.selectedFulfilment === 'pickup') {
+          const retailOverride = sellEstimate && sellEstimate.basis !== 'scrap';
+          if (retailOverride) {
+            const offerText = formatGBP(sellEstimate.offer);
+            if (config.selectedFulfilment === 'pickup') {
+              lines.push(
+                `Retail purchase offer shown to customer (pickup): ${offerText}`,
+                'Collection fee noted: £100* (*=price may vary)'
+              );
+              lines.push(`Drop-off comparison: ${formatGBP(roundCurrency(sellEstimate.offer + 100, 25))}`);
+            } else {
+              lines.push(`Retail purchase offer shown to customer (drop-off): ${offerText}`);
+            }
+            lines.push('Scrap valuation held back on-site to avoid mixed messaging.');
+            lines.push(`Internal scrap reference (drop-off): ${dropOffText}`);
+            if (config.selectedFulfilment === 'pickup') {
+              lines.push(`Internal scrap reference (pickup): ${formatGBP(scrapEstimate.pickupOffer)}`);
+            }
+          } else if (config.selectedFulfilment === 'pickup') {
             const pickupText = formatGBP(scrapEstimate.pickupOffer);
             lines.push(`Estimated scrap price (pickup): ${pickupText}`, 'Collection fee noted: £100* (*=price may vary)');
             lines.push(`Drop-off comparison: ${dropOffText}`);

@@ -1061,6 +1061,29 @@
                 </div>
               </div>
 
+              <fieldset>
+                <legend>Preferred appointment</legend>
+                <div class="form-row">
+                  <div>
+                    <label for="scrapDate">Preferred date</label>
+                    <input id="scrapDate" name="scrapDate" type="date" required />
+                  </div>
+                  <div>
+                    <label for="scrapTime">Preferred time</label>
+                    <input
+                      id="scrapTime"
+                      name="scrapTime"
+                      type="time"
+                      required
+                      min="09:00"
+                      max="17:00"
+                      step="1800"
+                    />
+                  </div>
+                </div>
+                <p class="hint">Appointments are available between 9:00 and 17:00.</p>
+              </fieldset>
+
               <div class="quote-note">All scrap quotes are estimates and will be confirmed after we see the vehicle.</div>
 
               <div class="submit-row">
@@ -1181,6 +1204,29 @@
                 </div>
               </div>
 
+              <fieldset>
+                <legend>Preferred appointment</legend>
+                <div class="form-row">
+                  <div>
+                    <label for="sellDate">Preferred date</label>
+                    <input id="sellDate" name="sellDate" type="date" required />
+                  </div>
+                  <div>
+                    <label for="sellTime">Preferred time</label>
+                    <input
+                      id="sellTime"
+                      name="sellTime"
+                      type="time"
+                      required
+                      min="09:00"
+                      max="17:00"
+                      step="1800"
+                    />
+                  </div>
+                </div>
+                <p class="hint">Appointments are available between 9:00 and 17:00.</p>
+              </fieldset>
+
               <div class="quote-note">All purchase offers remain estimates until the vehicle is assessed at or before handover.</div>
 
               <div class="submit-row">
@@ -1287,6 +1333,28 @@
                 </div>
               </div>
               <div class="address-note" id="addressNote"></div>
+              <fieldset>
+                <legend>Preferred appointment</legend>
+                <div class="form-row">
+                  <div>
+                    <label for="serviceDate">Preferred date</label>
+                    <input id="serviceDate" name="serviceDate" type="date" required />
+                  </div>
+                  <div>
+                    <label for="serviceTime">Preferred time</label>
+                    <input
+                      id="serviceTime"
+                      name="serviceTime"
+                      type="time"
+                      required
+                      min="09:00"
+                      max="17:00"
+                      step="1800"
+                    />
+                  </div>
+                </div>
+                <p class="hint">Appointments are available between 9:00 and 17:00.</p>
+              </fieldset>
               <div class="submit-row">
                 <button type="submit">Book my appointment</button>
               </div>
@@ -1534,6 +1602,63 @@
         return `£${Math.max(0, Math.floor(amount)).toLocaleString('en-GB')}`;
       }
 
+      function formatDateForEmail(value) {
+        if (!value) return '';
+        const parts = value.split('-');
+        if (parts.length !== 3) return value;
+        const [year, month, day] = parts;
+        if (!year || !month || !day) return value;
+        return `${day}/${month}/${year}`;
+      }
+
+      function formatTimeForEmail(value) {
+        if (!value) return '';
+        const parts = value.split(':');
+        if (parts.length < 2) return value;
+        const [hours, minutes] = parts;
+        if (!hours || !minutes) return value;
+        return `${hours}:${minutes}`;
+      }
+
+      function setMinDateToday(input) {
+        if (!input) return;
+        const today = new Date();
+        const iso = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(
+          2,
+          '0'
+        )}`;
+        input.min = iso;
+        if (input.value && input.value < iso) {
+          input.value = iso;
+        }
+      }
+
+      function isValidFutureDate(value) {
+        if (!value) return false;
+        const parts = value.split('-').map((part) => Number(part));
+        if (parts.length !== 3) return false;
+        const [year, month, day] = parts;
+        if (![year, month, day].every((num) => Number.isInteger(num) && num > 0)) return false;
+        const selected = new Date(year, month - 1, day);
+        const today = new Date();
+        selected.setHours(0, 0, 0, 0);
+        today.setHours(0, 0, 0, 0);
+        return selected >= today;
+      }
+
+      function isValidAppointmentTime(value) {
+        if (!value) return false;
+        const match = /^([0-9]{2}):([0-9]{2})$/.exec(value);
+        if (!match) return false;
+        const hours = Number(match[1]);
+        const minutes = Number(match[2]);
+        if (!Number.isInteger(hours) || !Number.isInteger(minutes)) return false;
+        if (minutes % 30 !== 0) return false;
+        if (hours < 9 || hours > 17) return false;
+        if (hours === 17 && minutes !== 0) return false;
+        return true;
+      }
+
       const API_URL = '/api/vrm';
       const SUPPORT_EMAIL = 'support@mitchsautoservices.co.uk';
       const SCRAP_ONLY_MESSAGE = 'This vehicle currently qualifies for our scrap valuation only.';
@@ -1556,6 +1681,34 @@
         county: document.getElementById('county'),
         postcode: document.getElementById('postcode')
       };
+
+      const serviceAppointment = {
+        date: document.getElementById('serviceDate'),
+        time: document.getElementById('serviceTime')
+      };
+
+      const scrapAppointmentInputs = {
+        date: document.getElementById('scrapDate'),
+        time: document.getElementById('scrapTime')
+      };
+
+      const sellAppointmentInputs = {
+        date: document.getElementById('sellDate'),
+        time: document.getElementById('sellTime')
+      };
+
+      const appointmentDateInputs = [
+        scrapAppointmentInputs.date,
+        sellAppointmentInputs.date,
+        serviceAppointment.date
+      ].filter(Boolean);
+
+      appointmentDateInputs.forEach((input) => {
+        setMinDateToday(input);
+        input.addEventListener('focus', () => setMinDateToday(input));
+        input.addEventListener('click', () => setMinDateToday(input));
+        input.addEventListener('input', () => setMinDateToday(input));
+      });
 
       attachPostcodeFormatter(addressInputs.postcode);
 
@@ -1664,6 +1817,7 @@
             email: document.getElementById('scrapEmail'),
             phone: document.getElementById('scrapPhone')
           },
+          appointment: scrapAppointmentInputs,
           result: document.getElementById('scrapQuoteResult'),
           quoteButton: document.getElementById('scrapQuoteBtn'),
           emailButton: document.getElementById('scrapEmailBtn'),
@@ -1699,6 +1853,7 @@
             email: document.getElementById('sellEmail'),
             phone: document.getElementById('sellPhone')
           },
+          appointment: sellAppointmentInputs,
           result: document.getElementById('sellQuoteResult'),
           quoteButton: document.getElementById('sellQuoteBtn'),
           emailButton: document.getElementById('sellEmailBtn'),
@@ -2134,6 +2289,13 @@
           return;
         }
 
+        const appointment = config.appointment
+          ? {
+              date: config.appointment.date ? config.appointment.date.value : '',
+              time: config.appointment.time ? config.appointment.time.value : ''
+            }
+          : { date: '', time: '' };
+
         if (!config.selectedFulfilment) {
           alert('Please choose whether you will drop the car off or need us to pick it up.');
           return;
@@ -2149,6 +2311,23 @@
 
         if (action === 'email' && config.form && !config.form.reportValidity()) {
           return;
+        }
+
+        if (action === 'email' && config.appointment) {
+          if (!isValidFutureDate(appointment.date)) {
+            alert('Please choose a preferred date from today onwards.');
+            if (config.appointment.date) {
+              config.appointment.date.focus();
+            }
+            return;
+          }
+          if (!isValidAppointmentTime(appointment.time)) {
+            alert('Please choose a time between 9:00 and 17:00 in 30-minute slots.');
+            if (config.appointment.time) {
+              config.appointment.time.focus();
+            }
+            return;
+          }
         }
 
         if (config.result) {
@@ -2197,6 +2376,7 @@
           fulfilment: config.selectedFulfilment,
           conditionNotes,
           features,
+          appointment,
           scrapEstimate,
           sellEstimate,
           vehicle
@@ -2211,7 +2391,8 @@
             scrapEstimate,
             sellEstimate,
             conditionNotes,
-            features
+            features,
+            appointment
           });
         }
       }
@@ -2297,7 +2478,8 @@
         scrapEstimate,
         sellEstimate,
         conditionNotes,
-        features = {}
+        features = {},
+        appointment = {}
       }) {
         if (!config) return;
 
@@ -2320,6 +2502,8 @@
           ? `${Math.round(mileageValue).toLocaleString('en-GB')} miles`
           : 'Not provided';
         const fulfilmentText = config.selectedFulfilment === 'pickup' ? 'Have car picked up' : 'Drop off at garage';
+        const appointmentDate = appointment.date || (config.appointment && config.appointment.date && config.appointment.date.value) || '';
+        const appointmentTime = appointment.time || (config.appointment && config.appointment.time && config.appointment.time.value) || '';
         const featureFlags = {
           isShell: Boolean(features.isShell),
           hasCatalyst: Boolean(features.hasCatalyst),
@@ -2340,6 +2524,12 @@
           '',
           `Preferred handover: ${fulfilmentText}`
         ].filter(Boolean);
+
+        if (appointmentDate || appointmentTime) {
+          const dateLabel = appointmentDate ? formatDateForEmail(appointmentDate) : 'Date not provided';
+          const timeLabel = appointmentTime ? formatTimeForEmail(appointmentTime) : 'Time not provided';
+          lines.push('', `Preferred appointment: ${dateLabel} at ${timeLabel}`);
+        }
 
         lines.push(
           '',
@@ -2495,6 +2685,13 @@
         customerDetails.open = false;
         customerForm.reset();
         addressNote.textContent = '';
+        if (serviceAppointment.date) {
+          setMinDateToday(serviceAppointment.date);
+          serviceAppointment.date.value = '';
+        }
+        if (serviceAppointment.time) {
+          serviceAppointment.time.value = '';
+        }
         selectedMode = '';
         fulfilmentRadios.forEach((radio) => {
           radio.checked = false;
@@ -2652,6 +2849,13 @@
         customerDetails.open = false;
         customerForm.reset();
         addressNote.textContent = '';
+        if (serviceAppointment.date) {
+          setMinDateToday(serviceAppointment.date);
+          serviceAppointment.date.value = '';
+        }
+        if (serviceAppointment.time) {
+          serviceAppointment.time.value = '';
+        }
         Object.values(addressInputs).forEach((input) => {
           input.value = '';
           input.readOnly = false;
@@ -2826,6 +3030,25 @@
           postcode: addressInputs.postcode.value.trim()
         };
 
+        const appointmentDate = serviceAppointment.date ? serviceAppointment.date.value : '';
+        const appointmentTime = serviceAppointment.time ? serviceAppointment.time.value : '';
+
+        if (!isValidFutureDate(appointmentDate)) {
+          alert('Please pick a preferred date from today onwards.');
+          if (serviceAppointment.date) {
+            serviceAppointment.date.focus();
+          }
+          return;
+        }
+
+        if (!isValidAppointmentTime(appointmentTime)) {
+          alert('Please select a preferred time between 9:00 and 17:00 in 30-minute steps.');
+          if (serviceAppointment.time) {
+            serviceAppointment.time.focus();
+          }
+          return;
+        }
+
         const engine = vehicleData.engineCapacity
           ? `${(Number(vehicleData.engineCapacity) / 1000).toFixed(1).replace(/\.0$/, '')}L`
           : 'N/A';
@@ -2847,6 +3070,7 @@
           `Service summary: ${selectedService.description}`,
           '',
           `Preferred fulfilment: ${selectedMode === 'mobile' ? 'Mobile service (customer location)' : 'Garage service (drop-off at Unit 5)'}`,
+          `Preferred appointment: ${formatDateForEmail(appointmentDate)} at ${formatTimeForEmail(appointmentTime)}`,
         ].filter(Boolean);
 
         if (selectedService.id === 'diagnostic') {

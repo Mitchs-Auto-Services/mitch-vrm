@@ -1500,12 +1500,14 @@
           </div>
         </details>
 
-        <div class="sumup-wrapper" aria-live="polite">
-          <h3>Secure SumUp payment</h3>
+        <div class="sumup-wrapper" aria-live="polite" hidden>
+          <h3>Secure your booking with a £<span data-deposit-amount>25</span> deposit</h3>
           <p>
-            Ready to leave a deposit? Use the SumUp card form below once we confirm the work and you’re
-            happy to proceed.
+            Pay a fixed £<span data-deposit-amount>25</span> SumUp deposit once you have chosen your service,
+            fulfilment option, and requested an appointment. This holds your slot while we finalise the details
+            together.
           </p>
+          <p class="hint">The payment form appears here after you send us your booking request.</p>
           <div id="sumup-card"></div>
         </div>
       </section>
@@ -1808,6 +1810,18 @@
 
       const API_URL = '/api/vrm';
       const SUPPORT_EMAIL = 'support@mitchsautoservices.co.uk';
+      const SUMUP_DEPOSIT_GBP = 25;
+      const sumupWrapper = document.querySelector('.sumup-wrapper');
+      function setSumUpVisibility(visible) {
+        if (!sumupWrapper) return;
+        sumupWrapper.hidden = !visible;
+      }
+      setSumUpVisibility(false);
+      if (sumupWrapper) {
+        sumupWrapper
+          .querySelectorAll('[data-deposit-amount]')
+          .forEach((node) => (node.textContent = SUMUP_DEPOSIT_GBP.toFixed(0)));
+      }
       const SCRAP_ONLY_MESSAGE = 'This vehicle currently qualifies for our scrap valuation only.';
       const vrmInput = document.getElementById('vrm');
       const vehicleCard = document.getElementById('vehicle');
@@ -2851,6 +2865,7 @@
           input.classList.remove('readonly');
         });
         lastMobileAddress = { door: '', street: '', county: '', postcode: '' };
+        setSumUpVisibility(false);
       }
 
       function collapseServiceCard(card, clearSelection = false) {
@@ -3009,6 +3024,7 @@
           input.required = false;
           input.classList.remove('readonly');
         });
+        setSumUpVisibility(false);
       }
 
       function applyFulfilmentState(mode, previousMode) {
@@ -3253,6 +3269,8 @@
 
         const subject = encodeURIComponent(`Service booking request – ${vrm} (${selectedMode === 'mobile' ? 'Mobile' : 'Garage'})`);
         const body = encodeURIComponent(lines.join('\n'));
+
+        setSumUpVisibility(true);
 
         window.location.href = `mailto:${SUPPORT_EMAIL}?subject=${subject}&body=${body}`;
       });

@@ -2272,92 +2272,9 @@
         config.result.innerHTML = parts.join('');
       }
 
-      async function logQuote(details) {
-        if (!details) return;
-        try {
-          const {
-            action = 'quote',
-            type = '',
-            vrm = '',
-            mileage = 0,
-            fulfilment = '',
-            conditionNotes = '',
-            features = {},
-            scrapEstimate = {},
-            sellEstimate = null,
-            vehicle = {}
-          } = details;
-
-          const safeVehicle = vehicle || {};
-          const safeFeatures = features || {};
-          const safeScrap = scrapEstimate || {};
-          const weightData = safeScrap.weightData || {};
-          const safeSell = sellEstimate || null;
-
-          const payload = {
-            action,
-            type,
-            vrm,
-            mileage,
-            fulfilment,
-            conditionNotes,
-            vehicle: {
-              make: safeVehicle.make || '',
-              model: safeVehicle.model || '',
-              yearOfManufacture: safeVehicle.yearOfManufacture || null,
-              bodyType: safeVehicle.bodyType || safeVehicle.bodyTypeDescription || '',
-              fuelType: safeVehicle.fuelType || '',
-              massInKg: safeVehicle.massInKg || null
-            },
-            features: {
-              isShell: Boolean(safeFeatures.isShell),
-              hasCatalyst: Boolean(safeFeatures.hasCatalyst),
-              hasAllWheels: Boolean(safeFeatures.hasAllWheels),
-              hasAlloyWheels: Boolean(safeFeatures.hasAlloyWheels)
-            },
-            scrap: {
-              pricingMode: safeScrap.pricingMode || '',
-              dropOffOffer: Number(safeScrap.dropOffOffer) || 0,
-              pickupOffer: Number(safeScrap.pickupOffer) || 0,
-              shellDropOffOffer: Number(safeScrap.shellDropOffOffer) || 0,
-              shellPickupOffer: Number(safeScrap.shellPickupOffer) || 0,
-              weightKg: Number(safeScrap.weightKg) || null,
-              shellWeightKg: Number(safeScrap.shellWeightKg) || null,
-              workingWeightKg: Number(safeScrap.workingWeightKg) || null,
-              weightSource: weightData.weightSource || '',
-              rawKerbMass: Number(weightData.rawKerbMass) || null,
-              ratePerTonneApplied: Number(safeScrap.ratePerTonneApplied) || null,
-              catalystAddon: Number(safeScrap.catalystAddon) || 0,
-              wheelsAddon: Number(safeScrap.wheelsAddon) || 0,
-              alloyAddon: Number(safeScrap.alloyAddon) || 0,
-              addonsTotal: Number(safeScrap.addonsTotal) || 0,
-              processingDeduction: Number(safeScrap.processingDeduction) || 0,
-              collectionCost: Number(safeScrap.collectionCost) || 0
-            },
-            sell: safeSell
-              ? {
-                  offer: Number(safeSell.offer) || 0,
-                  basis: safeSell.basis || '',
-                  resaleValue: Number(safeSell.resaleValue) || 0,
-                  repairAllowance: Number(safeSell.repairAllowance) || 0,
-                  mileagePenalty: Number(safeSell.mileagePenalty) || 0,
-                  runningCosts: Number(safeSell.runningCosts) || 0,
-                  totalCosts: Number(safeSell.totalCosts) || 0,
-                  profitRequirement: Number(safeSell.profitRequirement) || 0,
-                  collectionCost: Number(safeSell.collectionCost) || 0,
-                  reason: safeSell.reason || ''
-                }
-              : null
-          };
-
-          await fetch('/api/log-quote', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
-          });
-        } catch (error) {
-          console.warn('Quote log skipped', error);
-        }
+      async function logQuote() {
+        // Quote logging disabled while the API endpoint is unavailable.
+        return;
       }
 
       function sendQuoteEmail({

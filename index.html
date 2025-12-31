@@ -442,17 +442,6 @@
         font-size: 1.2rem;
       }
 
-      .vehicle-meta {
-        margin-top: 12px;
-        display: grid;
-        gap: 8px;
-      }
-
-      .vehicle-price {
-        font-weight: 700;
-        color: var(--orange);
-      }
-
       .hint {
         color: rgba(255, 255, 255, 0.7);
         font-size: 0.95rem;
@@ -551,6 +540,47 @@
         font-weight: 700;
         letter-spacing: 0.02em;
         font-size: 0.95rem;
+      }
+
+      .service-pricing {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 16px;
+      }
+
+      .pricing-card {
+        border-radius: 16px;
+        padding: 18px;
+        background: rgba(11, 11, 13, 0.85);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        display: grid;
+        gap: 10px;
+      }
+
+      .pricing-card h4 {
+        margin: 0;
+        font-size: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+
+      .pricing-card p {
+        margin: 0;
+        color: rgba(255, 255, 255, 0.8);
+        font-size: 0.95rem;
+        line-height: 1.5;
+      }
+
+      .pricing-card .price {
+        font-size: 1.2rem;
+        font-weight: 800;
+        color: var(--orange);
+      }
+
+      .pricing-note {
+        font-size: 0.95rem;
+        color: rgba(255, 255, 255, 0.75);
+        margin: 0;
       }
 
       .service-toggle .service-price {
@@ -1381,6 +1411,10 @@
         <details id="services" class="flow-panel" hidden>
           <summary>Select a service</summary>
           <div class="panel-body">
+            <div id="servicePricing" class="service-pricing"></div>
+            <p class="pricing-note" id="pricingNote" hidden>
+              Prices are based on standard service time and manufacturer specifications. Any additional work or non-standard requirements will be discussed and approved before work begins.
+            </p>
             <div id="serviceGrid" class="services-grid" role="list"></div>
             <div id="selectedService" class="selection-summary" hidden></div>
           </div>
@@ -1791,30 +1825,23 @@
         return 5.0;
       }
 
-      function getInterimServicePricing(vehicle = {}) {
+      function getOilBand(vehicle = {}) {
         const oilLitres = estimateOilCapacityLitres(vehicle);
-        if (!Number.isFinite(oilLitres) || oilLitres <= 0) {
-          return null;
-        }
+        if (!Number.isFinite(oilLitres) || oilLitres <= 0) return null;
+        if (oilLitres <= 4.5) return 'A';
+        if (oilLitres <= 5.5) return 'B';
+        if (oilLitres <= 6.5) return 'C';
+        return 'D';
+      }
 
-        let band = 'A';
-        let price = 150;
-
-        if (oilLitres <= 4.5) {
-          band = 'A';
-          price = 150;
-        } else if (oilLitres <= 5.5) {
-          band = 'B';
-          price = 165;
-        } else if (oilLitres <= 6.5) {
-          band = 'C';
-          price = 180;
-        } else {
-          band = 'D';
-          price = 195;
-        }
-
-        return { oilLitres, band, price };
+      function getServicePricingForBand(band) {
+        const bands = {
+          A: { basic: 150, intermediate: 185, full: 230 },
+          B: { basic: 165, intermediate: 200, full: 245 },
+          C: { basic: 180, intermediate: 215, full: 260 },
+          D: { basic: 195, intermediate: 230, full: 275 }
+        };
+        return bands[band] || null;
       }
 
       const API_URL = '/api/vrm';
@@ -1824,6 +1851,8 @@
       const vehicleCard = document.getElementById('vehicle');
       const servicesDetails = document.getElementById('services');
       const serviceGrid = document.getElementById('serviceGrid');
+      const servicePricing = document.getElementById('servicePricing');
+      const pricingNote = document.getElementById('pricingNote');
       const selectedServiceSummary = document.getElementById('selectedService');
       const modeDetails = document.getElementById('modeDetails');
       const fulfilmentRadios = Array.from(document.querySelectorAll('input[name="fulfilment"]'));
@@ -2954,6 +2983,48 @@
         });
       }
 
+      function renderServicePricing(band) {
+        if (!servicePricing || !pricingNote) return;
+        servicePricing.innerHTML = '';
+        pricingNote.hidden = true;
+
+        const pricing = getServicePricingForBand(band);
+        if (!pricing) return;
+
+        const items = [
+          {
+            title: 'Basic Service – Oil Change',
+            includes: 'Oil change and oil filter replacement with OE-quality parts and correct grade engine oil.',
+            price: pricing.basic
+          },
+          {
+            title: 'Intermediate Service – Oil + Filters',
+            includes: 'Oil and oil filter plus air filter and cabin filter replacements using OE-quality parts.',
+            price: pricing.intermediate
+          },
+          {
+            title: 'Full Service – Full Inspection and Service',
+            includes:
+              'Oil, oil filter, air filter, cabin filter, full inspection, and diagnostic scan with OE-quality parts.',
+            price: pricing.full
+          }
+        ];
+
+        items.forEach((item) => {
+          const card = document.createElement('div');
+          card.className = 'pricing-card';
+          card.innerHTML = `
+            <h4>${item.title}</h4>
+            <p>${item.includes}</p>
+            <p>Includes labour and standard service inspection.</p>
+            <div class="price">${formatGBP(item.price)}</div>
+          `;
+          servicePricing.appendChild(card);
+        });
+
+        pricingNote.hidden = false;
+      }
+
       function resetFlowAfterLookup() {
         selectedService = null;
         selectedMode = '';
@@ -2962,6 +3033,12 @@
         diagnosticNotesInput = null;
 
         renderServicesForFuel(vehicleData && vehicleData.fuelType ? vehicleData.fuelType : '');
+        if (servicePricing) {
+          servicePricing.innerHTML = '';
+        }
+        if (pricingNote) {
+          pricingNote.hidden = true;
+        }
 
         clearSelectedServiceSummary();
         servicesDetails.hidden = false;
@@ -3069,30 +3146,17 @@
             .filter(Boolean)
             .join(' • ');
 
-          const interimPricing = getInterimServicePricing(data);
-          const interimLitres = interimPricing
-            ? `${Number(interimPricing.oilLitres).toFixed(1).replace(/\.0$/, '')}L`
-            : null;
-
           const vehicleName = `${make} ${model}`.trim() || 'Vehicle found';
+          const oilBand = getOilBand(data);
           vehicleCard.innerHTML = `
             <strong>${vehicleName}</strong>
             <div>${detailLine || 'DVLA details confirmed.'}</div>
-            <div class="vehicle-meta">
-              <div class="hint">Registration: ${vrm}</div>
-              ${
-                interimPricing
-                  ? `
-                <div>Engine oil capacity: ${interimLitres} (Band ${interimPricing.band})</div>
-                <div class="vehicle-price">Interim Service fixed price: ${formatGBP(interimPricing.price)}</div>
-                <div class="hint">Price includes OE-quality parts and oil to manufacturer specification. Additional work or non-standard requirements will be quoted before work begins.</div>
-              `
-                  : ''
-              }
-            </div>
+            ${oilBand ? `<div class="hint">Oil capacity band: ${oilBand}</div>` : ''}
+            <div class="hint">Registration: ${vrm}</div>
           `;
 
           resetFlowAfterLookup();
+          renderServicePricing(oilBand);
         } catch (error) {
           vehicleCard.innerHTML = `
             <strong>We couldn\'t confirm that vehicle.</strong>
@@ -3206,10 +3270,6 @@
         const vehicleName = `${vehicleData.make || ''} ${vehicleData.model || ''}`.trim() || 'Vehicle details available';
         const year = vehicleData.yearOfManufacture ? `Year: ${vehicleData.yearOfManufacture}` : null;
         const fuel = vehicleData.fuelType ? `Fuel: ${vehicleData.fuelType}` : null;
-        const interimPricing = getInterimServicePricing(vehicleData);
-        const interimLitres = interimPricing
-          ? `${Number(interimPricing.oilLitres).toFixed(1).replace(/\.0$/, '')}L`
-          : null;
 
         const lines = [
           'Website booking request for Mitchs Auto Services',
@@ -3219,9 +3279,6 @@
           year || null,
           fuel || null,
           `Engine: ${engine}`,
-          interimPricing
-            ? `Interim Service fixed price: ${formatGBP(interimPricing.price)} (Oil capacity ${interimLitres}, Band ${interimPricing.band})`
-            : null,
           '',
           `Selected service: ${selectedService.name}`,
           `Guide price: From £${selectedService.price}`,

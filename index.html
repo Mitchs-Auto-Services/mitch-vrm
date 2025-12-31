@@ -1415,6 +1415,7 @@
             <p class="pricing-note" id="pricingNote" hidden>
               Prices are based on standard service time and manufacturer specifications. Any additional work or non-standard requirements will be discussed and approved before work begins.
             </p>
+            <div id="serviceGrid" class="services-grid" role="list"></div>
             <div id="selectedService" class="selection-summary" hidden></div>
           </div>
         </details>
@@ -1521,6 +1522,216 @@
 
     <script>
       
+      const OTHER_SERVICES = [
+        {
+          id: 'diagnostic',
+          name: "Diagnostic/ I Don't Know",
+          price: 50,
+          applicableTo: 'both',
+          description:
+            'Comprehensive computerised health check with live data, a short road test, and an emailed report. Choose this when you are unsure about a noise, warning light, leak, or running issue so we can map out the fix.'
+        },
+        {
+          id: 'air_filter',
+          name: 'Air Filter Replacement',
+          price: 80,
+          applicableTo: 'both',
+          description:
+            'We remove the clogged filter, clean the air box, and fit a fresh element so the engine can breathe freely again. Ideal every 12 months or when acceleration feels strangled, the idle is lumpy, or the old filter looks black and dusty.'
+        },
+        {
+          id: 'battery_replacement',
+          name: 'Battery Replacement (includes recoding)',
+          price: 200,
+          applicableTo: 'both',
+          description:
+            'Supply and fit a correct-spec battery, code it to the vehicle where required, and test the charging system afterwards. Choose this if cranking is slow, electrical glitches keep appearing, or the battery has needed repeated jump starts.'
+        },
+        {
+          id: 'brake_change',
+          name: 'Brake Change',
+          price: 100,
+          applicableTo: 'both',
+          description:
+            'Replace pads on both sides of the axle, inspect the discs, and road-test to confirm safe stopping power. Book when you hear scraping, feel vibration through the pedal, see a brake warning, or the MOT has advised replacement.'
+        },
+        {
+          id: 'brake_fluid',
+          name: 'Brake Fluid Flush',
+          price: 70,
+          applicableTo: 'both',
+          description:
+            'Drain and refill the hydraulic system with fresh fluid to restore a firm pedal and shorten stopping distances. Recommended every two years, or sooner if the pedal feels spongy, braking fades downhill, or the fluid looks dark.'
+        },
+        {
+          id: 'battery_recharge',
+          name: 'Car Battery Recharge (overnight)',
+          price: 80,
+          applicableTo: 'both',
+          description:
+            'Overnight smart charge to recover a flat or sulphated battery, followed by a health test so you know if it is still serviceable. Ideal after the vehicle has been parked for weeks, only does short trips, or struggles to restart each morning.'
+        },
+        {
+          id: 'diagnostic_check',
+          name: 'Car Diagnostic Check',
+          price: 50,
+          applicableTo: 'both',
+          description:
+            'Targeted electronic diagnostic session for known faults. We scan every module, review live data, and email the findings—perfect when the engine light is on, a system is misbehaving, or you need proof before repairs.'
+        },
+        {
+          id: 'car_refresh',
+          name: 'Car Refresh Service Package',
+          price: 600,
+          applicableTo: 'both',
+          description:
+            'Deep refresh for vehicles that have missed maintenance: new oil, filters, coolant, spark plugs if needed, brake inspection with replacements where necessary, tyre and light checks, battery test, and fresh bulbs so the car feels nearly new again.'
+        },
+        {
+          id: 'coolant',
+          name: 'Coolant Change',
+          price: 80,
+          applicableTo: 'both',
+          description:
+            'Flush the cooling system, pressure-check for leaks, and refill with the correct antifreeze mix. Book every three years or whenever temperatures creep up, coolant looks rusty, or hoses and water pump work is planned.'
+        },
+        {
+          id: 'pollen_filter',
+          name: 'Dust/Pollen Filter Replacement',
+          price: 80,
+          applicableTo: 'both',
+          description:
+            'Fit a fresh cabin filter to clear musty smells, boost heater fan performance, and trap pollen. Ideal each spring or when passengers suffer allergies, windows mist easily, or airflow from the vents has dropped.'
+        },
+        {
+          id: 'engine_oil',
+          name: 'Engine Oil & Filter Change',
+          price: 60,
+          applicableTo: 'both',
+          description:
+            'Replace engine oil and filter with the correct specification, reset service indicators, and check for leaks. Schedule every 6,000–10,000 miles or annually to protect against premature wear and noisy start-ups.'
+        },
+        {
+          id: 'fuel_filter',
+          name: 'Fuel Filter Replacement',
+          price: 50,
+          applicableTo: 'both',
+          description:
+            'Swap the fuel filter to prevent debris from starving injectors or fuel pumps. Recommended when acceleration is hesitant, the engine struggles to start, or the last replacement was more than two years ago.'
+        },
+        {
+          id: 'lights',
+          name: 'Headlights & Rear Lights Replacement',
+          price: 60,
+          applicableTo: 'both',
+          description:
+            'Supply and fit quality bulbs so you stay road-legal with crisp lighting. Perfect when bulbs have failed, dashboards show lamp warnings, or night-time visibility has dipped.'
+        },
+        {
+          id: 'major_service',
+          name: 'Major Service Package',
+          price: 350,
+          applicableTo: 'both',
+          description:
+            'Full strip-down service covering all routine fluids, filters, spark plugs if required, brake fluid flush, and brake replacements where needed. Book every two to three years or on high-mileage cars that need everything reset.'
+        },
+        {
+          id: 'minor_service',
+          name: 'Minor Service Package',
+          price: 110,
+          applicableTo: 'both',
+          description:
+            'Interim service including oil, filter, coolant top-up, and air and cabin filters. Ideal six months after a major service or when mileage has jumped but the car is not yet due a full overhaul.'
+        },
+        {
+          id: 'premium_service',
+          name: 'Premium Service Package',
+          price: 300,
+          applicableTo: 'both',
+          description:
+            'Extended service that pairs the minor items with spark plugs where needed plus detailed brake, tyre, lighting, and battery checks. Choose before big trips or when you want near-major coverage without full strip-down costs.'
+        },
+        {
+          id: 'pre_mot',
+          name: 'Pre-MOT Diagnosis & Repair Plan',
+          price: 150,
+          applicableTo: 'both',
+          description:
+            'MOT-style inspection covering emissions, brakes, suspension, and lighting, followed by a prioritised repair list. Book a few weeks before your MOT to fix issues in advance and avoid retest fees.'
+        },
+        {
+          id: 'seasonal',
+          name: 'Seasonal Maintenance Package',
+          price: 150,
+          applicableTo: 'both',
+          description:
+            'Season-ready package covering battery condition, brake inspection, tyre pressures, coolant level, and lighting so you are prepared for winter cold snaps or summer heatwaves.'
+        },
+        {
+          id: 'tyre_health',
+          name: 'Tyre Health Check',
+          price: 35,
+          applicableTo: 'both',
+          description:
+            'Detailed tyre assessment covering tread depth, wear patterns, pressures, and valve or sidewall condition. Ideal if the steering pulls, there is vibration at speed, or you want peace of mind before a trip.'
+        },
+        {
+          id: 'wiper_motor',
+          name: 'Window Wiper Motor Replacement',
+          price: 50,
+          applicableTo: 'both',
+          description:
+            'Replace the failing wiper motor, align linkages, and test sweep speed to restore clear vision. Book when wipers stall mid-screen, slow to a crawl, or smell burnt when switched on.'
+        },
+        {
+          id: 'air_con',
+          name: 'Air Conditioning Top-Up/Recharge',
+          price: 85,
+          applicableTo: 'both',
+          description:
+            'Recover and regas the air-conditioning system, add leak-trace dye, and verify vent temperatures so cooling performance returns. Ideal when only warm air blows, windows take ages to demist, or there is a musty smell.'
+        },
+        {
+          id: 'fuel_injector',
+          name: 'Fuel Injector Replacement (includes Recoding)',
+          price: 150,
+          applicableTo: 'both',
+          description:
+            'Remove and replace faulty injectors, code them to the ECU, and balance fuel trims to smooth running. Recommended for misfires, rough idle, fuel smells, or when diagnostics show injector faults.'
+        },
+        {
+          id: 'glow_plug',
+          name: 'Glow Plug Replacement',
+          price: 50,
+          applicableTo: 'diesel',
+          description:
+            'Diesel only: fit new glow plugs, test the circuit, and clear related fault codes so cold starts improve. Book ahead of winter or when morning starts create white smoke and a rough idle.'
+        },
+        {
+          id: 'spark_plug',
+          name: 'Spark Plug Replacement',
+          price: 50,
+          applicableTo: 'petrol',
+          description:
+            'Petrol engines only: install the correct spark plugs, torque them to specification, and check ignition health. Ideal every 40,000 miles or when there are misfires, poor economy, or hard starting.'
+        },
+        {
+          id: 'ignition',
+          name: 'Ignition Coils / Leads Replacement',
+          price: 80,
+          applicableTo: 'petrol',
+          description:
+            'Petrol engines only: replace weak coils or leads, secure the wiring, and verify smooth running under load. Book when you feel jerky acceleration, see flashing engine lights, or diagnostics show coil faults.'
+        },
+        {
+          id: 'handbrake',
+          name: 'Handbrake Adjustment',
+          price: 150,
+          applicableTo: 'both',
+          description:
+            'Strip, clean, and adjust the handbrake cables and mechanisms so it bites earlier and holds on hills. Ideal before an MOT, after brake work, or when the lever pulls up too high.'
+        }
+      ];
       let pricingServicesById = {};
 
 
@@ -1632,6 +1843,7 @@
       const vrmInput = document.getElementById('vrm');
       const vehicleCard = document.getElementById('vehicle');
       const servicesDetails = document.getElementById('services');
+      const serviceGrid = document.getElementById('serviceGrid');
       const servicePricing = document.getElementById('servicePricing');
       const pricingNote = document.getElementById('pricingNote');
       const selectedServiceSummary = document.getElementById('selectedService');
@@ -2765,6 +2977,64 @@
         pricingNote.hidden = false;
       }
 
+      function renderServicesForFuel(fuelType = '') {
+        const fuel = fuelType.toLowerCase();
+        serviceGrid.innerHTML = '';
+
+        const available = OTHER_SERVICES.filter((service) => {
+          if (!service.applicableTo || service.applicableTo === 'both') return true;
+          if (!fuel) return false;
+          if (service.applicableTo === 'petrol') return fuel.includes('petrol');
+          if (service.applicableTo === 'diesel') return fuel.includes('diesel');
+          return false;
+        });
+
+        if (!available.length) {
+          const message = document.createElement('p');
+          message.className = 'hint';
+          message.textContent = 'Service list unavailable for this fuel type. Please contact us for advice.';
+          serviceGrid.appendChild(message);
+          return;
+        }
+
+        available.forEach((service) => {
+          const card = document.createElement('article');
+          card.className = 'service-card';
+          card.dataset.serviceId = service.id;
+          card.dataset.price = service.price;
+          card.setAttribute('aria-expanded', 'false');
+
+          const contentParts = [`<p>${service.description}</p>`];
+          if (service.id === 'diagnostic') {
+            contentParts.push(`
+              <div class="diagnostic-field">
+                <label for="diagnosticNotes">Tell us what\'s happening (required when selected)</label>
+                <textarea
+                  id="diagnosticNotes"
+                  name="diagnosticNotes"
+                  form="customerForm"
+                  data-diagnostic-notes
+                  disabled
+                  placeholder="Describe any noises, warning lights, leaks, or changes in performance."
+                ></textarea>
+              </div>
+            `);
+          }
+
+          card.innerHTML = `
+            <button type="button" class="service-toggle">
+              <span class="service-name">${service.name}</span>
+              <span class="service-price">From £${service.price}</span>
+            </button>
+            <div class="service-content" id="service-${service.id}" hidden>
+              ${contentParts.join('')}
+            </div>
+          `;
+
+          serviceGrid.appendChild(card);
+        });
+      }
+
       function resetFlowAfterLookup() {
         selectedService = null;
         selectedMode = '';
@@ -2774,6 +3044,9 @@
 
         if (servicePricing) {
           servicePricing.innerHTML = '';
+        }
+        if (serviceGrid) {
+          serviceGrid.innerHTML = '';
         }
         if (pricingNote) {
           pricingNote.hidden = true;
@@ -2895,6 +3168,7 @@
 
           resetFlowAfterLookup();
           renderServicePricing(oilBand);
+          renderServicesForFuel(data.fuelType || '');
         } catch (error) {
           vehicleCard.innerHTML = `
             <strong>We couldn\'t confirm that vehicle.</strong>
@@ -2916,6 +3190,30 @@
 
         const serviceId = card.dataset.serviceId;
         const service = pricingServicesById[serviceId];
+        if (!service) return;
+
+        const isAlreadyOpen = card.getAttribute('aria-expanded') === 'true';
+        if (isAlreadyOpen) {
+          collapseServiceCard(card, true);
+          return;
+        }
+
+        activateServiceCard(card, service);
+      });
+
+      serviceGrid.addEventListener('click', (event) => {
+        const toggle = event.target.closest('.service-toggle');
+        if (!toggle) return;
+        if (!vehicleData) {
+          alert('Please look up a vehicle first.');
+          return;
+        }
+
+        const card = toggle.closest('.service-card');
+        if (!card) return;
+
+        const serviceId = card.dataset.serviceId;
+        const service = OTHER_SERVICES.find((item) => item.id === serviceId);
         if (!service) return;
 
         const isAlreadyOpen = card.getAttribute('aria-expanded') === 'true';
